@@ -11,7 +11,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const { niche, subreddits } = $input.first().json;\n// Parse comma-separated subreddits, keep only r/ prefixed ones\nconst subs = (subreddits || '').split(',').map(s => s.trim()).filter(s => s.startsWith('r/'));\nreturn subs.map(sub => ({ json: { niche, sub: sub.replace('r/', '') } }));"
+        "jsCode": "const { niche, subreddits } = $input.first().json;\nconst subs = (subreddits || '')\n  .split(',')\n  .map(s => s.trim())\n  .filter(s => s.startsWith('r/'))\n  .map(s => s.replace('r/', ''));\n\nif (subs.length === 0) {\n  throw new Error(`No valid subreddits for niche \"${niche}\". Expected comma-separated r/name entries.`);\n}\n\nreturn subs.map(sub => ({ json: { niche, sub } }));"
       },
       "id": "split-subreddits",
       "name": "Split Subreddits",
@@ -21,23 +21,71 @@
     },
     {
       "parameters": {
-        "url": "https://www.reddit.com/r/{{ $json.sub }}/hot.json?limit=25",
+        "url": "https://oauth.reddit.com/r/{{ $json.sub }}/hot.json",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "limit", "value": "50" },
+            { "name": "t",     "value": "month" }
+          ]
+        },
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "User-Agent", "value": "r0merch-bot/1.0" }
+            { "name": "Authorization", "value": "Bearer {{ $vars.REDDIT_ACCESS_TOKEN }}" },
+            { "name": "User-Agent",    "value": "r0merch-bot/1.0 by u/{{ $vars.REDDIT_USERNAME }}" }
           ]
+        },
+        "options": {
+          "timeout": 15000,
+          "retry": {
+            "enabled": true,
+            "maxRetries": 2,
+            "waitBetweenTries": 2000
+          }
         }
       },
-      "id": "reddit-fetch",
+      "id": "reddit-hot-fetch",
       "name": "Fetch Subreddit Hot",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [440, 300]
+      "position": [440, 200]
     },
     {
       "parameters": {
-        "jsCode": "const posts = $input.all();\nconst niche = $('Execute Workflow Trigger').first().json.niche;\n\nconst data = posts.flatMap(item => {\n  const children = item.json?.data?.children || [];\n  return children.map(c => ({\n    title:  c.data?.title || '',\n    url:    c.data?.url   || '',\n    score:  c.data?.score || 0,\n    flair:  c.data?.link_flair_text || '',\n    sub:    c.data?.subreddit || ''\n  }));\n});\n\nreturn [{ json: { source: 'reddit', niche, data } }];"
+        "url": "https://oauth.reddit.com/r/{{ $json.sub }}/top.json",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "limit", "value": "25" },
+            { "name": "t",     "value": "month" }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "Bearer {{ $vars.REDDIT_ACCESS_TOKEN }}" },
+            { "name": "User-Agent",    "value": "r0merch-bot/1.0 by u/{{ $vars.REDDIT_USERNAME }}" }
+          ]
+        },
+        "options": {
+          "timeout": 15000,
+          "retry": {
+            "enabled": true,
+            "maxRetries": 2,
+            "waitBetweenTries": 2000
+          }
+        }
+      },
+      "id": "reddit-top-fetch",
+      "name": "Fetch Subreddit Top",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [440, 400]
+    },
+    {
+      "parameters": {
+        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche;\nconst allItems = $input.all();\n\nconst extractPosts = (item) => {\n  const children = item.json?.data?.children || [];\n  return children\n    .filter(c => !c.data?.stickied)\n    .map(c => ({\n      title:    c.data?.title || '',\n      url:      c.data?.url   || '',\n      score:    c.data?.score || 0,\n      comments: c.data?.num_comments || 0,\n      flair:    c.data?.link_flair_text || '',\n      sub:      c.data?.subreddit || '',\n      selftext: (c.data?.selftext || '').slice(0, 200)\n    }));\n};\n\nconst seen = new Set();\nconst data = allItems\n  .flatMap(extractPosts)\n  .filter(p => {\n    if (!p.title || seen.has(p.url)) return false;\n    seen.add(p.url);\n    return true;\n  })\n  .sort((a, b) => b.score - a.score);\n\nreturn [{ json: { source: 'reddit', niche, data } }];"
       },
       "id": "parse-reddit",
       "name": "Parse Reddit Posts",
@@ -47,9 +95,15 @@
     }
   ],
   "connections": {
-    "Execute Workflow Trigger": { "main": [[{ "node": "Split Subreddits",   "type": "main", "index": 0 }]] },
-    "Split Subreddits":         { "main": [[{ "node": "Fetch Subreddit Hot", "type": "main", "index": 0 }]] },
-    "Fetch Subreddit Hot":      { "main": [[{ "node": "Parse Reddit Posts",  "type": "main", "index": 0 }]] }
+    "Execute Workflow Trigger": { "main": [[{ "node": "Split Subreddits",    "type": "main", "index": 0 }]] },
+    "Split Subreddits": {
+      "main": [[
+        { "node": "Fetch Subreddit Hot", "type": "main", "index": 0 },
+        { "node": "Fetch Subreddit Top", "type": "main", "index": 0 }
+      ]]
+    },
+    "Fetch Subreddit Hot": { "main": [[{ "node": "Parse Reddit Posts", "type": "main", "index": 0 }]] },
+    "Fetch Subreddit Top": { "main": [[{ "node": "Parse Reddit Posts", "type": "main", "index": 1 }]] }
   },
   "active": false,
   "settings": { "executionOrder": "v1" },

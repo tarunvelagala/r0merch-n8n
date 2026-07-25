@@ -11,27 +11,27 @@
     },
     {
       "parameters": {
-        "url": "https://www.amazon.com/s?k={{ encodeURIComponent($json.niche + ' t-shirt') }}&rh=n%3A1036592",
-        "sendHeaders": true,
-        "headerParameters": {
+        "url": "https://serpapi.com/search.json",
+        "sendQuery": true,
+        "queryParameters": {
           "parameters": [
-            { "name": "User-Agent", "value": "Mozilla/5.0 (compatible; r0merch-bot/1.0)" }
+            { "name": "engine",   "value": "amazon" },
+            { "name": "k",        "value": "={{ $json.niche + ' t-shirt' }}" },
+            { "name": "amazon_domain", "value": "amazon.com" },
+            { "name": "api_key",  "value": "={{ $vars.SERPAPI_KEY }}" },
+            { "name": "department", "value": "fashion-mens-graphic-tees" }
           ]
-        },
-        "options": {
-          "response": { "response": { "responseFormat": "text" } }
         }
       },
       "id": "amazon-fetch",
-      "name": "Fetch Amazon Search",
+      "name": "SerpAPI Amazon Search",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [220, 300],
-      "notes": "Consider using an Amazon Product API or SerpAPI for reliable results"
+      "position": [220, 300]
     },
     {
       "parameters": {
-        "jsCode": "// TODO: parse Amazon HTML or API response\n// Expected shape: { title, url, price, image, rating, reviews, bsr }\nconst niche = $('Execute Workflow Trigger').first().json.niche;\nconst data = [];\n\nreturn [{ json: { source: 'amazon', niche, data } }];"
+        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche;\nconst results = $input.first().json?.organic_results || [];\n\nconst data = results.map(item => ({\n  title:   item.title || '',\n  url:     item.link  || `https://www.amazon.com/dp/${item.asin}`,\n  price:   item.price?.raw || item.price || '',\n  image:   item.thumbnail || '',\n  rating:  item.rating || 0,\n  reviews: item.reviews?.total || item.ratings_total || 0,\n  asin:    item.asin || '',\n  bsr:     item.bestseller_rank || null\n}));\n\nreturn [{ json: { source: 'amazon', niche, data } }];"
       },
       "id": "parse-amazon",
       "name": "Parse Amazon Results",
@@ -41,8 +41,8 @@
     }
   ],
   "connections": {
-    "Execute Workflow Trigger": { "main": [[{ "node": "Fetch Amazon Search",    "type": "main", "index": 0 }]] },
-    "Fetch Amazon Search":      { "main": [[{ "node": "Parse Amazon Results",   "type": "main", "index": 0 }]] }
+    "Execute Workflow Trigger": { "main": [[{ "node": "SerpAPI Amazon Search",  "type": "main", "index": 0 }]] },
+    "SerpAPI Amazon Search":    { "main": [[{ "node": "Parse Amazon Results",   "type": "main", "index": 0 }]] }
   },
   "active": false,
   "settings": { "executionOrder": "v1" },

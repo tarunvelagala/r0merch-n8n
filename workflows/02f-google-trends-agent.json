@@ -15,19 +15,21 @@
         "sendQuery": true,
         "queryParameters": {
           "parameters": [
-            { "name": "engine",  "value": "google_trends" },
-            { "name": "q",       "value": "={{ $json.niche + ' t-shirt' }}" },
-            { "name": "api_key", "value": "={{ $vars.SERPAPI_KEY }}" },
+            { "name": "engine",    "value": "google_trends" },
+            { "name": "q",         "value": "={{ $json.niche + ' t-shirt' }}" },
+            { "name": "api_key",   "value": "={{ $vars.SERPAPI_KEY }}" },
             { "name": "data_type", "value": "TIMESERIES" },
-            { "name": "date",    "value": "today 12-m" }
+            { "name": "date",      "value": "today 12-m" },
+            { "name": "geo",       "value": "US" }
           ]
-        }
+        },
+        "options": { "timeout": 20000 }
       },
-      "id": "trends-fetch",
-      "name": "SerpAPI Google Trends",
+      "id": "trends-timeseries-fetch",
+      "name": "SerpAPI Timeseries",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [220, 300]
+      "position": [220, 150]
     },
     {
       "parameters": {
@@ -35,38 +37,41 @@
         "sendQuery": true,
         "queryParameters": {
           "parameters": [
-            { "name": "engine",  "value": "google_trends" },
-            { "name": "q",       "value": "={{ $json.niche + ' t-shirt' }}" },
-            { "name": "api_key", "value": "={{ $vars.SERPAPI_KEY }}" },
-            { "name": "data_type", "value": "RELATED_QUERIES" }
+            { "name": "engine",    "value": "google_trends" },
+            { "name": "q",         "value": "={{ $json.niche + ' t-shirt' }}" },
+            { "name": "api_key",   "value": "={{ $vars.SERPAPI_KEY }}" },
+            { "name": "data_type", "value": "RELATED_QUERIES" },
+            { "name": "date",      "value": "today 12-m" },
+            { "name": "geo",       "value": "US" }
           ]
-        }
+        },
+        "options": { "timeout": 20000 }
       },
-      "id": "related-queries-fetch",
+      "id": "trends-related-fetch",
       "name": "SerpAPI Related Queries",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [220, 500]
+      "position": [220, 450]
     },
     {
       "parameters": {
-        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche;\nconst timeseriesRaw  = $('SerpAPI Google Trends').first().json;\nconst relatedRaw     = $('SerpAPI Related Queries').first().json;\n\nconst timeline  = timeseriesRaw?.interest_over_time?.timeline_data || [];\nconst rising    = relatedRaw?.related_queries?.rising  || [];\nconst top       = relatedRaw?.related_queries?.top     || [];\n\nconst data = {\n  timeline:       timeline.map(t => ({ date: t.date, value: t.values?.[0]?.extracted_value || 0 })),\n  risingQueries:  rising.map(r => r.query),\n  topQueries:     top.map(t => t.query)\n};\n\nreturn [{ json: { source: 'google_trends', niche, data } }];"
+        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche;\nconst timeseriesRaw = $('SerpAPI Timeseries').first().json;\nconst relatedRaw    = $('SerpAPI Related Queries').first().json;\n\n// --- Timeseries ---\nconst timeline = (timeseriesRaw?.interest_over_time?.timeline_data || []).map(t => ({\n  date:  t.date,\n  value: t.values?.[0]?.extracted_value ?? 0\n}));\n\n// --- Trend direction: compare last 4 weeks vs previous 4 weeks ---\nconst recentSlice = timeline.slice(-4).map(t => t.value);\nconst prevSlice   = timeline.slice(-8, -4).map(t => t.value);\nconst avg = arr => arr.length ? arr.reduce((s, v) => s + v, 0) / arr.length : 0;\nconst recentAvg = avg(recentSlice);\nconst prevAvg   = avg(prevSlice);\nconst trendDirection = recentAvg > prevAvg * 1.1 ? 'rising'\n                     : recentAvg < prevAvg * 0.9 ? 'falling'\n                     : 'stable';\n\n// --- Peak months for seasonality ---\nconst byMonth = {};\ntimeline.forEach(({ date, value }) => {\n  const month = date?.split(' ')?.[0] || date?.slice(0, 7) || '';\n  if (!byMonth[month]) byMonth[month] = [];\n  byMonth[month].push(value);\n});\nconst monthlyAvg = Object.entries(byMonth).map(([month, vals]) => ({\n  month,\n  avg: avg(vals)\n})).sort((a, b) => b.avg - a.avg);\nconst peakMonths = monthlyAvg.slice(0, 3).map(m => m.month);\nconst lowMonths  = monthlyAvg.slice(-3).map(m => m.month);\n\n// --- Related queries ---\nconst rising = (relatedRaw?.related_queries?.rising || []).map(r => ({\n  query: r.query,\n  value: r.extracted_value || r.value\n}));\nconst top = (relatedRaw?.related_queries?.top || []).map(r => ({\n  query: r.query,\n  value: r.extracted_value || r.value\n}));\n\nconst data = {\n  timeline,\n  trendDirection,\n  peakMonths,\n  lowMonths,\n  risingQueries: rising.map(r => r.query),\n  topQueries:    top.map(r => r.query),\n  risingFull:    rising,\n  topFull:       top\n};\n\nreturn [{ json: { source: 'google_trends', niche, data } }];"
       },
       "id": "parse-trends",
       "name": "Parse Trends",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [440, 400]
+      "position": [440, 300]
     }
   ],
   "connections": {
     "Execute Workflow Trigger": {
       "main": [[
-        { "node": "SerpAPI Google Trends",   "type": "main", "index": 0 },
+        { "node": "SerpAPI Timeseries",      "type": "main", "index": 0 },
         { "node": "SerpAPI Related Queries", "type": "main", "index": 0 }
       ]]
     },
-    "SerpAPI Google Trends":   { "main": [[{ "node": "Parse Trends", "type": "main", "index": 0 }]] },
+    "SerpAPI Timeseries":      { "main": [[{ "node": "Parse Trends", "type": "main", "index": 0 }]] },
     "SerpAPI Related Queries": { "main": [[{ "node": "Parse Trends", "type": "main", "index": 1 }]] }
   },
   "active": false,

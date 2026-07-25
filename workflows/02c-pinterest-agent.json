@@ -11,27 +11,47 @@
     },
     {
       "parameters": {
-        "url": "https://www.pinterest.com/search/pins/?q={{ encodeURIComponent($json.niche + ' t-shirt design') }}",
+        "url": "https://api.pinterest.com/v5/search/pins",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "query",     "value": "={{ $json.niche + ' t-shirt design' }}" },
+            { "name": "page_size", "value": "25" },
+            { "name": "ad_account_id", "value": "" }
+          ]
+        },
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "User-Agent", "value": "Mozilla/5.0 (compatible; r0merch-bot/1.0)" }
+            { "name": "Authorization", "value": "Bearer {{ $vars.PINTEREST_ACCESS_TOKEN }}" }
           ]
-        },
-        "options": {
-          "response": { "response": { "responseFormat": "text" } }
         }
       },
       "id": "pinterest-fetch",
-      "name": "Fetch Pinterest Search",
+      "name": "Pinterest API Search",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [220, 300],
-      "notes": "Use Pinterest API v5 with Bearer token for better results"
+      "position": [220, 150]
     },
     {
       "parameters": {
-        "jsCode": "// TODO: parse Pinterest response\n// Expected shape: { title, url, image, saves, description }\nconst niche = $('Execute Workflow Trigger').first().json.niche;\nconst data = [];\n\nreturn [{ json: { source: 'pinterest', niche, data } }];"
+        "url": "https://api.pinterest.com/v5/trends/keywords/{{ encodeURIComponent($json.niche + ' t-shirt') }}/trending",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "Bearer {{ $vars.PINTEREST_ACCESS_TOKEN }}" }
+          ]
+        }
+      },
+      "id": "pinterest-trends-fetch",
+      "name": "Pinterest Trending Keywords",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [220, 450]
+    },
+    {
+      "parameters": {
+        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche;\nconst pinsRaw    = $('Pinterest API Search').first().json;\nconst trendsRaw  = $('Pinterest Trending Keywords').first().json;\n\nconst pins = (pinsRaw?.items || []).map(pin => ({\n  title:       pin.title || '',\n  description: (pin.description || '').slice(0, 200),\n  url:         pin.link  || `https://www.pinterest.com/pin/${pin.id}`,\n  image:       pin.media?.images?.['600x']?.url || '',\n  saves:       pin.save_count  || 0,\n  clicks:      pin.click_count || 0,\n  dominantColor: pin.dominant_color || ''\n}));\n\nconst trendingKeywords = (trendsRaw?.keywords || []).map(k => k.keyword || k);\n\nconst data = { pins, trendingKeywords };\n\nreturn [{ json: { source: 'pinterest', niche, data } }];"
       },
       "id": "parse-pinterest",
       "name": "Parse Pinterest Results",
@@ -41,8 +61,14 @@
     }
   ],
   "connections": {
-    "Execute Workflow Trigger": { "main": [[{ "node": "Fetch Pinterest Search",   "type": "main", "index": 0 }]] },
-    "Fetch Pinterest Search":   { "main": [[{ "node": "Parse Pinterest Results",  "type": "main", "index": 0 }]] }
+    "Execute Workflow Trigger": {
+      "main": [[
+        { "node": "Pinterest API Search",        "type": "main", "index": 0 },
+        { "node": "Pinterest Trending Keywords", "type": "main", "index": 0 }
+      ]]
+    },
+    "Pinterest API Search":        { "main": [[{ "node": "Parse Pinterest Results", "type": "main", "index": 0 }]] },
+    "Pinterest Trending Keywords": { "main": [[{ "node": "Parse Pinterest Results", "type": "main", "index": 1 }]] }
   },
   "active": false,
   "settings": { "executionOrder": "v1" },
