@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-07-25T15:18:35.734Z",
+  "updatedAt": "2026-07-25T15:41:11.420Z",
   "createdAt": "2026-07-25T15:18:35.734Z",
   "id": "09597748-4eb1-4b4c-a646-d802f2156694",
   "name": "r0merch — Pinterest Agent",
@@ -15,81 +15,70 @@
       "typeVersion": 1,
       "position": [
         0,
-        300
+        304
       ]
     },
     {
       "parameters": {
+        "method": "GET",
         "url": "https://api.pinterest.com/v5/search/pins",
         "sendQuery": true,
         "queryParameters": {
           "parameters": [
-            {
-              "name": "query",
-              "value": "={{ $json.niche + ' t-shirt design' }}"
-            },
-            {
-              "name": "page_size",
-              "value": "25"
-            },
-            {
-              "name": "ad_account_id",
-              "value": ""
-            }
+            { "name": "query",     "value": "={{ $json.niche + ' t-shirt design' }}" },
+            { "name": "page_size", "value": "25" }
           ]
         },
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            {
-              "name": "Authorization",
-              "value": "Bearer {{ $vars.PINTEREST_ACCESS_TOKEN }}"
-            }
+            { "name": "Authorization", "value": "={{ 'Bearer ' + $vars.PINTEREST_ACCESS_TOKEN }}" }
           ]
-        }
+        },
+        "options": {}
       },
       "id": "pinterest-fetch",
       "name": "Pinterest API Search",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        220,
-        150
+        224,
+        160
       ]
     },
     {
       "parameters": {
-        "url": "https://api.pinterest.com/v5/trends/keywords/{{ encodeURIComponent($json.niche + ' t-shirt') }}/trending",
-        "sendHeaders": true,
-        "headerParameters": {
+        "url": "https://serpapi.com/search.json",
+        "sendQuery": true,
+        "queryParameters": {
           "parameters": [
-            {
-              "name": "Authorization",
-              "value": "Bearer {{ $vars.PINTEREST_ACCESS_TOKEN }}"
-            }
+            { "name": "engine",  "value": "pinterest" },
+            { "name": "q",       "value": "={{ $json.niche + ' t-shirt' }}" },
+            { "name": "api_key", "value": "={{ $vars.SERPAPI_KEY }}" }
           ]
-        }
+        },
+        "options": {}
       },
       "id": "pinterest-trends-fetch",
       "name": "Pinterest Trending Keywords",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        220,
-        450
+        224,
+        464
       ]
     },
     {
       "parameters": {
-        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche;\nconst pinsRaw    = $('Pinterest API Search').first().json;\nconst trendsRaw  = $('Pinterest Trending Keywords').first().json;\n\nconst pins = (pinsRaw?.items || []).map(pin => ({\n  title:       pin.title || '',\n  description: (pin.description || '').slice(0, 200),\n  url:         pin.link  || `https://www.pinterest.com/pin/${pin.id}`,\n  image:       pin.media?.images?.['600x']?.url || '',\n  saves:       pin.save_count  || 0,\n  clicks:      pin.click_count || 0,\n  dominantColor: pin.dominant_color || ''\n}));\n\nconst trendingKeywords = (trendsRaw?.keywords || []).map(k => k.keyword || k);\n\nconst data = { pins, trendingKeywords };\n\nreturn [{ json: { source: 'pinterest', niche, data } }];"
+        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche;\nconst pinsRaw   = $('Pinterest API Search').first().json;\nconst serpRaw   = $('Pinterest Trending Keywords').first().json;\n\n// Pinterest API v5 /search/pins response\nconst pins = (pinsRaw?.items || []).map(pin => ({\n  title:         pin.title || '',\n  description:   (pin.description || '').slice(0, 200),\n  url:           pin.link || `https://www.pinterest.com/pin/${pin.id}`,\n  image:         pin.media?.images?.['600x']?.url || '',\n  saves:         pin.save_count  || 0,\n  clicks:        pin.click_count || 0,\n  dominantColor: pin.dominant_color || ''\n}));\n\n// SerpAPI pinterest engine response\nconst serpPins = (serpRaw?.pins_results || []).map(p => ({\n  title:       p.title || '',\n  description: (p.description || '').slice(0, 200),\n  url:         p.link  || '',\n  image:       p.images?.orig?.url || p.images?.['236x']?.url || ''\n}));\n\nconst trendingKeywords = [\n  ...(serpRaw?.related_keywords || []),\n  ...(serpRaw?.refinements || [])\n].filter(Boolean).slice(0, 20);\n\nconst data = {\n  pins: [...pins, ...serpPins].slice(0, 30),\n  trendingKeywords\n};\n\nreturn [{ json: { source: 'pinterest', niche, data } }];"
       },
       "id": "parse-pinterest",
       "name": "Parse Pinterest Results",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        440,
-        300
+        448,
+        304
       ]
     }
   ],
@@ -134,14 +123,15 @@
     }
   },
   "settings": {
-    "executionOrder": "v1"
+    "executionOrder": "v1",
+    "binaryMode": "separate"
   },
   "staticData": null,
   "meta": null,
-  "pinData": null,
-  "versionId": "40c503ed-636f-4e17-97e5-5a90a26ec8a0",
+  "pinData": {},
+  "versionId": "0ce8b908-78cb-4105-8f9a-52450d0d312f",
   "activeVersionId": null,
-  "versionCounter": 6,
+  "versionCounter": 19,
   "triggerCount": 0,
   "tags": [],
   "shared": [
