@@ -39,7 +39,7 @@
           "parameters": [
             {
               "name": "Authorization",
-              "value": "={{ 'Bearer ' + $vars.PINTEREST_ACCESS_TOKEN }}"
+              "value": "={{ 'Bearer ' + $env.PINTEREST_ACCESS_TOKEN }}"
             }
           ]
         },

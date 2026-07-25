@@ -11,9 +11,27 @@ services:
       - ./workflows:/workflows
       - ./docker-entrypoint.sh:/r0merch-entrypoint.sh:ro
     entrypoint: ["/bin/sh", "/r0merch-entrypoint.sh"]
+    env_file:
+      - .env
     environment:
       N8N_BASIC_AUTH_ACTIVE: "true"
       N8N_BASIC_AUTH_USER: "admin"
       N8N_BASIC_AUTH_PASSWORD: "admin"
       N8N_COMMUNITY_PACKAGES_ENABLED: "true"
       NPM_CONFIG_UPDATE_NOTIFIER: "false"
+      # Expose secrets to n8n expressions via $env.KEY
+      PINTEREST_ACCESS_TOKEN: "${PINTEREST_ACCESS_TOKEN}"
+      GEMINI_API_KEY: "${GEMINI_API_KEY}"
+      OPENAI_API_KEY: "${OPENAI_API_KEY}"
+      SERPAPI_KEY: "${SERPAPI_KEY}"
+      REDDIT_ACCESS_TOKEN: "${REDDIT_ACCESS_TOKEN}"
+      REDDIT_USERNAME: "${REDDIT_USERNAME}"
+      GOOGLE_SHEET_ID: "${GOOGLE_SHEET_ID}"
+      NOTION_DATABASE_ID: "${NOTION_DATABASE_ID}"
+      AIRTABLE_BASE_ID: "${AIRTABLE_BASE_ID}"
+      ETSY_API_KEY: "${ETSY_API_KEY}"
+      ETSY_SHOP_ID: "${ETSY_SHOP_ID}"
+      ETSY_ACCESS_TOKEN: "${ETSY_ACCESS_TOKEN}"
+      ETSY_SHIPPING_PROFILE_ID: "${ETSY_SHIPPING_PROFILE_ID}"
+      AMAZON_SELLER_ID: "${AMAZON_SELLER_ID}"
+      AMAZON_ACCESS_TOKEN: "${AMAZON_ACCESS_TOKEN}"
