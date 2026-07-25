@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-07-25T16:00:12.589Z",
+  "updatedAt": "2026-07-25T16:05:43.614Z",
   "createdAt": "2026-07-25T15:18:35.734Z",
   "id": "09597748-4eb1-4b4c-a646-d802f2156694",
   "name": "r0merch \u2014 Pinterest Agent",
@@ -26,7 +26,7 @@
           "parameters": [
             {
               "name": "engine",
-              "value": "pinterest"
+              "value": "google_images"
             },
             {
               "name": "q",
@@ -35,6 +35,14 @@
             {
               "name": "api_key",
               "value": "={{ $env.SERPAPI_KEY }}"
+            },
+            {
+              "name": "hl",
+              "value": "en"
+            },
+            {
+              "name": "gl",
+              "value": "us"
             }
           ]
         },
@@ -42,8 +50,8 @@
           "timeout": 20000
         }
       },
-      "id": "serpapi-pins",
-      "name": "SerpAPI Pinterest Pins",
+      "id": "serpapi-images",
+      "name": "SerpAPI Google Images",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
@@ -59,15 +67,23 @@
           "parameters": [
             {
               "name": "engine",
-              "value": "pinterest"
+              "value": "google_images"
             },
             {
               "name": "q",
-              "value": "={{ $json.niche + ' t-shirt trending' }}"
+              "value": "={{ $json.niche + ' t-shirt print on demand trending' }}"
             },
             {
               "name": "api_key",
               "value": "={{ $env.SERPAPI_KEY }}"
+            },
+            {
+              "name": "hl",
+              "value": "en"
+            },
+            {
+              "name": "gl",
+              "value": "us"
             }
           ]
         },
@@ -76,7 +92,7 @@
         }
       },
       "id": "serpapi-trending",
-      "name": "SerpAPI Pinterest Trending",
+      "name": "SerpAPI Trending Images",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
@@ -86,9 +102,9 @@
     },
     {
       "parameters": {
-        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche;\nconst pinsRaw     = $('SerpAPI Pinterest Pins').first().json;\nconst trendingRaw = $('SerpAPI Pinterest Trending').first().json;\n\nconst mapPin = p => ({\n  title:       p.title || '',\n  description: (p.description || '').slice(0, 200),\n  url:         p.link  || '',\n  image:       p.images?.orig?.url || p.images?.['236x']?.url || p.thumbnail || ''\n});\n\nconst pins     = (pinsRaw?.pins_results     || []).map(mapPin);\nconst trending = (trendingRaw?.pins_results || []).map(mapPin);\n\nconst trendingKeywords = [\n  ...(pinsRaw?.related_keywords     || []),\n  ...(trendingRaw?.related_keywords || []),\n  ...(pinsRaw?.refinements          || []),\n  ...(trendingRaw?.refinements      || [])\n].filter(Boolean).slice(0, 20);\n\nconst data = {\n  pins: [...pins, ...trending].slice(0, 30),\n  trendingKeywords\n};\n\nreturn [{ json: { source: 'pinterest', niche, data } }];"
+        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche;\nconst imagesRaw  = $('SerpAPI Google Images').first().json;\nconst trendRaw   = $('SerpAPI Trending Images').first().json;\n\nconst mapResult = r => ({\n  title:       r.title || '',\n  url:         r.link  || r.original || '',\n  image:       r.original || r.thumbnail || '',\n  source:      r.source || '',\n  snippet:     r.snippet || ''\n});\n\nconst pins     = (imagesRaw?.images_results || []).map(mapResult).slice(0, 20);\nconst trending = (trendRaw?.images_results  || []).map(mapResult).slice(0, 10);\n\nconst trendingKeywords = [\n  ...(imagesRaw?.suggested_searches || []).map(s => s.name || s.q || s).filter(Boolean),\n  ...(trendRaw?.suggested_searches  || []).map(s => s.name || s.q || s).filter(Boolean)\n].slice(0, 20);\n\nconst data = {\n  pins: [...pins, ...trending],\n  trendingKeywords\n};\n\nreturn [{ json: { source: 'pinterest', niche, data } }];"
       },
-      "id": "parse-pinterest",
+      "id": "parse-results",
       "name": "Parse Pinterest Results",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -103,19 +119,19 @@
       "main": [
         [
           {
-            "node": "SerpAPI Pinterest Pins",
+            "node": "SerpAPI Google Images",
             "type": "main",
             "index": 0
           },
           {
-            "node": "SerpAPI Pinterest Trending",
+            "node": "SerpAPI Trending Images",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "SerpAPI Pinterest Pins": {
+    "SerpAPI Google Images": {
       "main": [
         [
           {
@@ -126,7 +142,7 @@
         ]
       ]
     },
-    "SerpAPI Pinterest Trending": {
+    "SerpAPI Trending Images": {
       "main": [
         [
           {
@@ -145,9 +161,9 @@
   "staticData": null,
   "meta": null,
   "pinData": {},
-  "versionId": "1061be52-2deb-4c92-9b40-7d56a17d8bf9",
+  "versionId": "e68e05f4-b652-44d2-8d7c-55558c570945",
   "activeVersionId": null,
-  "versionCounter": 40,
+  "versionCounter": 42,
   "triggerCount": 0,
   "tags": [],
   "shared": [
