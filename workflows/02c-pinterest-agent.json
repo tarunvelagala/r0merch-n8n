@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-07-25T15:48:51.921Z",
+  "updatedAt": "2026-07-25T16:00:12.589Z",
   "createdAt": "2026-07-25T15:18:35.734Z",
   "id": "09597748-4eb1-4b4c-a646-d802f2156694",
   "name": "r0merch \u2014 Pinterest Agent",
@@ -15,43 +15,7 @@
       "typeVersion": 1,
       "position": [
         0,
-        304
-      ]
-    },
-    {
-      "parameters": {
-        "url": "https://api.pinterest.com/pins?",
-        "sendQuery": true,
-        "queryParameters": {
-          "parameters": [
-            {
-              "name": "query",
-              "value": "={{ $json.niche + ' t-shirt design' }}"
-            },
-            {
-              "name": "page_size",
-              "value": "25"
-            }
-          ]
-        },
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Authorization",
-              "value": "={{ 'Bearer ' + $env.PINTEREST_ACCESS_TOKEN }}"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "id": "pinterest-fetch",
-      "name": "Pinterest API Search",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        224,
-        160
+        300
       ]
     },
     {
@@ -66,36 +30,71 @@
             },
             {
               "name": "q",
-              "value": "={{ $json.niche + ' t-shirt' }}"
+              "value": "={{ $json.niche + ' t-shirt design' }}"
             },
             {
               "name": "api_key",
-              "value": "={{ $vars.SERPAPI_KEY }}"
+              "value": "={{ $env.SERPAPI_KEY }}"
             }
           ]
         },
-        "options": {}
+        "options": {
+          "timeout": 20000
+        }
       },
-      "id": "pinterest-trends-fetch",
-      "name": "Pinterest Trending Keywords",
+      "id": "serpapi-pins",
+      "name": "SerpAPI Pinterest Pins",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        224,
-        464
+        220,
+        150
       ]
     },
     {
       "parameters": {
-        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche;\nconst pinsRaw   = $('Pinterest API Search').first().json;\nconst serpRaw   = $('Pinterest Trending Keywords').first().json;\n\n// Pinterest API v5 /search/pins response\nconst pins = (pinsRaw?.items || []).map(pin => ({\n  title:         pin.title || '',\n  description:   (pin.description || '').slice(0, 200),\n  url:           pin.link || `https://www.pinterest.com/pin/${pin.id}`,\n  image:         pin.media?.images?.['600x']?.url || '',\n  saves:         pin.save_count  || 0,\n  clicks:        pin.click_count || 0,\n  dominantColor: pin.dominant_color || ''\n}));\n\n// SerpAPI pinterest engine response\nconst serpPins = (serpRaw?.pins_results || []).map(p => ({\n  title:       p.title || '',\n  description: (p.description || '').slice(0, 200),\n  url:         p.link  || '',\n  image:       p.images?.orig?.url || p.images?.['236x']?.url || ''\n}));\n\nconst trendingKeywords = [\n  ...(serpRaw?.related_keywords || []),\n  ...(serpRaw?.refinements || [])\n].filter(Boolean).slice(0, 20);\n\nconst data = {\n  pins: [...pins, ...serpPins].slice(0, 30),\n  trendingKeywords\n};\n\nreturn [{ json: { source: 'pinterest', niche, data } }];"
+        "url": "https://serpapi.com/search.json",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "engine",
+              "value": "pinterest"
+            },
+            {
+              "name": "q",
+              "value": "={{ $json.niche + ' t-shirt trending' }}"
+            },
+            {
+              "name": "api_key",
+              "value": "={{ $env.SERPAPI_KEY }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 20000
+        }
+      },
+      "id": "serpapi-trending",
+      "name": "SerpAPI Pinterest Trending",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        220,
+        450
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche;\nconst pinsRaw     = $('SerpAPI Pinterest Pins').first().json;\nconst trendingRaw = $('SerpAPI Pinterest Trending').first().json;\n\nconst mapPin = p => ({\n  title:       p.title || '',\n  description: (p.description || '').slice(0, 200),\n  url:         p.link  || '',\n  image:       p.images?.orig?.url || p.images?.['236x']?.url || p.thumbnail || ''\n});\n\nconst pins     = (pinsRaw?.pins_results     || []).map(mapPin);\nconst trending = (trendingRaw?.pins_results || []).map(mapPin);\n\nconst trendingKeywords = [\n  ...(pinsRaw?.related_keywords     || []),\n  ...(trendingRaw?.related_keywords || []),\n  ...(pinsRaw?.refinements          || []),\n  ...(trendingRaw?.refinements      || [])\n].filter(Boolean).slice(0, 20);\n\nconst data = {\n  pins: [...pins, ...trending].slice(0, 30),\n  trendingKeywords\n};\n\nreturn [{ json: { source: 'pinterest', niche, data } }];"
       },
       "id": "parse-pinterest",
       "name": "Parse Pinterest Results",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        448,
-        304
+        440,
+        300
       ]
     }
   ],
@@ -104,19 +103,19 @@
       "main": [
         [
           {
-            "node": "Pinterest API Search",
+            "node": "SerpAPI Pinterest Pins",
             "type": "main",
             "index": 0
           },
           {
-            "node": "Pinterest Trending Keywords",
+            "node": "SerpAPI Pinterest Trending",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Pinterest API Search": {
+    "SerpAPI Pinterest Pins": {
       "main": [
         [
           {
@@ -127,7 +126,7 @@
         ]
       ]
     },
-    "Pinterest Trending Keywords": {
+    "SerpAPI Pinterest Trending": {
       "main": [
         [
           {
@@ -146,9 +145,9 @@
   "staticData": null,
   "meta": null,
   "pinData": {},
-  "versionId": "bda3c825-9bb1-4eea-abe3-f2dd96eb4abc",
+  "versionId": "1061be52-2deb-4c92-9b40-7d56a17d8bf9",
   "activeVersionId": null,
-  "versionCounter": 27,
+  "versionCounter": 40,
   "triggerCount": 0,
   "tags": [],
   "shared": [
