@@ -1,5 +1,11 @@
 {
-  "name": "r0merch \u2014 Google Trends Agent",
+  "updatedAt": "2026-07-25T15:18:38.613Z",
+  "createdAt": "2026-07-25T15:18:38.613Z",
+  "id": "4a5b9883-f228-4502-a93b-ae5197d28d30",
+  "name": "r0merch — Google Trends Agent",
+  "description": null,
+  "active": false,
+  "isArchived": false,
   "nodes": [
     {
       "parameters": {},
@@ -156,15 +162,38 @@
       ]
     }
   },
-  "active": false,
   "settings": {
     "executionOrder": "v1"
   },
-  "tags": [
-    "pod",
-    "research",
-    "trends",
-    "r0merch"
+  "staticData": null,
+  "meta": null,
+  "pinData": null,
+  "versionId": "8b2efced-5379-4c7b-9b35-2e8f4c434577",
+  "activeVersionId": null,
+  "versionCounter": 6,
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-07-25T15:18:38.615Z",
+      "createdAt": "2026-07-25T15:18:38.615Z",
+      "role": "workflow:owner",
+      "workflowId": "4a5b9883-f228-4502-a93b-ae5197d28d30",
+      "projectId": "A5qWeG5doYXJG0tr",
+      "project": {
+        "updatedAt": "2026-03-29T08:57:26.442Z",
+        "createdAt": "2026-03-29T08:55:38.920Z",
+        "id": "A5qWeG5doYXJG0tr",
+        "name": "Tarun Velagala <tarunvelagala80@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "7a3b5da8-30cb-4aea-98f3-9838086695e3"
+      }
+    }
   ],
-  "id": "4a5b9883-f228-4502-a93b-ae5197d28d30"
+  "versionMetadata": {
+    "name": null,
+    "description": null
+  }
 }

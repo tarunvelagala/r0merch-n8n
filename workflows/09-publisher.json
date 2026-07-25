@@ -1,5 +1,11 @@
 {
-  "name": "r0merch \u2014 Publisher (Optional)",
+  "updatedAt": "2026-07-25T15:18:46.337Z",
+  "createdAt": "2026-07-25T15:18:46.337Z",
+  "id": "8770f81f-e7ce-469e-a60b-410df33f951f",
+  "name": "r0merch — Publisher (Optional)",
+  "description": null,
+  "active": false,
+  "isArchived": false,
   "nodes": [
     {
       "parameters": {},
@@ -123,16 +129,38 @@
       ]
     }
   },
-  "active": false,
   "settings": {
     "executionOrder": "v1"
   },
-  "tags": [
-    "pod",
-    "publisher",
-    "etsy",
-    "amazon",
-    "r0merch"
+  "staticData": null,
+  "meta": null,
+  "pinData": null,
+  "versionId": "c7dbb7cd-6a72-4518-8aae-9c5adaf93800",
+  "activeVersionId": null,
+  "versionCounter": 6,
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-07-25T15:18:46.339Z",
+      "createdAt": "2026-07-25T15:18:46.339Z",
+      "role": "workflow:owner",
+      "workflowId": "8770f81f-e7ce-469e-a60b-410df33f951f",
+      "projectId": "A5qWeG5doYXJG0tr",
+      "project": {
+        "updatedAt": "2026-03-29T08:57:26.442Z",
+        "createdAt": "2026-03-29T08:55:38.920Z",
+        "id": "A5qWeG5doYXJG0tr",
+        "name": "Tarun Velagala <tarunvelagala80@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "7a3b5da8-30cb-4aea-98f3-9838086695e3"
+      }
+    }
   ],
-  "id": "8770f81f-e7ce-469e-a60b-410df33f951f"
+  "versionMetadata": {
+    "name": null,
+    "description": null
+  }
 }

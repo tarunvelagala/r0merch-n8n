@@ -1,5 +1,11 @@
 {
-  "name": "r0merch \u2014 Vision Agent",
+  "updatedAt": "2026-07-25T15:18:39.577Z",
+  "createdAt": "2026-07-25T15:18:39.577Z",
+  "id": "b7a2e73f-4388-431e-9bb3-737dfd7cf77d",
+  "name": "r0merch — Vision Agent",
+  "description": null,
+  "active": false,
+  "isArchived": false,
   "nodes": [
     {
       "parameters": {},
@@ -73,7 +79,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({\n  contents: [{\n    parts: [\n      {\n        inline_data: {\n          mime_type: $json.mimeType,\n          data: $json.base64\n        }\n      },\n      {\n        text: 'You are a print-on-demand design analyst. Analyze this t-shirt product image and return ONLY a raw JSON object \u2014 no markdown, no code fences.\\n\\nRequired fields:\\n{\\n  \"style\": \"e.g. Vintage / Minimalist / Bold / Retro / Streetwear\",\\n  \"layout\": \"e.g. Centered / Left-aligned / All-over / Top / Chest\",\\n  \"colors\": [\"list of dominant colors as hex or names\"],\\n  \"fonts\": \"typography style description\",\\n  \"icons\": [\"list of graphic elements or illustrations present\"],\\n  \"texture\": \"Clean / Distressed / Grunge / Halftone / Watercolor\",\\n  \"complexity\": \"Low / Medium / High\",\\n  \"visualHierarchy\": \"brief description of layout priority\",\\n  \"mood\": \"e.g. Inspirational / Humorous / Bold / Calm / Edgy\"\\n}'\n      }\n    ]\n  }],\n  generationConfig: { temperature: 0.1, maxOutputTokens: 512 }\n}) }}"
+        "jsonBody": "={{ JSON.stringify({\n  contents: [{\n    parts: [\n      {\n        inline_data: {\n          mime_type: $json.mimeType,\n          data: $json.base64\n        }\n      },\n      {\n        text: 'You are a print-on-demand design analyst. Analyze this t-shirt product image and return ONLY a raw JSON object — no markdown, no code fences.\\n\\nRequired fields:\\n{\\n  \"style\": \"e.g. Vintage / Minimalist / Bold / Retro / Streetwear\",\\n  \"layout\": \"e.g. Centered / Left-aligned / All-over / Top / Chest\",\\n  \"colors\": [\"list of dominant colors as hex or names\"],\\n  \"fonts\": \"typography style description\",\\n  \"icons\": [\"list of graphic elements or illustrations present\"],\\n  \"texture\": \"Clean / Distressed / Grunge / Halftone / Watercolor\",\\n  \"complexity\": \"Low / Medium / High\",\\n  \"visualHierarchy\": \"brief description of layout priority\",\\n  \"mood\": \"e.g. Inspirational / Humorous / Bold / Calm / Edgy\"\\n}'\n      }\n    ]\n  }],\n  generationConfig: { temperature: 0.1, maxOutputTokens: 512 }\n}) }}"
       },
       "id": "gemini-vision",
       "name": "Gemini Vision Analyze",
@@ -155,16 +161,38 @@
       ]
     }
   },
-  "active": false,
   "settings": {
     "executionOrder": "v1"
   },
-  "tags": [
-    "pod",
-    "research",
-    "vision",
-    "gemini",
-    "r0merch"
+  "staticData": null,
+  "meta": null,
+  "pinData": null,
+  "versionId": "99843f02-832b-40c5-81af-7749bfd1bcc3",
+  "activeVersionId": null,
+  "versionCounter": 6,
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-07-25T15:18:39.579Z",
+      "createdAt": "2026-07-25T15:18:39.579Z",
+      "role": "workflow:owner",
+      "workflowId": "b7a2e73f-4388-431e-9bb3-737dfd7cf77d",
+      "projectId": "A5qWeG5doYXJG0tr",
+      "project": {
+        "updatedAt": "2026-03-29T08:57:26.442Z",
+        "createdAt": "2026-03-29T08:55:38.920Z",
+        "id": "A5qWeG5doYXJG0tr",
+        "name": "Tarun Velagala <tarunvelagala80@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "7a3b5da8-30cb-4aea-98f3-9838086695e3"
+      }
+    }
   ],
-  "id": "b7a2e73f-4388-431e-9bb3-737dfd7cf77d"
+  "versionMetadata": {
+    "name": null,
+    "description": null
+  }
 }

@@ -8,7 +8,7 @@ services:
     volumes:
       - /Users/C5404787/n8n/data:/home/node/.n8n
       - /Users/C5404787/n8n/files:/home/node/.n8n-files
-      - ./workflows:/workflows:ro
+      - ./workflows:/workflows
       - ./docker-entrypoint.sh:/r0merch-entrypoint.sh:ro
     entrypoint: ["/bin/sh", "/r0merch-entrypoint.sh"]
     environment:

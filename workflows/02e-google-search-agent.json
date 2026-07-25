@@ -1,5 +1,11 @@
 {
-  "name": "r0merch \u2014 Google Search Agent",
+  "updatedAt": "2026-07-25T15:18:37.645Z",
+  "createdAt": "2026-07-25T15:18:37.645Z",
+  "id": "1fb17f86-9092-4ea6-b5cd-4631ca01134c",
+  "name": "r0merch — Google Search Agent",
+  "description": null,
+  "active": false,
+  "isArchived": false,
   "nodes": [
     {
       "parameters": {},
@@ -156,15 +162,38 @@
       ]
     }
   },
-  "active": false,
   "settings": {
     "executionOrder": "v1"
   },
-  "tags": [
-    "pod",
-    "research",
-    "google",
-    "r0merch"
+  "staticData": null,
+  "meta": null,
+  "pinData": null,
+  "versionId": "cadd4567-1c66-4790-a8f5-e292ae7b005c",
+  "activeVersionId": null,
+  "versionCounter": 6,
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-07-25T15:18:37.646Z",
+      "createdAt": "2026-07-25T15:18:37.646Z",
+      "role": "workflow:owner",
+      "workflowId": "1fb17f86-9092-4ea6-b5cd-4631ca01134c",
+      "projectId": "A5qWeG5doYXJG0tr",
+      "project": {
+        "updatedAt": "2026-03-29T08:57:26.442Z",
+        "createdAt": "2026-03-29T08:55:38.920Z",
+        "id": "A5qWeG5doYXJG0tr",
+        "name": "Tarun Velagala <tarunvelagala80@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "7a3b5da8-30cb-4aea-98f3-9838086695e3"
+      }
+    }
   ],
-  "id": "1fb17f86-9092-4ea6-b5cd-4631ca01134c"
+  "versionMetadata": {
+    "name": null,
+    "description": null
+  }
 }

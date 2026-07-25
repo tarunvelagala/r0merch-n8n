@@ -1,5 +1,11 @@
 {
-  "name": "r0merch \u2014 Reddit Agent",
+  "updatedAt": "2026-07-25T15:18:36.697Z",
+  "createdAt": "2026-07-25T15:18:36.697Z",
+  "id": "8c4e70a0-cdfa-4f6e-9345-f2895b55ab04",
+  "name": "r0merch — Reddit Agent",
+  "description": null,
+  "active": false,
+  "isArchived": false,
   "nodes": [
     {
       "parameters": {},
@@ -184,15 +190,38 @@
       ]
     }
   },
-  "active": false,
   "settings": {
     "executionOrder": "v1"
   },
-  "tags": [
-    "pod",
-    "research",
-    "reddit",
-    "r0merch"
+  "staticData": null,
+  "meta": null,
+  "pinData": null,
+  "versionId": "532e67d0-556a-40bd-b5c5-529cb706f7e9",
+  "activeVersionId": null,
+  "versionCounter": 6,
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-07-25T15:18:36.699Z",
+      "createdAt": "2026-07-25T15:18:36.699Z",
+      "role": "workflow:owner",
+      "workflowId": "8c4e70a0-cdfa-4f6e-9345-f2895b55ab04",
+      "projectId": "A5qWeG5doYXJG0tr",
+      "project": {
+        "updatedAt": "2026-03-29T08:57:26.442Z",
+        "createdAt": "2026-03-29T08:55:38.920Z",
+        "id": "A5qWeG5doYXJG0tr",
+        "name": "Tarun Velagala <tarunvelagala80@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "7a3b5da8-30cb-4aea-98f3-9838086695e3"
+      }
+    }
   ],
-  "id": "8c4e70a0-cdfa-4f6e-9345-f2895b55ab04"
+  "versionMetadata": {
+    "name": null,
+    "description": null
+  }
 }
