@@ -1,5 +1,5 @@
 {
-  "name": "r0merch — SEO Generator",
+  "name": "r0merch \u2014 SEO Generator",
   "nodes": [
     {
       "parameters": {},
@@ -7,7 +7,10 @@
       "name": "Execute Workflow Trigger",
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1,
-      "position": [0, 300]
+      "position": [
+        0,
+        300
+      ]
     },
     {
       "parameters": {
@@ -17,14 +20,22 @@
       "name": "Split Designs",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [220, 300]
+      "position": [
+        220,
+        300
+      ]
     },
     {
       "parameters": {
         "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent",
         "sendQuery": true,
         "queryParameters": {
-          "parameters": [{ "name": "key", "value": "={{ $vars.GEMINI_API_KEY }}" }]
+          "parameters": [
+            {
+              "name": "key",
+              "value": "={{ $vars.GEMINI_API_KEY }}"
+            }
+          ]
         },
         "sendBody": true,
         "specifyBody": "json",
@@ -34,7 +45,10 @@
       "name": "Gemini SEO Generation",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [440, 300]
+      "position": [
+        440,
+        300
+      ]
     },
     {
       "parameters": {
@@ -44,7 +58,10 @@
       "name": "Parse SEO Metadata",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [660, 300]
+      "position": [
+        660,
+        300
+      ]
     },
     {
       "parameters": {
@@ -54,16 +71,67 @@
       "name": "Collect All Records",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [880, 300]
+      "position": [
+        880,
+        300
+      ]
     }
   ],
   "connections": {
-    "Execute Workflow Trigger": { "main": [[{ "node": "Split Designs",         "type": "main", "index": 0 }]] },
-    "Split Designs":            { "main": [[{ "node": "Gemini SEO Generation", "type": "main", "index": 0 }]] },
-    "Gemini SEO Generation":    { "main": [[{ "node": "Parse SEO Metadata",   "type": "main", "index": 0 }]] },
-    "Parse SEO Metadata":       { "main": [[{ "node": "Collect All Records",  "type": "main", "index": 0 }]] }
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Split Designs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Designs": {
+      "main": [
+        [
+          {
+            "node": "Gemini SEO Generation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini SEO Generation": {
+      "main": [
+        [
+          {
+            "node": "Parse SEO Metadata",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse SEO Metadata": {
+      "main": [
+        [
+          {
+            "node": "Collect All Records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
   },
   "active": false,
-  "settings": { "executionOrder": "v1" },
-  "tags": ["pod", "seo", "gemini", "r0merch"]
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [
+    "pod",
+    "seo",
+    "gemini",
+    "r0merch"
+  ],
+  "id": "70f2fdb2-215a-4dd5-968b-aceac3989e2f"
 }

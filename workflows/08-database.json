@@ -1,5 +1,5 @@
 {
-  "name": "r0merch — Database",
+  "name": "r0merch \u2014 Database",
   "nodes": [
     {
       "parameters": {},
@@ -7,7 +7,10 @@
       "name": "Execute Workflow Trigger",
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1,
-      "position": [0, 300]
+      "position": [
+        0,
+        300
+      ]
     },
     {
       "parameters": {
@@ -17,9 +20,11 @@
       "name": "Split Records",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [220, 300]
+      "position": [
+        220,
+        300
+      ]
     },
-
     {
       "parameters": {
         "documentId": "={{ $vars.GOOGLE_SHEET_ID }}",
@@ -27,21 +32,21 @@
         "columns": {
           "mappingMode": "defineBelow",
           "value": {
-            "Niche":          "={{ $json.niche }}",
-            "Concept ID":     "={{ $json.conceptId }}",
-            "Title":          "={{ $json.title }}",
-            "Phrase":         "={{ $json.phrase }}",
-            "Tone":           "={{ $json.tone }}",
-            "Target Audience":"={{ $json.targetAudience }}",
-            "Selling Angle":  "={{ $json.sellingAngle }}",
-            "Image Prompt":   "={{ $json.imagePrompt }}",
-            "PNG URL":        "={{ $json.imageUrl }}",
-            "Etsy Title":     "={{ $json.etsyTitle }}",
-            "Etsy Tags":      "={{ ($json.etsyTags || []).join(', ') }}",
-            "Amazon Title":   "={{ $json.amazonTitle }}",
-            "Amazon Keywords":"={{ $json.amazonKeywords }}",
-            "SEO Filename":   "={{ $json.seoFileName }}",
-            "Created Date":   "={{ $json.generatedAt }}"
+            "Niche": "={{ $json.niche }}",
+            "Concept ID": "={{ $json.conceptId }}",
+            "Title": "={{ $json.title }}",
+            "Phrase": "={{ $json.phrase }}",
+            "Tone": "={{ $json.tone }}",
+            "Target Audience": "={{ $json.targetAudience }}",
+            "Selling Angle": "={{ $json.sellingAngle }}",
+            "Image Prompt": "={{ $json.imagePrompt }}",
+            "PNG URL": "={{ $json.imageUrl }}",
+            "Etsy Title": "={{ $json.etsyTitle }}",
+            "Etsy Tags": "={{ ($json.etsyTags || []).join(', ') }}",
+            "Amazon Title": "={{ $json.amazonTitle }}",
+            "Amazon Keywords": "={{ $json.amazonKeywords }}",
+            "SEO Filename": "={{ $json.seoFileName }}",
+            "Created Date": "={{ $json.generatedAt }}"
           }
         },
         "options": {}
@@ -50,10 +55,12 @@
       "name": "Save to Google Sheets",
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4,
-      "position": [440, 150],
+      "position": [
+        440,
+        150
+      ],
       "notes": "Set GOOGLE_SHEET_ID in n8n Variables. Requires Google Sheets OAuth2 credential."
     },
-
     {
       "parameters": {
         "resource": "page",
@@ -62,12 +69,36 @@
         "title": "={{ $json.etsyTitle || $json.title }}",
         "propertiesUi": {
           "propertyValues": [
-            { "key": "Niche",           "type": "rich_text",  "textValue": "={{ $json.niche }}" },
-            { "key": "Phrase",          "type": "rich_text",  "textValue": "={{ $json.phrase }}" },
-            { "key": "Tone",            "type": "select",     "selectValue": "={{ $json.tone }}" },
-            { "key": "PNG URL",         "type": "url",        "urlValue": "={{ $json.imageUrl }}" },
-            { "key": "Etsy Tags",       "type": "rich_text",  "textValue": "={{ ($json.etsyTags || []).join(', ') }}" },
-            { "key": "Created Date",    "type": "date",       "dateValue": "={{ $json.generatedAt }}" }
+            {
+              "key": "Niche",
+              "type": "rich_text",
+              "textValue": "={{ $json.niche }}"
+            },
+            {
+              "key": "Phrase",
+              "type": "rich_text",
+              "textValue": "={{ $json.phrase }}"
+            },
+            {
+              "key": "Tone",
+              "type": "select",
+              "selectValue": "={{ $json.tone }}"
+            },
+            {
+              "key": "PNG URL",
+              "type": "url",
+              "urlValue": "={{ $json.imageUrl }}"
+            },
+            {
+              "key": "Etsy Tags",
+              "type": "rich_text",
+              "textValue": "={{ ($json.etsyTags || []).join(', ') }}"
+            },
+            {
+              "key": "Created Date",
+              "type": "date",
+              "dateValue": "={{ $json.generatedAt }}"
+            }
           ]
         }
       },
@@ -75,11 +106,13 @@
       "name": "Save to Notion",
       "type": "n8n-nodes-base.notion",
       "typeVersion": 2,
-      "position": [440, 300],
+      "position": [
+        440,
+        300
+      ],
       "disabled": true,
       "notes": "Set NOTION_DATABASE_ID in n8n Variables. Enable when ready."
     },
-
     {
       "parameters": {
         "operation": "create",
@@ -88,12 +121,12 @@
         "columns": {
           "mappingMode": "defineBelow",
           "value": {
-            "Niche":         "={{ $json.niche }}",
-            "Title":         "={{ $json.etsyTitle || $json.title }}",
-            "Phrase":        "={{ $json.phrase }}",
-            "PNG URL":       "={{ $json.imageUrl }}",
-            "Etsy Tags":     "={{ ($json.etsyTags || []).join(', ') }}",
-            "Created Date":  "={{ $json.generatedAt }}"
+            "Niche": "={{ $json.niche }}",
+            "Title": "={{ $json.etsyTitle || $json.title }}",
+            "Phrase": "={{ $json.phrase }}",
+            "PNG URL": "={{ $json.imageUrl }}",
+            "Etsy Tags": "={{ ($json.etsyTags || []).join(', ') }}",
+            "Created Date": "={{ $json.generatedAt }}"
           }
         },
         "options": {}
@@ -102,22 +135,56 @@
       "name": "Save to Airtable",
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2,
-      "position": [440, 450],
+      "position": [
+        440,
+        450
+      ],
       "disabled": true,
       "notes": "Set AIRTABLE_BASE_ID in n8n Variables. Enable when ready."
     }
   ],
   "connections": {
-    "Execute Workflow Trigger": { "main": [[{ "node": "Split Records", "type": "main", "index": 0 }]] },
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Split Records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
     "Split Records": {
-      "main": [[
-        { "node": "Save to Google Sheets", "type": "main", "index": 0 },
-        { "node": "Save to Notion",        "type": "main", "index": 0 },
-        { "node": "Save to Airtable",      "type": "main", "index": 0 }
-      ]]
+      "main": [
+        [
+          {
+            "node": "Save to Google Sheets",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Save to Notion",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Save to Airtable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
-  "settings": { "executionOrder": "v1" },
-  "tags": ["pod", "database", "r0merch"]
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [
+    "pod",
+    "database",
+    "r0merch"
+  ],
+  "id": "5be92a45-a579-44e8-bf9c-7443d99080c5"
 }

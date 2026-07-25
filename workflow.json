@@ -1,17 +1,25 @@
 {
-  "name": "r0merch — Main Orchestrator",
+  "name": "r0merch \u2014 Main Orchestrator",
   "nodes": [
     {
       "parameters": {
         "rule": {
-          "interval": [{ "field": "cronExpression", "expression": "0 9 * * 1" }]
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 * * 1"
+            }
+          ]
         }
       },
       "id": "trigger-schedule",
       "name": "Schedule Trigger",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
-      "position": [0, 300]
+      "position": [
+        0,
+        300
+      ]
     },
     {
       "parameters": {
@@ -21,7 +29,10 @@
       "name": "Read Niches",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [220, 300]
+      "position": [
+        220,
+        300
+      ]
     },
     {
       "parameters": {
@@ -32,15 +43,24 @@
       "name": "Split In Batches",
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
-      "position": [440, 300]
+      "position": [
+        440,
+        300
+      ]
     },
     {
       "parameters": {
         "workflowId": "={{ $vars.RESEARCH_AGENT_WORKFLOW_ID }}",
         "workflowInputs": {
           "values": [
-            { "name": "niche", "stringValue": "={{ $json.niche }}" },
-            { "name": "marketing_pages", "stringValue": "={{ $json.marketing_pages }}" }
+            {
+              "name": "niche",
+              "stringValue": "={{ $json.niche }}"
+            },
+            {
+              "name": "marketing_pages",
+              "stringValue": "={{ $json.marketing_pages }}"
+            }
           ]
         }
       },
@@ -48,14 +68,20 @@
       "name": "Research Agent",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
-      "position": [660, 300]
+      "position": [
+        660,
+        300
+      ]
     },
     {
       "parameters": {
         "workflowId": "={{ $vars.TREND_AGGREGATOR_WORKFLOW_ID }}",
         "workflowInputs": {
           "values": [
-            { "name": "researchData", "stringValue": "={{ JSON.stringify($json) }}" }
+            {
+              "name": "researchData",
+              "stringValue": "={{ JSON.stringify($json) }}"
+            }
           ]
         }
       },
@@ -63,14 +89,20 @@
       "name": "Trend Aggregator",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
-      "position": [880, 300]
+      "position": [
+        880,
+        300
+      ]
     },
     {
       "parameters": {
         "workflowId": "={{ $vars.GEMINI_ANALYST_WORKFLOW_ID }}",
         "workflowInputs": {
           "values": [
-            { "name": "trendReport", "stringValue": "={{ JSON.stringify($json) }}" }
+            {
+              "name": "trendReport",
+              "stringValue": "={{ JSON.stringify($json) }}"
+            }
           ]
         }
       },
@@ -78,14 +110,20 @@
       "name": "Gemini Trend Analyst",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
-      "position": [1100, 300]
+      "position": [
+        1100,
+        300
+      ]
     },
     {
       "parameters": {
         "workflowId": "={{ $vars.PROMPT_GENERATOR_WORKFLOW_ID }}",
         "workflowInputs": {
           "values": [
-            { "name": "trendAnalysis", "stringValue": "={{ JSON.stringify($json) }}" }
+            {
+              "name": "trendAnalysis",
+              "stringValue": "={{ JSON.stringify($json) }}"
+            }
           ]
         }
       },
@@ -93,14 +131,20 @@
       "name": "Generate Image Prompts",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
-      "position": [1320, 300]
+      "position": [
+        1320,
+        300
+      ]
     },
     {
       "parameters": {
         "workflowId": "={{ $vars.IMAGE_GENERATOR_WORKFLOW_ID }}",
         "workflowInputs": {
           "values": [
-            { "name": "concepts", "stringValue": "={{ JSON.stringify($json) }}" }
+            {
+              "name": "concepts",
+              "stringValue": "={{ JSON.stringify($json) }}"
+            }
           ]
         }
       },
@@ -108,14 +152,20 @@
       "name": "Generate PNG Designs",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
-      "position": [1540, 300]
+      "position": [
+        1540,
+        300
+      ]
     },
     {
       "parameters": {
         "workflowId": "={{ $vars.SEO_GENERATOR_WORKFLOW_ID }}",
         "workflowInputs": {
           "values": [
-            { "name": "designs", "stringValue": "={{ JSON.stringify($json) }}" }
+            {
+              "name": "designs",
+              "stringValue": "={{ JSON.stringify($json) }}"
+            }
           ]
         }
       },
@@ -123,14 +173,20 @@
       "name": "Generate SEO Metadata",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
-      "position": [1760, 300]
+      "position": [
+        1760,
+        300
+      ]
     },
     {
       "parameters": {
         "workflowId": "={{ $vars.DATABASE_WORKFLOW_ID }}",
         "workflowInputs": {
           "values": [
-            { "name": "records", "stringValue": "={{ JSON.stringify($json) }}" }
+            {
+              "name": "records",
+              "stringValue": "={{ JSON.stringify($json) }}"
+            }
           ]
         }
       },
@@ -138,14 +194,20 @@
       "name": "Save to Database",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
-      "position": [1980, 300]
+      "position": [
+        1980,
+        300
+      ]
     },
     {
       "parameters": {
         "workflowId": "={{ $vars.PUBLISHER_WORKFLOW_ID }}",
         "workflowInputs": {
           "values": [
-            { "name": "listings", "stringValue": "={{ JSON.stringify($json) }}" }
+            {
+              "name": "listings",
+              "stringValue": "={{ JSON.stringify($json) }}"
+            }
           ]
         }
       },
@@ -153,25 +215,137 @@
       "name": "Publish to Etsy / Amazon",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
-      "position": [2200, 300],
+      "position": [
+        2200,
+        300
+      ],
       "disabled": true,
-      "notes": "Optional — enable when ready to publish"
+      "notes": "Optional \u2014 enable when ready to publish"
     }
   ],
   "connections": {
-    "Schedule Trigger":    { "main": [[{ "node": "Read Niches",             "type": "main", "index": 0 }]] },
-    "Read Niches":         { "main": [[{ "node": "Split In Batches",         "type": "main", "index": 0 }]] },
-    "Split In Batches":    { "main": [[{ "node": "Research Agent",           "type": "main", "index": 0 }]] },
-    "Research Agent":      { "main": [[{ "node": "Trend Aggregator",         "type": "main", "index": 0 }]] },
-    "Trend Aggregator":    { "main": [[{ "node": "Gemini Trend Analyst",     "type": "main", "index": 0 }]] },
-    "Gemini Trend Analyst":{ "main": [[{ "node": "Generate Image Prompts",   "type": "main", "index": 0 }]] },
-    "Generate Image Prompts":{ "main": [[{ "node": "Generate PNG Designs",   "type": "main", "index": 0 }]] },
-    "Generate PNG Designs":{ "main": [[{ "node": "Generate SEO Metadata",    "type": "main", "index": 0 }]] },
-    "Generate SEO Metadata":{ "main": [[{ "node": "Save to Database",        "type": "main", "index": 0 }]] },
-    "Save to Database":    { "main": [[{ "node": "Publish to Etsy / Amazon", "type": "main", "index": 0 }]] }
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Read Niches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Niches": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split In Batches": {
+      "main": [
+        [
+          {
+            "node": "Research Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Research Agent": {
+      "main": [
+        [
+          {
+            "node": "Trend Aggregator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trend Aggregator": {
+      "main": [
+        [
+          {
+            "node": "Gemini Trend Analyst",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Trend Analyst": {
+      "main": [
+        [
+          {
+            "node": "Generate Image Prompts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Image Prompts": {
+      "main": [
+        [
+          {
+            "node": "Generate PNG Designs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate PNG Designs": {
+      "main": [
+        [
+          {
+            "node": "Generate SEO Metadata",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate SEO Metadata": {
+      "main": [
+        [
+          {
+            "node": "Save to Database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save to Database": {
+      "main": [
+        [
+          {
+            "node": "Publish to Etsy / Amazon",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
   },
   "active": false,
-  "settings": { "executionOrder": "v1" },
-  "meta": { "instanceId": "" },
-  "tags": ["pod", "orchestrator", "r0merch"]
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "instanceId": ""
+  },
+  "tags": [
+    "pod",
+    "orchestrator",
+    "r0merch"
+  ],
+  "id": "1790571d-754c-4445-be73-1c370705998b"
 }

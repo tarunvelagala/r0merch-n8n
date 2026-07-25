@@ -1,5 +1,5 @@
 {
-  "name": "r0merch — Amazon Agent",
+  "name": "r0merch \u2014 Amazon Agent",
   "nodes": [
     {
       "parameters": {},
@@ -7,7 +7,10 @@
       "name": "Execute Workflow Trigger",
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1,
-      "position": [0, 300]
+      "position": [
+        0,
+        300
+      ]
     },
     {
       "parameters": {
@@ -15,11 +18,26 @@
         "sendQuery": true,
         "queryParameters": {
           "parameters": [
-            { "name": "engine",   "value": "amazon" },
-            { "name": "k",        "value": "={{ $json.niche + ' t-shirt' }}" },
-            { "name": "amazon_domain", "value": "amazon.com" },
-            { "name": "api_key",  "value": "={{ $vars.SERPAPI_KEY }}" },
-            { "name": "department", "value": "fashion-mens-graphic-tees" }
+            {
+              "name": "engine",
+              "value": "amazon"
+            },
+            {
+              "name": "k",
+              "value": "={{ $json.niche + ' t-shirt' }}"
+            },
+            {
+              "name": "amazon_domain",
+              "value": "amazon.com"
+            },
+            {
+              "name": "api_key",
+              "value": "={{ $vars.SERPAPI_KEY }}"
+            },
+            {
+              "name": "department",
+              "value": "fashion-mens-graphic-tees"
+            }
           ]
         }
       },
@@ -27,7 +45,10 @@
       "name": "SerpAPI Amazon Search",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [220, 300]
+      "position": [
+        220,
+        300
+      ]
     },
     {
       "parameters": {
@@ -37,14 +58,45 @@
       "name": "Parse Amazon Results",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [440, 300]
+      "position": [
+        440,
+        300
+      ]
     }
   ],
   "connections": {
-    "Execute Workflow Trigger": { "main": [[{ "node": "SerpAPI Amazon Search",  "type": "main", "index": 0 }]] },
-    "SerpAPI Amazon Search":    { "main": [[{ "node": "Parse Amazon Results",   "type": "main", "index": 0 }]] }
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "SerpAPI Amazon Search",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SerpAPI Amazon Search": {
+      "main": [
+        [
+          {
+            "node": "Parse Amazon Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
   },
   "active": false,
-  "settings": { "executionOrder": "v1" },
-  "tags": ["pod", "research", "amazon", "r0merch"]
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [
+    "pod",
+    "research",
+    "amazon",
+    "r0merch"
+  ],
+  "id": "5263dc0c-b3cc-4962-b9d0-de12fb260b56"
 }

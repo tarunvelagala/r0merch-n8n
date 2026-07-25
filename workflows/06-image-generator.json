@@ -1,5 +1,5 @@
 {
-  "name": "r0merch — Image Generator",
+  "name": "r0merch \u2014 Image Generator",
   "nodes": [
     {
       "parameters": {},
@@ -7,7 +7,10 @@
       "name": "Execute Workflow Trigger",
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1,
-      "position": [0, 300]
+      "position": [
+        0,
+        300
+      ]
     },
     {
       "parameters": {
@@ -17,7 +20,10 @@
       "name": "Split Into Concepts",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [220, 300]
+      "position": [
+        220,
+        300
+      ]
     },
     {
       "parameters": {
@@ -26,8 +32,14 @@
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "Authorization", "value": "Bearer {{ $vars.OPENAI_API_KEY }}" },
-            { "name": "Content-Type",  "value": "application/json" }
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $vars.OPENAI_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
           ]
         },
         "sendBody": true,
@@ -38,7 +50,10 @@
       "name": "ChatGPT Image Generation",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [440, 300],
+      "position": [
+        440,
+        300
+      ],
       "notes": "Set OPENAI_API_KEY in n8n Variables. Uses gpt-image-1 model."
     },
     {
@@ -49,20 +64,30 @@
       "name": "Prepare PNG Record",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [660, 300]
+      "position": [
+        660,
+        300
+      ]
     },
     {
       "parameters": {
         "url": "={{ $json.imageUrl }}",
         "options": {
-          "response": { "response": { "responseFormat": "file" } }
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
         }
       },
       "id": "download-png",
       "name": "Download PNG",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [880, 300]
+      "position": [
+        880,
+        300
+      ]
     },
     {
       "parameters": {
@@ -72,17 +97,78 @@
       "name": "Collect All Designs",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1100, 300]
+      "position": [
+        1100,
+        300
+      ]
     }
   ],
   "connections": {
-    "Execute Workflow Trigger": { "main": [[{ "node": "Split Into Concepts",    "type": "main", "index": 0 }]] },
-    "Split Into Concepts":      { "main": [[{ "node": "ChatGPT Image Generation","type": "main", "index": 0 }]] },
-    "ChatGPT Image Generation": { "main": [[{ "node": "Prepare PNG Record",     "type": "main", "index": 0 }]] },
-    "Prepare PNG Record":       { "main": [[{ "node": "Download PNG",           "type": "main", "index": 0 }]] },
-    "Download PNG":             { "main": [[{ "node": "Collect All Designs",    "type": "main", "index": 0 }]] }
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Split Into Concepts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Into Concepts": {
+      "main": [
+        [
+          {
+            "node": "ChatGPT Image Generation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ChatGPT Image Generation": {
+      "main": [
+        [
+          {
+            "node": "Prepare PNG Record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare PNG Record": {
+      "main": [
+        [
+          {
+            "node": "Download PNG",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download PNG": {
+      "main": [
+        [
+          {
+            "node": "Collect All Designs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
   },
   "active": false,
-  "settings": { "executionOrder": "v1" },
-  "tags": ["pod", "image-gen", "openai", "r0merch"]
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [
+    "pod",
+    "image-gen",
+    "openai",
+    "r0merch"
+  ],
+  "id": "a7e13a5f-b228-40c9-b37a-c91545985814"
 }

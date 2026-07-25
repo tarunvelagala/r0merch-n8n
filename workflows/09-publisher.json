@@ -1,5 +1,5 @@
 {
-  "name": "r0merch — Publisher (Optional)",
+  "name": "r0merch \u2014 Publisher (Optional)",
   "nodes": [
     {
       "parameters": {},
@@ -7,7 +7,10 @@
       "name": "Execute Workflow Trigger",
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1,
-      "position": [0, 300]
+      "position": [
+        0,
+        300
+      ]
     },
     {
       "parameters": {
@@ -17,9 +20,11 @@
       "name": "Split Listings",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [220, 300]
+      "position": [
+        220,
+        300
+      ]
     },
-
     {
       "parameters": {
         "method": "POST",
@@ -27,9 +32,18 @@
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "x-api-key",     "value": "={{ $vars.ETSY_API_KEY }}" },
-            { "name": "Authorization", "value": "Bearer {{ $vars.ETSY_ACCESS_TOKEN }}" },
-            { "name": "Content-Type",  "value": "application/json" }
+            {
+              "name": "x-api-key",
+              "value": "={{ $vars.ETSY_API_KEY }}"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $vars.ETSY_ACCESS_TOKEN }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
           ]
         },
         "sendBody": true,
@@ -40,11 +54,13 @@
       "name": "Etsy: Create Listing",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [440, 150],
+      "position": [
+        440,
+        150
+      ],
       "disabled": true,
       "notes": "Set ETSY_SHOP_ID, ETSY_API_KEY, ETSY_ACCESS_TOKEN, ETSY_SHIPPING_PROFILE_ID in n8n Variables"
     },
-
     {
       "parameters": {
         "method": "POST",
@@ -52,8 +68,14 @@
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "x-amz-access-token", "value": "={{ $vars.AMAZON_ACCESS_TOKEN }}" },
-            { "name": "Content-Type",        "value": "application/json" }
+            {
+              "name": "x-amz-access-token",
+              "value": "={{ $vars.AMAZON_ACCESS_TOKEN }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
           ]
         },
         "sendBody": true,
@@ -64,21 +86,53 @@
       "name": "Amazon: Create Listing",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [440, 450],
+      "position": [
+        440,
+        450
+      ],
       "disabled": true,
       "notes": "Set AMAZON_SELLER_ID, AMAZON_ACCESS_TOKEN in n8n Variables. Uses SP-API."
     }
   ],
   "connections": {
-    "Execute Workflow Trigger": { "main": [[{ "node": "Split Listings", "type": "main", "index": 0 }]] },
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Split Listings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
     "Split Listings": {
-      "main": [[
-        { "node": "Etsy: Create Listing",   "type": "main", "index": 0 },
-        { "node": "Amazon: Create Listing", "type": "main", "index": 0 }
-      ]]
+      "main": [
+        [
+          {
+            "node": "Etsy: Create Listing",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Amazon: Create Listing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
-  "settings": { "executionOrder": "v1" },
-  "tags": ["pod", "publisher", "etsy", "amazon", "r0merch"]
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [
+    "pod",
+    "publisher",
+    "etsy",
+    "amazon",
+    "r0merch"
+  ],
+  "id": "8770f81f-e7ce-469e-a60b-410df33f951f"
 }

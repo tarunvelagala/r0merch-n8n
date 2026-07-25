@@ -1,5 +1,5 @@
 {
-  "name": "r0merch — Prompt Generator",
+  "name": "r0merch \u2014 Prompt Generator",
   "nodes": [
     {
       "parameters": {},
@@ -7,14 +7,22 @@
       "name": "Execute Workflow Trigger",
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1,
-      "position": [0, 300]
+      "position": [
+        0,
+        300
+      ]
     },
     {
       "parameters": {
         "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent",
         "sendQuery": true,
         "queryParameters": {
-          "parameters": [{ "name": "key", "value": "={{ $vars.GEMINI_API_KEY }}" }]
+          "parameters": [
+            {
+              "name": "key",
+              "value": "={{ $vars.GEMINI_API_KEY }}"
+            }
+          ]
         },
         "sendBody": true,
         "specifyBody": "json",
@@ -24,7 +32,10 @@
       "name": "Gemini Generate Concepts",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [220, 300]
+      "position": [
+        220,
+        300
+      ]
     },
     {
       "parameters": {
@@ -34,14 +45,45 @@
       "name": "Parse 10 Concepts",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [440, 300]
+      "position": [
+        440,
+        300
+      ]
     }
   ],
   "connections": {
-    "Execute Workflow Trigger": { "main": [[{ "node": "Gemini Generate Concepts", "type": "main", "index": 0 }]] },
-    "Gemini Generate Concepts": { "main": [[{ "node": "Parse 10 Concepts",        "type": "main", "index": 0 }]] }
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Gemini Generate Concepts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Generate Concepts": {
+      "main": [
+        [
+          {
+            "node": "Parse 10 Concepts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
   },
   "active": false,
-  "settings": { "executionOrder": "v1" },
-  "tags": ["pod", "prompts", "gemini", "r0merch"]
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [
+    "pod",
+    "prompts",
+    "gemini",
+    "r0merch"
+  ],
+  "id": "6673d7e3-9b47-450e-81c9-b470e83e7230"
 }

@@ -1,5 +1,5 @@
 {
-  "name": "r0merch — Gemini Trend Analyst",
+  "name": "r0merch \u2014 Gemini Trend Analyst",
   "nodes": [
     {
       "parameters": {},
@@ -7,14 +7,22 @@
       "name": "Execute Workflow Trigger",
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1,
-      "position": [0, 300]
+      "position": [
+        0,
+        300
+      ]
     },
     {
       "parameters": {
         "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent",
         "sendQuery": true,
         "queryParameters": {
-          "parameters": [{ "name": "key", "value": "={{ $vars.GEMINI_API_KEY }}" }]
+          "parameters": [
+            {
+              "name": "key",
+              "value": "={{ $vars.GEMINI_API_KEY }}"
+            }
+          ]
         },
         "sendBody": true,
         "specifyBody": "json",
@@ -24,7 +32,10 @@
       "name": "Gemini Trend Analysis",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [220, 300]
+      "position": [
+        220,
+        300
+      ]
     },
     {
       "parameters": {
@@ -34,14 +45,45 @@
       "name": "Parse Trend Analysis",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [440, 300]
+      "position": [
+        440,
+        300
+      ]
     }
   ],
   "connections": {
-    "Execute Workflow Trigger": { "main": [[{ "node": "Gemini Trend Analysis", "type": "main", "index": 0 }]] },
-    "Gemini Trend Analysis":   { "main": [[{ "node": "Parse Trend Analysis",  "type": "main", "index": 0 }]] }
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Gemini Trend Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Trend Analysis": {
+      "main": [
+        [
+          {
+            "node": "Parse Trend Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
   },
   "active": false,
-  "settings": { "executionOrder": "v1" },
-  "tags": ["pod", "gemini", "analyst", "r0merch"]
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [
+    "pod",
+    "gemini",
+    "analyst",
+    "r0merch"
+  ],
+  "id": "56d91c94-825f-4b48-90eb-08625926ef3e"
 }

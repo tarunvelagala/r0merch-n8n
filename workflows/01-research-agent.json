@@ -1,5 +1,5 @@
 {
-  "name": "r0merch — Research Agent",
+  "name": "r0merch \u2014 Research Agent",
   "nodes": [
     {
       "parameters": {},
@@ -7,7 +7,10 @@
       "name": "Execute Workflow Trigger",
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1,
-      "position": [0, 400]
+      "position": [
+        0,
+        400
+      ]
     },
     {
       "parameters": {
@@ -17,15 +20,20 @@
       "name": "Unpack Input",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [220, 400]
+      "position": [
+        220,
+        400
+      ]
     },
-
     {
       "parameters": {
         "workflowId": "={{ $vars.ETSY_AGENT_WORKFLOW_ID }}",
         "workflowInputs": {
           "values": [
-            { "name": "niche", "stringValue": "={{ $json.niche }}" }
+            {
+              "name": "niche",
+              "stringValue": "={{ $json.niche }}"
+            }
           ]
         }
       },
@@ -33,14 +41,20 @@
       "name": "Etsy Agent",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
-      "position": [440, 100]
+      "position": [
+        440,
+        100
+      ]
     },
     {
       "parameters": {
         "workflowId": "={{ $vars.AMAZON_AGENT_WORKFLOW_ID }}",
         "workflowInputs": {
           "values": [
-            { "name": "niche", "stringValue": "={{ $json.niche }}" }
+            {
+              "name": "niche",
+              "stringValue": "={{ $json.niche }}"
+            }
           ]
         }
       },
@@ -48,14 +62,20 @@
       "name": "Amazon Agent",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
-      "position": [440, 250]
+      "position": [
+        440,
+        250
+      ]
     },
     {
       "parameters": {
         "workflowId": "={{ $vars.PINTEREST_AGENT_WORKFLOW_ID }}",
         "workflowInputs": {
           "values": [
-            { "name": "niche", "stringValue": "={{ $json.niche }}" }
+            {
+              "name": "niche",
+              "stringValue": "={{ $json.niche }}"
+            }
           ]
         }
       },
@@ -63,15 +83,24 @@
       "name": "Pinterest Agent",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
-      "position": [440, 400]
+      "position": [
+        440,
+        400
+      ]
     },
     {
       "parameters": {
         "workflowId": "={{ $vars.REDDIT_AGENT_WORKFLOW_ID }}",
         "workflowInputs": {
           "values": [
-            { "name": "niche", "stringValue": "={{ $json.niche }}" },
-            { "name": "subreddits", "stringValue": "={{ $json.marketing_pages }}" }
+            {
+              "name": "niche",
+              "stringValue": "={{ $json.niche }}"
+            },
+            {
+              "name": "subreddits",
+              "stringValue": "={{ $json.marketing_pages }}"
+            }
           ]
         }
       },
@@ -79,14 +108,20 @@
       "name": "Reddit Agent",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
-      "position": [440, 550]
+      "position": [
+        440,
+        550
+      ]
     },
     {
       "parameters": {
         "workflowId": "={{ $vars.GOOGLE_SEARCH_WORKFLOW_ID }}",
         "workflowInputs": {
           "values": [
-            { "name": "niche", "stringValue": "={{ $json.niche }}" }
+            {
+              "name": "niche",
+              "stringValue": "={{ $json.niche }}"
+            }
           ]
         }
       },
@@ -94,14 +129,20 @@
       "name": "Google Search Agent",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
-      "position": [440, 700]
+      "position": [
+        440,
+        700
+      ]
     },
     {
       "parameters": {
         "workflowId": "={{ $vars.GOOGLE_TRENDS_WORKFLOW_ID }}",
         "workflowInputs": {
           "values": [
-            { "name": "niche", "stringValue": "={{ $json.niche }}" }
+            {
+              "name": "niche",
+              "stringValue": "={{ $json.niche }}"
+            }
           ]
         }
       },
@@ -109,14 +150,20 @@
       "name": "Google Trends Agent",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
-      "position": [440, 850]
+      "position": [
+        440,
+        850
+      ]
     },
     {
       "parameters": {
         "workflowId": "={{ $vars.VISION_AGENT_WORKFLOW_ID }}",
         "workflowInputs": {
           "values": [
-            { "name": "niche", "stringValue": "={{ $json.niche }}" }
+            {
+              "name": "niche",
+              "stringValue": "={{ $json.niche }}"
+            }
           ]
         }
       },
@@ -124,9 +171,11 @@
       "name": "Vision Agent",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
-      "position": [440, 1000]
+      "position": [
+        440,
+        1000
+      ]
     },
-
     {
       "parameters": {
         "mode": "mergeByPosition",
@@ -136,9 +185,11 @@
       "name": "Merge All Results",
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3,
-      "position": [700, 550]
+      "position": [
+        700,
+        550
+      ]
     },
-
     {
       "parameters": {
         "jsCode": "// Collect all parallel branch outputs into one research object\nconst items = $input.all();\nconst niche = $('Unpack Input').first().json.niche;\n\nconst result = {\n  niche,\n  etsy:         items.find(i => i.json.source === 'etsy')?.json?.data        || [],\n  amazon:       items.find(i => i.json.source === 'amazon')?.json?.data      || [],\n  pinterest:    items.find(i => i.json.source === 'pinterest')?.json?.data   || [],\n  reddit:       items.find(i => i.json.source === 'reddit')?.json?.data      || [],\n  googleSearch: items.find(i => i.json.source === 'google_search')?.json?.data || [],\n  googleTrends: items.find(i => i.json.source === 'google_trends')?.json?.data || [],\n  vision:       items.find(i => i.json.source === 'vision')?.json?.data      || [],\n  collectedAt:  new Date().toISOString()\n};\n\nreturn [{ json: result }];"
@@ -147,32 +198,162 @@
       "name": "Combine Research",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [920, 550]
+      "position": [
+        920,
+        550
+      ]
     }
   ],
   "connections": {
-    "Execute Workflow Trigger": { "main": [[{ "node": "Unpack Input", "type": "main", "index": 0 }]] },
-    "Unpack Input": {
-      "main": [[
-        { "node": "Etsy Agent",           "type": "main", "index": 0 },
-        { "node": "Amazon Agent",         "type": "main", "index": 0 },
-        { "node": "Pinterest Agent",      "type": "main", "index": 0 },
-        { "node": "Reddit Agent",         "type": "main", "index": 0 },
-        { "node": "Google Search Agent",  "type": "main", "index": 0 },
-        { "node": "Google Trends Agent",  "type": "main", "index": 0 },
-        { "node": "Vision Agent",         "type": "main", "index": 0 }
-      ]]
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Unpack Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
-    "Etsy Agent":          { "main": [[{ "node": "Merge All Results", "type": "main", "index": 0 }]] },
-    "Amazon Agent":        { "main": [[{ "node": "Merge All Results", "type": "main", "index": 1 }]] },
-    "Pinterest Agent":     { "main": [[{ "node": "Merge All Results", "type": "main", "index": 2 }]] },
-    "Reddit Agent":        { "main": [[{ "node": "Merge All Results", "type": "main", "index": 3 }]] },
-    "Google Search Agent": { "main": [[{ "node": "Merge All Results", "type": "main", "index": 4 }]] },
-    "Google Trends Agent": { "main": [[{ "node": "Merge All Results", "type": "main", "index": 5 }]] },
-    "Vision Agent":        { "main": [[{ "node": "Merge All Results", "type": "main", "index": 6 }]] },
-    "Merge All Results":   { "main": [[{ "node": "Combine Research",  "type": "main", "index": 0 }]] }
+    "Unpack Input": {
+      "main": [
+        [
+          {
+            "node": "Etsy Agent",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Amazon Agent",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Pinterest Agent",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Reddit Agent",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Search Agent",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Trends Agent",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Vision Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Etsy Agent": {
+      "main": [
+        [
+          {
+            "node": "Merge All Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Amazon Agent": {
+      "main": [
+        [
+          {
+            "node": "Merge All Results",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Pinterest Agent": {
+      "main": [
+        [
+          {
+            "node": "Merge All Results",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Reddit Agent": {
+      "main": [
+        [
+          {
+            "node": "Merge All Results",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Google Search Agent": {
+      "main": [
+        [
+          {
+            "node": "Merge All Results",
+            "type": "main",
+            "index": 4
+          }
+        ]
+      ]
+    },
+    "Google Trends Agent": {
+      "main": [
+        [
+          {
+            "node": "Merge All Results",
+            "type": "main",
+            "index": 5
+          }
+        ]
+      ]
+    },
+    "Vision Agent": {
+      "main": [
+        [
+          {
+            "node": "Merge All Results",
+            "type": "main",
+            "index": 6
+          }
+        ]
+      ]
+    },
+    "Merge All Results": {
+      "main": [
+        [
+          {
+            "node": "Combine Research",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
   },
   "active": false,
-  "settings": { "executionOrder": "v1" },
-  "tags": ["pod", "research", "r0merch"]
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [
+    "pod",
+    "research",
+    "r0merch"
+  ],
+  "id": "f978e116-7fe9-465d-8bb2-c61587fae2b9"
 }

@@ -1,5 +1,5 @@
 {
-  "name": "r0merch — Vision Agent",
+  "name": "r0merch \u2014 Vision Agent",
   "nodes": [
     {
       "parameters": {},
@@ -7,7 +7,10 @@
       "name": "Execute Workflow Trigger",
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1,
-      "position": [0, 300]
+      "position": [
+        0,
+        300
+      ]
     },
     {
       "parameters": {
@@ -17,13 +20,20 @@
       "name": "Prepare Image List",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [220, 300]
+      "position": [
+        220,
+        300
+      ]
     },
     {
       "parameters": {
         "url": "={{ $json.imageUrl }}",
         "options": {
-          "response": { "response": { "responseFormat": "file" } },
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          },
           "timeout": 15000
         }
       },
@@ -31,7 +41,10 @@
       "name": "Download Image",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [440, 300]
+      "position": [
+        440,
+        300
+      ]
     },
     {
       "parameters": {
@@ -41,24 +54,35 @@
       "name": "Encode to Base64",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [660, 300]
+      "position": [
+        660,
+        300
+      ]
     },
     {
       "parameters": {
         "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent",
         "sendQuery": true,
         "queryParameters": {
-          "parameters": [{ "name": "key", "value": "={{ $vars.GEMINI_API_KEY }}" }]
+          "parameters": [
+            {
+              "name": "key",
+              "value": "={{ $vars.GEMINI_API_KEY }}"
+            }
+          ]
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({\n  contents: [{\n    parts: [\n      {\n        inline_data: {\n          mime_type: $json.mimeType,\n          data: $json.base64\n        }\n      },\n      {\n        text: 'You are a print-on-demand design analyst. Analyze this t-shirt product image and return ONLY a raw JSON object — no markdown, no code fences.\\n\\nRequired fields:\\n{\\n  \"style\": \"e.g. Vintage / Minimalist / Bold / Retro / Streetwear\",\\n  \"layout\": \"e.g. Centered / Left-aligned / All-over / Top / Chest\",\\n  \"colors\": [\"list of dominant colors as hex or names\"],\\n  \"fonts\": \"typography style description\",\\n  \"icons\": [\"list of graphic elements or illustrations present\"],\\n  \"texture\": \"Clean / Distressed / Grunge / Halftone / Watercolor\",\\n  \"complexity\": \"Low / Medium / High\",\\n  \"visualHierarchy\": \"brief description of layout priority\",\\n  \"mood\": \"e.g. Inspirational / Humorous / Bold / Calm / Edgy\"\\n}'\n      }\n    ]\n  }],\n  generationConfig: { temperature: 0.1, maxOutputTokens: 512 }\n}) }}"
+        "jsonBody": "={{ JSON.stringify({\n  contents: [{\n    parts: [\n      {\n        inline_data: {\n          mime_type: $json.mimeType,\n          data: $json.base64\n        }\n      },\n      {\n        text: 'You are a print-on-demand design analyst. Analyze this t-shirt product image and return ONLY a raw JSON object \u2014 no markdown, no code fences.\\n\\nRequired fields:\\n{\\n  \"style\": \"e.g. Vintage / Minimalist / Bold / Retro / Streetwear\",\\n  \"layout\": \"e.g. Centered / Left-aligned / All-over / Top / Chest\",\\n  \"colors\": [\"list of dominant colors as hex or names\"],\\n  \"fonts\": \"typography style description\",\\n  \"icons\": [\"list of graphic elements or illustrations present\"],\\n  \"texture\": \"Clean / Distressed / Grunge / Halftone / Watercolor\",\\n  \"complexity\": \"Low / Medium / High\",\\n  \"visualHierarchy\": \"brief description of layout priority\",\\n  \"mood\": \"e.g. Inspirational / Humorous / Bold / Calm / Edgy\"\\n}'\n      }\n    ]\n  }],\n  generationConfig: { temperature: 0.1, maxOutputTokens: 512 }\n}) }}"
       },
       "id": "gemini-vision",
       "name": "Gemini Vision Analyze",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [880, 300]
+      "position": [
+        880,
+        300
+      ]
     },
     {
       "parameters": {
@@ -68,17 +92,79 @@
       "name": "Parse Vision Results",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1100, 300]
+      "position": [
+        1100,
+        300
+      ]
     }
   ],
   "connections": {
-    "Execute Workflow Trigger": { "main": [[{ "node": "Prepare Image List",    "type": "main", "index": 0 }]] },
-    "Prepare Image List":       { "main": [[{ "node": "Download Image",        "type": "main", "index": 0 }]] },
-    "Download Image":           { "main": [[{ "node": "Encode to Base64",      "type": "main", "index": 0 }]] },
-    "Encode to Base64":         { "main": [[{ "node": "Gemini Vision Analyze", "type": "main", "index": 0 }]] },
-    "Gemini Vision Analyze":    { "main": [[{ "node": "Parse Vision Results",  "type": "main", "index": 0 }]] }
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Prepare Image List",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Image List": {
+      "main": [
+        [
+          {
+            "node": "Download Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Image": {
+      "main": [
+        [
+          {
+            "node": "Encode to Base64",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Encode to Base64": {
+      "main": [
+        [
+          {
+            "node": "Gemini Vision Analyze",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Vision Analyze": {
+      "main": [
+        [
+          {
+            "node": "Parse Vision Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
   },
   "active": false,
-  "settings": { "executionOrder": "v1" },
-  "tags": ["pod", "research", "vision", "gemini", "r0merch"]
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [
+    "pod",
+    "research",
+    "vision",
+    "gemini",
+    "r0merch"
+  ],
+  "id": "b7a2e73f-4388-431e-9bb3-737dfd7cf77d"
 }

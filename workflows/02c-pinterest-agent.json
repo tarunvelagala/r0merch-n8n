@@ -1,5 +1,5 @@
 {
-  "name": "r0merch — Pinterest Agent",
+  "name": "r0merch \u2014 Pinterest Agent",
   "nodes": [
     {
       "parameters": {},
@@ -7,7 +7,10 @@
       "name": "Execute Workflow Trigger",
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1,
-      "position": [0, 300]
+      "position": [
+        0,
+        300
+      ]
     },
     {
       "parameters": {
@@ -15,15 +18,27 @@
         "sendQuery": true,
         "queryParameters": {
           "parameters": [
-            { "name": "query",     "value": "={{ $json.niche + ' t-shirt design' }}" },
-            { "name": "page_size", "value": "25" },
-            { "name": "ad_account_id", "value": "" }
+            {
+              "name": "query",
+              "value": "={{ $json.niche + ' t-shirt design' }}"
+            },
+            {
+              "name": "page_size",
+              "value": "25"
+            },
+            {
+              "name": "ad_account_id",
+              "value": ""
+            }
           ]
         },
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "Authorization", "value": "Bearer {{ $vars.PINTEREST_ACCESS_TOKEN }}" }
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $vars.PINTEREST_ACCESS_TOKEN }}"
+            }
           ]
         }
       },
@@ -31,7 +46,10 @@
       "name": "Pinterest API Search",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [220, 150]
+      "position": [
+        220,
+        150
+      ]
     },
     {
       "parameters": {
@@ -39,7 +57,10 @@
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "Authorization", "value": "Bearer {{ $vars.PINTEREST_ACCESS_TOKEN }}" }
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $vars.PINTEREST_ACCESS_TOKEN }}"
+            }
           ]
         }
       },
@@ -47,7 +68,10 @@
       "name": "Pinterest Trending Keywords",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [220, 450]
+      "position": [
+        220,
+        450
+      ]
     },
     {
       "parameters": {
@@ -57,20 +81,61 @@
       "name": "Parse Pinterest Results",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [440, 300]
+      "position": [
+        440,
+        300
+      ]
     }
   ],
   "connections": {
     "Execute Workflow Trigger": {
-      "main": [[
-        { "node": "Pinterest API Search",        "type": "main", "index": 0 },
-        { "node": "Pinterest Trending Keywords", "type": "main", "index": 0 }
-      ]]
+      "main": [
+        [
+          {
+            "node": "Pinterest API Search",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Pinterest Trending Keywords",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
-    "Pinterest API Search":        { "main": [[{ "node": "Parse Pinterest Results", "type": "main", "index": 0 }]] },
-    "Pinterest Trending Keywords": { "main": [[{ "node": "Parse Pinterest Results", "type": "main", "index": 1 }]] }
+    "Pinterest API Search": {
+      "main": [
+        [
+          {
+            "node": "Parse Pinterest Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinterest Trending Keywords": {
+      "main": [
+        [
+          {
+            "node": "Parse Pinterest Results",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    }
   },
   "active": false,
-  "settings": { "executionOrder": "v1" },
-  "tags": ["pod", "research", "pinterest", "r0merch"]
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [
+    "pod",
+    "research",
+    "pinterest",
+    "r0merch"
+  ],
+  "id": "09597748-4eb1-4b4c-a646-d802f2156694"
 }

@@ -1,5 +1,5 @@
 {
-  "name": "r0merch — Google Search Agent",
+  "name": "r0merch \u2014 Google Search Agent",
   "nodes": [
     {
       "parameters": {},
@@ -7,7 +7,10 @@
       "name": "Execute Workflow Trigger",
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1,
-      "position": [0, 300]
+      "position": [
+        0,
+        300
+      ]
     },
     {
       "parameters": {
@@ -15,12 +18,30 @@
         "sendQuery": true,
         "queryParameters": {
           "parameters": [
-            { "name": "engine",  "value": "google" },
-            { "name": "q",       "value": "={{ $json.niche + ' t-shirt best selling design 2025' }}" },
-            { "name": "api_key", "value": "={{ $vars.SERPAPI_KEY }}" },
-            { "name": "num",     "value": "20" },
-            { "name": "hl",      "value": "en" },
-            { "name": "gl",      "value": "us" }
+            {
+              "name": "engine",
+              "value": "google"
+            },
+            {
+              "name": "q",
+              "value": "={{ $json.niche + ' t-shirt best selling design 2025' }}"
+            },
+            {
+              "name": "api_key",
+              "value": "={{ $vars.SERPAPI_KEY }}"
+            },
+            {
+              "name": "num",
+              "value": "20"
+            },
+            {
+              "name": "hl",
+              "value": "en"
+            },
+            {
+              "name": "gl",
+              "value": "us"
+            }
           ]
         },
         "options": {
@@ -31,7 +52,10 @@
       "name": "SerpAPI Google Search",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [220, 150]
+      "position": [
+        220,
+        150
+      ]
     },
     {
       "parameters": {
@@ -39,12 +63,30 @@
         "sendQuery": true,
         "queryParameters": {
           "parameters": [
-            { "name": "engine",  "value": "google" },
-            { "name": "q",       "value": "={{ $json.niche + ' t-shirt print on demand niche ideas' }}" },
-            { "name": "api_key", "value": "={{ $vars.SERPAPI_KEY }}" },
-            { "name": "num",     "value": "10" },
-            { "name": "hl",      "value": "en" },
-            { "name": "gl",      "value": "us" }
+            {
+              "name": "engine",
+              "value": "google"
+            },
+            {
+              "name": "q",
+              "value": "={{ $json.niche + ' t-shirt print on demand niche ideas' }}"
+            },
+            {
+              "name": "api_key",
+              "value": "={{ $vars.SERPAPI_KEY }}"
+            },
+            {
+              "name": "num",
+              "value": "10"
+            },
+            {
+              "name": "hl",
+              "value": "en"
+            },
+            {
+              "name": "gl",
+              "value": "us"
+            }
           ]
         },
         "options": {
@@ -55,7 +97,10 @@
       "name": "SerpAPI Niche Ideas Search",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [220, 450]
+      "position": [
+        220,
+        450
+      ]
     },
     {
       "parameters": {
@@ -65,20 +110,61 @@
       "name": "Parse Google Results",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [440, 300]
+      "position": [
+        440,
+        300
+      ]
     }
   ],
   "connections": {
     "Execute Workflow Trigger": {
-      "main": [[
-        { "node": "SerpAPI Google Search",       "type": "main", "index": 0 },
-        { "node": "SerpAPI Niche Ideas Search",  "type": "main", "index": 0 }
-      ]]
+      "main": [
+        [
+          {
+            "node": "SerpAPI Google Search",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "SerpAPI Niche Ideas Search",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
-    "SerpAPI Google Search":      { "main": [[{ "node": "Parse Google Results", "type": "main", "index": 0 }]] },
-    "SerpAPI Niche Ideas Search": { "main": [[{ "node": "Parse Google Results", "type": "main", "index": 1 }]] }
+    "SerpAPI Google Search": {
+      "main": [
+        [
+          {
+            "node": "Parse Google Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SerpAPI Niche Ideas Search": {
+      "main": [
+        [
+          {
+            "node": "Parse Google Results",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    }
   },
   "active": false,
-  "settings": { "executionOrder": "v1" },
-  "tags": ["pod", "research", "google", "r0merch"]
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [
+    "pod",
+    "research",
+    "google",
+    "r0merch"
+  ],
+  "id": "1fb17f86-9092-4ea6-b5cd-4631ca01134c"
 }

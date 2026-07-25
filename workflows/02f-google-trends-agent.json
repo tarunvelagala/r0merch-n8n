@@ -1,5 +1,5 @@
 {
-  "name": "r0merch — Google Trends Agent",
+  "name": "r0merch \u2014 Google Trends Agent",
   "nodes": [
     {
       "parameters": {},
@@ -7,7 +7,10 @@
       "name": "Execute Workflow Trigger",
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1,
-      "position": [0, 300]
+      "position": [
+        0,
+        300
+      ]
     },
     {
       "parameters": {
@@ -15,21 +18,44 @@
         "sendQuery": true,
         "queryParameters": {
           "parameters": [
-            { "name": "engine",    "value": "google_trends" },
-            { "name": "q",         "value": "={{ $json.niche + ' t-shirt' }}" },
-            { "name": "api_key",   "value": "={{ $vars.SERPAPI_KEY }}" },
-            { "name": "data_type", "value": "TIMESERIES" },
-            { "name": "date",      "value": "today 12-m" },
-            { "name": "geo",       "value": "US" }
+            {
+              "name": "engine",
+              "value": "google_trends"
+            },
+            {
+              "name": "q",
+              "value": "={{ $json.niche + ' t-shirt' }}"
+            },
+            {
+              "name": "api_key",
+              "value": "={{ $vars.SERPAPI_KEY }}"
+            },
+            {
+              "name": "data_type",
+              "value": "TIMESERIES"
+            },
+            {
+              "name": "date",
+              "value": "today 12-m"
+            },
+            {
+              "name": "geo",
+              "value": "US"
+            }
           ]
         },
-        "options": { "timeout": 20000 }
+        "options": {
+          "timeout": 20000
+        }
       },
       "id": "trends-timeseries-fetch",
       "name": "SerpAPI Timeseries",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [220, 150]
+      "position": [
+        220,
+        150
+      ]
     },
     {
       "parameters": {
@@ -37,21 +63,44 @@
         "sendQuery": true,
         "queryParameters": {
           "parameters": [
-            { "name": "engine",    "value": "google_trends" },
-            { "name": "q",         "value": "={{ $json.niche + ' t-shirt' }}" },
-            { "name": "api_key",   "value": "={{ $vars.SERPAPI_KEY }}" },
-            { "name": "data_type", "value": "RELATED_QUERIES" },
-            { "name": "date",      "value": "today 12-m" },
-            { "name": "geo",       "value": "US" }
+            {
+              "name": "engine",
+              "value": "google_trends"
+            },
+            {
+              "name": "q",
+              "value": "={{ $json.niche + ' t-shirt' }}"
+            },
+            {
+              "name": "api_key",
+              "value": "={{ $vars.SERPAPI_KEY }}"
+            },
+            {
+              "name": "data_type",
+              "value": "RELATED_QUERIES"
+            },
+            {
+              "name": "date",
+              "value": "today 12-m"
+            },
+            {
+              "name": "geo",
+              "value": "US"
+            }
           ]
         },
-        "options": { "timeout": 20000 }
+        "options": {
+          "timeout": 20000
+        }
       },
       "id": "trends-related-fetch",
       "name": "SerpAPI Related Queries",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [220, 450]
+      "position": [
+        220,
+        450
+      ]
     },
     {
       "parameters": {
@@ -61,20 +110,61 @@
       "name": "Parse Trends",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [440, 300]
+      "position": [
+        440,
+        300
+      ]
     }
   ],
   "connections": {
     "Execute Workflow Trigger": {
-      "main": [[
-        { "node": "SerpAPI Timeseries",      "type": "main", "index": 0 },
-        { "node": "SerpAPI Related Queries", "type": "main", "index": 0 }
-      ]]
+      "main": [
+        [
+          {
+            "node": "SerpAPI Timeseries",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "SerpAPI Related Queries",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
-    "SerpAPI Timeseries":      { "main": [[{ "node": "Parse Trends", "type": "main", "index": 0 }]] },
-    "SerpAPI Related Queries": { "main": [[{ "node": "Parse Trends", "type": "main", "index": 1 }]] }
+    "SerpAPI Timeseries": {
+      "main": [
+        [
+          {
+            "node": "Parse Trends",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SerpAPI Related Queries": {
+      "main": [
+        [
+          {
+            "node": "Parse Trends",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    }
   },
   "active": false,
-  "settings": { "executionOrder": "v1" },
-  "tags": ["pod", "research", "trends", "r0merch"]
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [
+    "pod",
+    "research",
+    "trends",
+    "r0merch"
+  ],
+  "id": "4a5b9883-f228-4502-a93b-ae5197d28d30"
 }

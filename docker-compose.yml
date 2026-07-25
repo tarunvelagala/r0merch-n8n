@@ -1,0 +1,19 @@
+services:
+  n8n:
+    image: n8nio/n8n
+    container_name: n8n
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    volumes:
+      - /Users/C5404787/n8n/data:/home/node/.n8n
+      - /Users/C5404787/n8n/files:/home/node/.n8n-files
+      - ./workflows:/workflows:ro
+      - ./docker-entrypoint.sh:/r0merch-entrypoint.sh:ro
+    entrypoint: ["/bin/sh", "/r0merch-entrypoint.sh"]
+    environment:
+      N8N_BASIC_AUTH_ACTIVE: "true"
+      N8N_BASIC_AUTH_USER: "admin"
+      N8N_BASIC_AUTH_PASSWORD: "admin"
+      N8N_COMMUNITY_PACKAGES_ENABLED: "true"
+      NPM_CONFIG_UPDATE_NOTIFIER: "false"

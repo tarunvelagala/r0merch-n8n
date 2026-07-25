@@ -1,5 +1,5 @@
 {
-  "name": "r0merch — Etsy Agent",
+  "name": "r0merch \u2014 Etsy Agent",
   "nodes": [
     {
       "parameters": {},
@@ -7,7 +7,10 @@
       "name": "Execute Workflow Trigger",
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1,
-      "position": [0, 300]
+      "position": [
+        0,
+        300
+      ]
     },
     {
       "parameters": {
@@ -15,28 +18,53 @@
         "sendQuery": true,
         "queryParameters": {
           "parameters": [
-            { "name": "keywords",  "value": "={{ $json.niche + ' t-shirt' }}" },
-            { "name": "limit",     "value": "25" },
-            { "name": "sort_on",   "value": "score" },
-            { "name": "sort_order","value": "desc" },
-            { "name": "includes",  "value": "Images,Tags" }
+            {
+              "name": "keywords",
+              "value": "={{ $json.niche + ' t-shirt' }}"
+            },
+            {
+              "name": "limit",
+              "value": "25"
+            },
+            {
+              "name": "sort_on",
+              "value": "score"
+            },
+            {
+              "name": "sort_order",
+              "value": "desc"
+            },
+            {
+              "name": "includes",
+              "value": "Images,Tags"
+            }
           ]
         },
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "x-api-key", "value": "={{ $vars.ETSY_API_KEY }}" }
+            {
+              "name": "x-api-key",
+              "value": "={{ $vars.ETSY_API_KEY }}"
+            }
           ]
         },
         "options": {
-          "response": { "response": { "responseFormat": "json" } }
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
         }
       },
       "id": "etsy-fetch",
       "name": "Etsy API Search",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [220, 300]
+      "position": [
+        220,
+        300
+      ]
     },
     {
       "parameters": {
@@ -46,14 +74,45 @@
       "name": "Parse Etsy Results",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [440, 300]
+      "position": [
+        440,
+        300
+      ]
     }
   ],
   "connections": {
-    "Execute Workflow Trigger": { "main": [[{ "node": "Etsy API Search",     "type": "main", "index": 0 }]] },
-    "Etsy API Search":          { "main": [[{ "node": "Parse Etsy Results",  "type": "main", "index": 0 }]] }
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Etsy API Search",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Etsy API Search": {
+      "main": [
+        [
+          {
+            "node": "Parse Etsy Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
   },
   "active": false,
-  "settings": { "executionOrder": "v1" },
-  "tags": ["pod", "research", "etsy", "r0merch"]
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [
+    "pod",
+    "research",
+    "etsy",
+    "r0merch"
+  ],
+  "id": "25b7d461-1692-4fab-8739-5419bed842c5"
 }
