@@ -1,0 +1,123 @@
+{
+  "name": "r0merch — Database",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "trigger-input",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [0, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json;\nlet parsed;\ntry {\n  parsed = typeof raw.records === 'string' ? JSON.parse(raw.records) : raw;\n} catch (_) { parsed = raw; }\n\nconst records = parsed.records || (Array.isArray(parsed) ? parsed : [parsed]);\nreturn records.map(r => ({ json: r }));"
+      },
+      "id": "split-records",
+      "name": "Split Records",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [220, 300]
+    },
+
+    {
+      "parameters": {
+        "documentId": "={{ $vars.GOOGLE_SHEET_ID }}",
+        "sheetName": "Designs",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Niche":          "={{ $json.niche }}",
+            "Concept ID":     "={{ $json.conceptId }}",
+            "Title":          "={{ $json.title }}",
+            "Phrase":         "={{ $json.phrase }}",
+            "Tone":           "={{ $json.tone }}",
+            "Target Audience":"={{ $json.targetAudience }}",
+            "Selling Angle":  "={{ $json.sellingAngle }}",
+            "Image Prompt":   "={{ $json.imagePrompt }}",
+            "PNG URL":        "={{ $json.imageUrl }}",
+            "Etsy Title":     "={{ $json.etsyTitle }}",
+            "Etsy Tags":      "={{ ($json.etsyTags || []).join(', ') }}",
+            "Amazon Title":   "={{ $json.amazonTitle }}",
+            "Amazon Keywords":"={{ $json.amazonKeywords }}",
+            "SEO Filename":   "={{ $json.seoFileName }}",
+            "Created Date":   "={{ $json.generatedAt }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "save-google-sheets",
+      "name": "Save to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [440, 150],
+      "notes": "Set GOOGLE_SHEET_ID in n8n Variables. Requires Google Sheets OAuth2 credential."
+    },
+
+    {
+      "parameters": {
+        "resource": "page",
+        "operation": "create",
+        "databaseId": "={{ $vars.NOTION_DATABASE_ID }}",
+        "title": "={{ $json.etsyTitle || $json.title }}",
+        "propertiesUi": {
+          "propertyValues": [
+            { "key": "Niche",           "type": "rich_text",  "textValue": "={{ $json.niche }}" },
+            { "key": "Phrase",          "type": "rich_text",  "textValue": "={{ $json.phrase }}" },
+            { "key": "Tone",            "type": "select",     "selectValue": "={{ $json.tone }}" },
+            { "key": "PNG URL",         "type": "url",        "urlValue": "={{ $json.imageUrl }}" },
+            { "key": "Etsy Tags",       "type": "rich_text",  "textValue": "={{ ($json.etsyTags || []).join(', ') }}" },
+            { "key": "Created Date",    "type": "date",       "dateValue": "={{ $json.generatedAt }}" }
+          ]
+        }
+      },
+      "id": "save-notion",
+      "name": "Save to Notion",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2,
+      "position": [440, 300],
+      "disabled": true,
+      "notes": "Set NOTION_DATABASE_ID in n8n Variables. Enable when ready."
+    },
+
+    {
+      "parameters": {
+        "operation": "create",
+        "baseId": "={{ $vars.AIRTABLE_BASE_ID }}",
+        "tableId": "Designs",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Niche":         "={{ $json.niche }}",
+            "Title":         "={{ $json.etsyTitle || $json.title }}",
+            "Phrase":        "={{ $json.phrase }}",
+            "PNG URL":       "={{ $json.imageUrl }}",
+            "Etsy Tags":     "={{ ($json.etsyTags || []).join(', ') }}",
+            "Created Date":  "={{ $json.generatedAt }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "save-airtable",
+      "name": "Save to Airtable",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2,
+      "position": [440, 450],
+      "disabled": true,
+      "notes": "Set AIRTABLE_BASE_ID in n8n Variables. Enable when ready."
+    }
+  ],
+  "connections": {
+    "Execute Workflow Trigger": { "main": [[{ "node": "Split Records", "type": "main", "index": 0 }]] },
+    "Split Records": {
+      "main": [[
+        { "node": "Save to Google Sheets", "type": "main", "index": 0 },
+        { "node": "Save to Notion",        "type": "main", "index": 0 },
+        { "node": "Save to Airtable",      "type": "main", "index": 0 }
+      ]]
+    }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "tags": ["pod", "database", "r0merch"]
+}

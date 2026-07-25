@@ -1,0 +1,29 @@
+{
+  "name": "r0merch — Trend Aggregator",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "trigger-input",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [0, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pure data normalization — no AI calls.\n// Input: researchData JSON string from Research Agent\nconst raw = $input.first().json;\nlet research;\ntry {\n  research = typeof raw.researchData === 'string'\n    ? JSON.parse(raw.researchData)\n    : raw;\n} catch (_) { research = raw; }\n\nconst { niche, etsy, amazon, pinterest, reddit, googleSearch, googleTrends, vision } = research;\n\n// --- Helpers ---\nconst freq = (arr) => {\n  const map = {};\n  arr.filter(Boolean).forEach(v => { map[v] = (map[v] || 0) + 1; });\n  return Object.entries(map).sort((a, b) => b[1] - a[1]).map(([k]) => k);\n};\n\n// --- Extract fields ---\nconst allTitles = [\n  ...(etsy    || []).map(i => i.title),\n  ...(amazon  || []).map(i => i.title),\n  ...(reddit  || []).map(i => i.title)\n].filter(Boolean);\n\nconst allTags = [\n  ...(etsy || []).flatMap(i => i.tags || [])\n].filter(Boolean);\n\nconst allColors  = (vision || []).flatMap(i => i.colors  || []);\nconst allFonts   = (vision || []).map(i => i.fonts).filter(Boolean);\nconst allIcons   = (vision || []).flatMap(i => i.icons   || []);\nconst allLayouts = (vision || []).map(i => i.layout).filter(Boolean);\nconst allStyles  = (vision || []).map(i => i.style).filter(Boolean);\n\nconst risingQueries = (googleTrends?.risingQueries  || []);\nconst topQueries    = (googleTrends?.topQueries     || []);\nconst pinterestPins = (pinterest || []).map(i => i.title).filter(Boolean);\n\nconst aggregated = {\n  niche,\n  colors:      freq(allColors).slice(0, 10),\n  fonts:       freq(allFonts).slice(0, 5),\n  icons:       freq(allIcons).slice(0, 15),\n  layouts:     freq(allLayouts).slice(0, 5),\n  styles:      freq(allStyles).slice(0, 5),\n  keywords:    freq([...allTags, ...risingQueries, ...topQueries]).slice(0, 30),\n  quotes:      allTitles.slice(0, 20),\n  audience:    [],          // TODO: infer from reddit flair / post topics\n  seasonality: [],          // TODO: derive from googleTrends timeline\n  competition: {\n    etsyCount:    (etsy    || []).length,\n    amazonCount:  (amazon  || []).length\n  },\n  pinterestTrends: pinterestPins.slice(0, 10),\n  aggregatedAt: new Date().toISOString()\n};\n\nreturn [{ json: aggregated }];"
+      },
+      "id": "aggregate",
+      "name": "Aggregate Research",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [220, 300]
+    }
+  ],
+  "connections": {
+    "Execute Workflow Trigger": { "main": [[{ "node": "Aggregate Research", "type": "main", "index": 0 }]] }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "tags": ["pod", "aggregator", "r0merch"]
+}

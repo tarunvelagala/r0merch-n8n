@@ -1,0 +1,47 @@
+{
+  "name": "r0merch — Prompt Generator",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "trigger-input",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [0, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [{ "name": "key", "value": "={{ $vars.GEMINI_API_KEY }}" }]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  contents: [{\n    parts: [{\n      text: `You are a creative director for a print-on-demand brand.\\n\\nHere is a trend analysis report:\\n${JSON.stringify($json.trendAnalysis ? JSON.parse($json.trendAnalysis) : $json, null, 2)}\\n\\nGenerate EXACTLY 10 original t-shirt design concepts. Each must be:\\n- Unique and non-overlapping\\n- Targeting a specific audience segment\\n- Based on real trends from the data\\n- Print-ready (clear hierarchy, limited colors)\\n\\nReturn ONLY a JSON array of 10 objects. No markdown.\\nShape per object:\\n{\\n  \"id\": 1,\\n  \"title\": \"\",\\n  \"concept\": \"\",\\n  \"targetAudience\": \"\",\\n  \"sellingAngle\": \"\",\\n  \"tone\": \"motivational|ironic|raw|minimalist|bold\",\\n  \"phrase\": \"\",\\n  \"imagePrompt\": \"\",\\n  \"colors\": [],\\n  \"typography\": \"\",\\n  \"icons\": []\\n}`\n    }]\n  }],\n  generationConfig: { temperature: 0.8, maxOutputTokens: 3000 }\n}) }}"
+      },
+      "id": "gemini-concepts",
+      "name": "Gemini Generate Concepts",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [220, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json?.candidates?.[0]?.content?.parts?.[0]?.text || '[]';\nconst match = raw.match(/\\[[\\s\\S]*\\]/);\nlet concepts = [];\ntry { concepts = JSON.parse(match?.[0] || '[]'); } catch (_) {}\n\nconst trendAnalysisRaw = $('Execute Workflow Trigger').first().json.trendAnalysis || '{}';\nlet niche = '';\ntry { niche = JSON.parse(trendAnalysisRaw).niche || ''; } catch (_) {}\n\nreturn [{ json: { niche, concepts } }];"
+      },
+      "id": "parse-concepts",
+      "name": "Parse 10 Concepts",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 300]
+    }
+  ],
+  "connections": {
+    "Execute Workflow Trigger": { "main": [[{ "node": "Gemini Generate Concepts", "type": "main", "index": 0 }]] },
+    "Gemini Generate Concepts": { "main": [[{ "node": "Parse 10 Concepts",        "type": "main", "index": 0 }]] }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "tags": ["pod", "prompts", "gemini", "r0merch"]
+}

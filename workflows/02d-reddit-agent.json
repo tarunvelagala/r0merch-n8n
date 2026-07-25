@@ -1,0 +1,57 @@
+{
+  "name": "r0merch — Reddit Agent",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "trigger-input",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [0, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const { niche, subreddits } = $input.first().json;\n// Parse comma-separated subreddits, keep only r/ prefixed ones\nconst subs = (subreddits || '').split(',').map(s => s.trim()).filter(s => s.startsWith('r/'));\nreturn subs.map(sub => ({ json: { niche, sub: sub.replace('r/', '') } }));"
+      },
+      "id": "split-subreddits",
+      "name": "Split Subreddits",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [220, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://www.reddit.com/r/{{ $json.sub }}/hot.json?limit=25",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "User-Agent", "value": "r0merch-bot/1.0" }
+          ]
+        }
+      },
+      "id": "reddit-fetch",
+      "name": "Fetch Subreddit Hot",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [440, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const posts = $input.all();\nconst niche = $('Execute Workflow Trigger').first().json.niche;\n\nconst data = posts.flatMap(item => {\n  const children = item.json?.data?.children || [];\n  return children.map(c => ({\n    title:  c.data?.title || '',\n    url:    c.data?.url   || '',\n    score:  c.data?.score || 0,\n    flair:  c.data?.link_flair_text || '',\n    sub:    c.data?.subreddit || ''\n  }));\n});\n\nreturn [{ json: { source: 'reddit', niche, data } }];"
+      },
+      "id": "parse-reddit",
+      "name": "Parse Reddit Posts",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [660, 300]
+    }
+  ],
+  "connections": {
+    "Execute Workflow Trigger": { "main": [[{ "node": "Split Subreddits",   "type": "main", "index": 0 }]] },
+    "Split Subreddits":         { "main": [[{ "node": "Fetch Subreddit Hot", "type": "main", "index": 0 }]] },
+    "Fetch Subreddit Hot":      { "main": [[{ "node": "Parse Reddit Posts",  "type": "main", "index": 0 }]] }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "tags": ["pod", "research", "reddit", "r0merch"]
+}

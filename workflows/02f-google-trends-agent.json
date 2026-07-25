@@ -1,0 +1,75 @@
+{
+  "name": "r0merch — Google Trends Agent",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "trigger-input",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [0, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://serpapi.com/search.json",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "engine",  "value": "google_trends" },
+            { "name": "q",       "value": "={{ $json.niche + ' t-shirt' }}" },
+            { "name": "api_key", "value": "={{ $vars.SERPAPI_KEY }}" },
+            { "name": "data_type", "value": "TIMESERIES" },
+            { "name": "date",    "value": "today 12-m" }
+          ]
+        }
+      },
+      "id": "trends-fetch",
+      "name": "SerpAPI Google Trends",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [220, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://serpapi.com/search.json",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "engine",  "value": "google_trends" },
+            { "name": "q",       "value": "={{ $json.niche + ' t-shirt' }}" },
+            { "name": "api_key", "value": "={{ $vars.SERPAPI_KEY }}" },
+            { "name": "data_type", "value": "RELATED_QUERIES" }
+          ]
+        }
+      },
+      "id": "related-queries-fetch",
+      "name": "SerpAPI Related Queries",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [220, 500]
+    },
+    {
+      "parameters": {
+        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche;\nconst timeseriesRaw  = $('SerpAPI Google Trends').first().json;\nconst relatedRaw     = $('SerpAPI Related Queries').first().json;\n\nconst timeline  = timeseriesRaw?.interest_over_time?.timeline_data || [];\nconst rising    = relatedRaw?.related_queries?.rising  || [];\nconst top       = relatedRaw?.related_queries?.top     || [];\n\nconst data = {\n  timeline:       timeline.map(t => ({ date: t.date, value: t.values?.[0]?.extracted_value || 0 })),\n  risingQueries:  rising.map(r => r.query),\n  topQueries:     top.map(t => t.query)\n};\n\nreturn [{ json: { source: 'google_trends', niche, data } }];"
+      },
+      "id": "parse-trends",
+      "name": "Parse Trends",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 400]
+    }
+  ],
+  "connections": {
+    "Execute Workflow Trigger": {
+      "main": [[
+        { "node": "SerpAPI Google Trends",   "type": "main", "index": 0 },
+        { "node": "SerpAPI Related Queries", "type": "main", "index": 0 }
+      ]]
+    },
+    "SerpAPI Google Trends":   { "main": [[{ "node": "Parse Trends", "type": "main", "index": 0 }]] },
+    "SerpAPI Related Queries": { "main": [[{ "node": "Parse Trends", "type": "main", "index": 1 }]] }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "tags": ["pod", "research", "trends", "r0merch"]
+}

@@ -1,0 +1,88 @@
+{
+  "name": "r0merch — Image Generator",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "trigger-input",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [0, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Unpack the 10 concepts array into individual items\nconst raw = $input.first().json;\nlet parsed;\ntry {\n  parsed = typeof raw.concepts === 'string' ? JSON.parse(raw.concepts) : raw;\n} catch (_) { parsed = raw; }\n\nconst concepts = parsed.concepts || [];\nconst niche    = parsed.niche || '';\n\nreturn concepts.map(c => ({ json: { niche, ...c } }));"
+      },
+      "id": "split-concepts",
+      "name": "Split Into Concepts",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [220, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/images/generations",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "Bearer {{ $vars.OPENAI_API_KEY }}" },
+            { "name": "Content-Type",  "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  model: 'gpt-image-1',\n  prompt: $json.imagePrompt + '. T-shirt design, transparent background, clean vector art, print-ready, high contrast, no gradients.',\n  n: 1,\n  size: '1024x1024',\n  response_format: 'url'\n}) }}"
+      },
+      "id": "chatgpt-images",
+      "name": "ChatGPT Image Generation",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [440, 300],
+      "notes": "Set OPENAI_API_KEY in n8n Variables. Uses gpt-image-1 model."
+    },
+    {
+      "parameters": {
+        "jsCode": "const ctx       = $('Split Into Concepts').first().json;\nconst imgUrl    = $input.first().json?.data?.[0]?.url || '';\nconst niche     = ctx.niche || 'unknown';\nconst id        = ctx.id || Date.now();\nconst ts        = new Date().toISOString().replace(/[:.]/g, '-');\nconst fileName  = `design_${niche}_${id}_${ts}.png`;\n\nreturn [{\n  json: {\n    niche,\n    conceptId:     id,\n    title:         ctx.title || '',\n    phrase:        ctx.phrase || '',\n    tone:          ctx.tone || '',\n    targetAudience:ctx.targetAudience || '',\n    sellingAngle:  ctx.sellingAngle || '',\n    imagePrompt:   ctx.imagePrompt || '',\n    imageUrl:      imgUrl,\n    fileName,\n    generatedAt:   new Date().toISOString()\n  }\n}];"
+      },
+      "id": "prepare-png",
+      "name": "Prepare PNG Record",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [660, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.imageUrl }}",
+        "options": {
+          "response": { "response": { "responseFormat": "file" } }
+        }
+      },
+      "id": "download-png",
+      "name": "Download PNG",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [880, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Collect all downloaded PNGs and pass as array to next step\nconst items = $input.all();\nreturn [{ json: { designs: items.map(i => i.json) } }];"
+      },
+      "id": "collect-designs",
+      "name": "Collect All Designs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1100, 300]
+    }
+  ],
+  "connections": {
+    "Execute Workflow Trigger": { "main": [[{ "node": "Split Into Concepts",    "type": "main", "index": 0 }]] },
+    "Split Into Concepts":      { "main": [[{ "node": "ChatGPT Image Generation","type": "main", "index": 0 }]] },
+    "ChatGPT Image Generation": { "main": [[{ "node": "Prepare PNG Record",     "type": "main", "index": 0 }]] },
+    "Prepare PNG Record":       { "main": [[{ "node": "Download PNG",           "type": "main", "index": 0 }]] },
+    "Download PNG":             { "main": [[{ "node": "Collect All Designs",    "type": "main", "index": 0 }]] }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "tags": ["pod", "image-gen", "openai", "r0merch"]
+}

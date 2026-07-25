@@ -1,0 +1,177 @@
+{
+  "name": "r0merch — Main Orchestrator",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "cronExpression", "expression": "0 9 * * 1" }]
+        }
+      },
+      "id": "trigger-schedule",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Load niches from CSV or hardcode here.\n// Each item: { niche, marketing_pages }\nreturn [\n  { json: { niche: 'christian', marketing_pages: 'r/Christianity,r/Bible,@christianmemes' } },\n  { json: { niche: 'nurse', marketing_pages: 'r/nursing,r/nurses,@nursehumor' } },\n  { json: { niche: 'cat-lovers', marketing_pages: 'r/cats,r/CatMemes,@catlovers' } }\n];"
+      },
+      "id": "read-niches",
+      "name": "Read Niches",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [220, 300]
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "id": "split-batches",
+      "name": "Split In Batches",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [440, 300]
+    },
+    {
+      "parameters": {
+        "workflowId": "={{ $vars.RESEARCH_AGENT_WORKFLOW_ID }}",
+        "workflowInputs": {
+          "values": [
+            { "name": "niche", "stringValue": "={{ $json.niche }}" },
+            { "name": "marketing_pages", "stringValue": "={{ $json.marketing_pages }}" }
+          ]
+        }
+      },
+      "id": "exec-research",
+      "name": "Research Agent",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [660, 300]
+    },
+    {
+      "parameters": {
+        "workflowId": "={{ $vars.TREND_AGGREGATOR_WORKFLOW_ID }}",
+        "workflowInputs": {
+          "values": [
+            { "name": "researchData", "stringValue": "={{ JSON.stringify($json) }}" }
+          ]
+        }
+      },
+      "id": "exec-trend-agg",
+      "name": "Trend Aggregator",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [880, 300]
+    },
+    {
+      "parameters": {
+        "workflowId": "={{ $vars.GEMINI_ANALYST_WORKFLOW_ID }}",
+        "workflowInputs": {
+          "values": [
+            { "name": "trendReport", "stringValue": "={{ JSON.stringify($json) }}" }
+          ]
+        }
+      },
+      "id": "exec-gemini-analyst",
+      "name": "Gemini Trend Analyst",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [1100, 300]
+    },
+    {
+      "parameters": {
+        "workflowId": "={{ $vars.PROMPT_GENERATOR_WORKFLOW_ID }}",
+        "workflowInputs": {
+          "values": [
+            { "name": "trendAnalysis", "stringValue": "={{ JSON.stringify($json) }}" }
+          ]
+        }
+      },
+      "id": "exec-prompt-gen",
+      "name": "Generate Image Prompts",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [1320, 300]
+    },
+    {
+      "parameters": {
+        "workflowId": "={{ $vars.IMAGE_GENERATOR_WORKFLOW_ID }}",
+        "workflowInputs": {
+          "values": [
+            { "name": "concepts", "stringValue": "={{ JSON.stringify($json) }}" }
+          ]
+        }
+      },
+      "id": "exec-image-gen",
+      "name": "Generate PNG Designs",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [1540, 300]
+    },
+    {
+      "parameters": {
+        "workflowId": "={{ $vars.SEO_GENERATOR_WORKFLOW_ID }}",
+        "workflowInputs": {
+          "values": [
+            { "name": "designs", "stringValue": "={{ JSON.stringify($json) }}" }
+          ]
+        }
+      },
+      "id": "exec-seo-gen",
+      "name": "Generate SEO Metadata",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [1760, 300]
+    },
+    {
+      "parameters": {
+        "workflowId": "={{ $vars.DATABASE_WORKFLOW_ID }}",
+        "workflowInputs": {
+          "values": [
+            { "name": "records", "stringValue": "={{ JSON.stringify($json) }}" }
+          ]
+        }
+      },
+      "id": "exec-database",
+      "name": "Save to Database",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [1980, 300]
+    },
+    {
+      "parameters": {
+        "workflowId": "={{ $vars.PUBLISHER_WORKFLOW_ID }}",
+        "workflowInputs": {
+          "values": [
+            { "name": "listings", "stringValue": "={{ JSON.stringify($json) }}" }
+          ]
+        }
+      },
+      "id": "exec-publisher",
+      "name": "Publish to Etsy / Amazon",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [2200, 300],
+      "disabled": true,
+      "notes": "Optional — enable when ready to publish"
+    }
+  ],
+  "connections": {
+    "Schedule Trigger":    { "main": [[{ "node": "Read Niches",             "type": "main", "index": 0 }]] },
+    "Read Niches":         { "main": [[{ "node": "Split In Batches",         "type": "main", "index": 0 }]] },
+    "Split In Batches":    { "main": [[{ "node": "Research Agent",           "type": "main", "index": 0 }]] },
+    "Research Agent":      { "main": [[{ "node": "Trend Aggregator",         "type": "main", "index": 0 }]] },
+    "Trend Aggregator":    { "main": [[{ "node": "Gemini Trend Analyst",     "type": "main", "index": 0 }]] },
+    "Gemini Trend Analyst":{ "main": [[{ "node": "Generate Image Prompts",   "type": "main", "index": 0 }]] },
+    "Generate Image Prompts":{ "main": [[{ "node": "Generate PNG Designs",   "type": "main", "index": 0 }]] },
+    "Generate PNG Designs":{ "main": [[{ "node": "Generate SEO Metadata",    "type": "main", "index": 0 }]] },
+    "Generate SEO Metadata":{ "main": [[{ "node": "Save to Database",        "type": "main", "index": 0 }]] },
+    "Save to Database":    { "main": [[{ "node": "Publish to Etsy / Amazon", "type": "main", "index": 0 }]] }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "meta": { "instanceId": "" },
+  "tags": ["pod", "orchestrator", "r0merch"]
+}

@@ -1,0 +1,44 @@
+{
+  "name": "r0merch — Etsy Agent",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "trigger-input",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [0, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://www.etsy.com/search?q={{ encodeURIComponent($json.niche + ' t-shirt') }}&ref=search_bar",
+        "options": {
+          "response": { "response": { "responseFormat": "text" } }
+        }
+      },
+      "id": "etsy-fetch",
+      "name": "Fetch Etsy Search",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [220, 300],
+      "notes": "Replace with Etsy API if you have API access: GET /v3/application/listings/active"
+    },
+    {
+      "parameters": {
+        "jsCode": "// TODO: parse Etsy HTML or API response into structured items\n// Expected output shape per item:\n// { title, url, price, image, tags, description, sales }\nconst niche = $('Execute Workflow Trigger').first().json.niche;\nconst raw = $input.first().json.data || '';\n\n// Placeholder — replace with real parsing logic\nconst data = [];\n\nreturn [{ json: { source: 'etsy', niche, data } }];"
+      },
+      "id": "parse-etsy",
+      "name": "Parse Etsy Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 300]
+    }
+  ],
+  "connections": {
+    "Execute Workflow Trigger": { "main": [[{ "node": "Fetch Etsy Search",   "type": "main", "index": 0 }]] },
+    "Fetch Etsy Search":        { "main": [[{ "node": "Parse Etsy Results",  "type": "main", "index": 0 }]] }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "tags": ["pod", "research", "etsy", "r0merch"]
+}

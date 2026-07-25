@@ -1,0 +1,50 @@
+{
+  "name": "r0merch — Amazon Agent",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "trigger-input",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [0, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://www.amazon.com/s?k={{ encodeURIComponent($json.niche + ' t-shirt') }}&rh=n%3A1036592",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "User-Agent", "value": "Mozilla/5.0 (compatible; r0merch-bot/1.0)" }
+          ]
+        },
+        "options": {
+          "response": { "response": { "responseFormat": "text" } }
+        }
+      },
+      "id": "amazon-fetch",
+      "name": "Fetch Amazon Search",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [220, 300],
+      "notes": "Consider using an Amazon Product API or SerpAPI for reliable results"
+    },
+    {
+      "parameters": {
+        "jsCode": "// TODO: parse Amazon HTML or API response\n// Expected shape: { title, url, price, image, rating, reviews, bsr }\nconst niche = $('Execute Workflow Trigger').first().json.niche;\nconst data = [];\n\nreturn [{ json: { source: 'amazon', niche, data } }];"
+      },
+      "id": "parse-amazon",
+      "name": "Parse Amazon Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 300]
+    }
+  ],
+  "connections": {
+    "Execute Workflow Trigger": { "main": [[{ "node": "Fetch Amazon Search",    "type": "main", "index": 0 }]] },
+    "Fetch Amazon Search":      { "main": [[{ "node": "Parse Amazon Results",   "type": "main", "index": 0 }]] }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "tags": ["pod", "research", "amazon", "r0merch"]
+}

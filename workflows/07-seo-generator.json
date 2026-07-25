@@ -1,0 +1,69 @@
+{
+  "name": "r0merch — SEO Generator",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "trigger-input",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [0, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json;\nlet parsed;\ntry {\n  parsed = typeof raw.designs === 'string' ? JSON.parse(raw.designs) : raw;\n} catch (_) { parsed = raw; }\n\nconst designs = parsed.designs || (Array.isArray(parsed) ? parsed : [parsed]);\nreturn designs.map(d => ({ json: d }));"
+      },
+      "id": "split-designs",
+      "name": "Split Designs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [220, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [{ "name": "key", "value": "={{ $vars.GEMINI_API_KEY }}" }]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  contents: [{\n    parts: [{\n      text: `You are an Etsy and Amazon SEO expert for print-on-demand products.\\n\\nDesign details:\\n- Niche: ${$json.niche}\\n- Title: ${$json.title}\\n- Phrase: ${$json.phrase}\\n- Concept: ${$json.concept || ''}\\n- Target Audience: ${$json.targetAudience}\\n- Selling Angle: ${$json.sellingAngle}\\n- Tone: ${$json.tone}\\n\\nGenerate SEO metadata. Return ONLY a JSON object. No markdown.\\nShape:\\n{\\n  \"etsyTitle\": \"\",\\n  \"etsyDescription\": \"\",\\n  \"etsyTags\": [],\\n  \"amazonTitle\": \"\",\\n  \"amazonBulletPoints\": [],\\n  \"amazonKeywords\": [],\\n  \"fileName\": \"\",\\n  \"altText\": \"\"\\n}\\nRules:\\n- etsyTitle: max 140 chars, keyword-rich\\n- etsyTags: exactly 13 tags, each max 20 chars\\n- amazonTitle: max 200 chars\\n- amazonBulletPoints: exactly 5 bullet points\\n- amazonKeywords: 250 chars max, space-separated\\n- fileName: URL-safe slug`\n    }]\n  }],\n  generationConfig: { temperature: 0.3, maxOutputTokens: 1500 }\n}) }}"
+      },
+      "id": "gemini-seo",
+      "name": "Gemini SEO Generation",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [440, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const ctx = $('Split Designs').first().json;\nconst raw = $input.first().json?.candidates?.[0]?.content?.parts?.[0]?.text || '{}';\nconst match = raw.match(/\\{[\\s\\S]*\\}/);\nlet seo = {};\ntry { seo = JSON.parse(match?.[0] || '{}'); } catch (_) {}\n\nreturn [{\n  json: {\n    ...ctx,\n    seo,\n    etsyTitle:         seo.etsyTitle         || '',\n    etsyDescription:   seo.etsyDescription   || '',\n    etsyTags:          seo.etsyTags          || [],\n    amazonTitle:       seo.amazonTitle       || '',\n    amazonBulletPoints:seo.amazonBulletPoints|| [],\n    amazonKeywords:    seo.amazonKeywords    || '',\n    seoFileName:       seo.fileName         || '',\n    altText:           seo.altText          || ''\n  }\n}];"
+      },
+      "id": "parse-seo",
+      "name": "Parse SEO Metadata",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [660, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nreturn [{ json: { records: items.map(i => i.json) } }];"
+      },
+      "id": "collect-records",
+      "name": "Collect All Records",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [880, 300]
+    }
+  ],
+  "connections": {
+    "Execute Workflow Trigger": { "main": [[{ "node": "Split Designs",         "type": "main", "index": 0 }]] },
+    "Split Designs":            { "main": [[{ "node": "Gemini SEO Generation", "type": "main", "index": 0 }]] },
+    "Gemini SEO Generation":    { "main": [[{ "node": "Parse SEO Metadata",   "type": "main", "index": 0 }]] },
+    "Parse SEO Metadata":       { "main": [[{ "node": "Collect All Records",  "type": "main", "index": 0 }]] }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "tags": ["pod", "seo", "gemini", "r0merch"]
+}

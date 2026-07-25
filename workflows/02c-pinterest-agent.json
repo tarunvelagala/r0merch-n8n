@@ -1,0 +1,50 @@
+{
+  "name": "r0merch — Pinterest Agent",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "trigger-input",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [0, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://www.pinterest.com/search/pins/?q={{ encodeURIComponent($json.niche + ' t-shirt design') }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "User-Agent", "value": "Mozilla/5.0 (compatible; r0merch-bot/1.0)" }
+          ]
+        },
+        "options": {
+          "response": { "response": { "responseFormat": "text" } }
+        }
+      },
+      "id": "pinterest-fetch",
+      "name": "Fetch Pinterest Search",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [220, 300],
+      "notes": "Use Pinterest API v5 with Bearer token for better results"
+    },
+    {
+      "parameters": {
+        "jsCode": "// TODO: parse Pinterest response\n// Expected shape: { title, url, image, saves, description }\nconst niche = $('Execute Workflow Trigger').first().json.niche;\nconst data = [];\n\nreturn [{ json: { source: 'pinterest', niche, data } }];"
+      },
+      "id": "parse-pinterest",
+      "name": "Parse Pinterest Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 300]
+    }
+  ],
+  "connections": {
+    "Execute Workflow Trigger": { "main": [[{ "node": "Fetch Pinterest Search",   "type": "main", "index": 0 }]] },
+    "Fetch Pinterest Search":   { "main": [[{ "node": "Parse Pinterest Results",  "type": "main", "index": 0 }]] }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "tags": ["pod", "research", "pinterest", "r0merch"]
+}

@@ -1,0 +1,59 @@
+{
+  "name": "r0merch — Vision Agent",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "trigger-input",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [0, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Input: niche (and optionally an array of image URLs from earlier research)\n// For skeleton: generate placeholder image URLs to analyze\nconst { niche } = $input.first().json;\n\n// TODO: replace with real image URLs from Etsy/Amazon scrape results\nconst imageUrls = [];\n\nreturn imageUrls.map((url, i) => ({ json: { niche, imageUrl: url, index: i } }));"
+      },
+      "id": "prepare-images",
+      "name": "Prepare Image List",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [220, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [{ "name": "key", "value": "={{ $vars.GEMINI_API_KEY }}" }]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  contents: [{\n    parts: [\n      {\n        inline_data: {\n          mime_type: 'image/jpeg',\n          data: ''\n        }\n      },\n      {\n        text: 'Analyze this t-shirt design and return ONLY a JSON object with these fields: style (e.g. Vintage/Minimalist/Bold), layout (e.g. Centered/Left-aligned/All-over), colors (array of hex or color names), fonts (typography description), icons (array of graphic elements), texture (e.g. Clean/Distressed/Grunge), complexity (Low/Medium/High), visualHierarchy (description). Return raw JSON only, no markdown.'\n      }\n    ]\n  }]\n}) }}"
+      },
+      "id": "gemini-vision",
+      "name": "Gemini Vision Analyze",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [440, 300],
+      "notes": "Swap inline_data.data with base64 image bytes fetched from imageUrl"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst niche = $('Execute Workflow Trigger').first().json.niche;\n\nconst data = items.map(item => {\n  const raw = item.json?.candidates?.[0]?.content?.parts?.[0]?.text || '{}';\n  const match = raw.match(/\\{[\\s\\S]*\\}/);\n  let analysis = {};\n  try { analysis = JSON.parse(match?.[0] || '{}'); } catch (_) {}\n  return analysis;\n}).filter(a => Object.keys(a).length > 0);\n\nreturn [{ json: { source: 'vision', niche, data } }];"
+      },
+      "id": "parse-vision",
+      "name": "Parse Vision Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [660, 300]
+    }
+  ],
+  "connections": {
+    "Execute Workflow Trigger": { "main": [[{ "node": "Prepare Image List",      "type": "main", "index": 0 }]] },
+    "Prepare Image List":       { "main": [[{ "node": "Gemini Vision Analyze",   "type": "main", "index": 0 }]] },
+    "Gemini Vision Analyze":    { "main": [[{ "node": "Parse Vision Results",    "type": "main", "index": 0 }]] }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "tags": ["pod", "research", "vision", "gemini", "r0merch"]
+}

@@ -1,0 +1,47 @@
+{
+  "name": "r0merch — Gemini Trend Analyst",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "trigger-input",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [0, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [{ "name": "key", "value": "={{ $vars.GEMINI_API_KEY }}" }]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  contents: [{\n    parts: [{\n      text: `You are a POD (print-on-demand) trend analyst. Below is structured market research data for the \"${$json.trendReport ? JSON.parse($json.trendReport).niche : $json.niche}\" niche.\\n\\nResearch data:\\n${JSON.stringify($json.trendReport ? JSON.parse($json.trendReport) : $json, null, 2)}\\n\\nBased on this data, identify:\\n1. Recurring colors (with hex codes where possible)\\n2. Popular typography styles\\n3. Common illustrations and icons\\n4. Preferred layouts\\n5. Underserved opportunities (low competition, real demand)\\n6. Saturated ideas to avoid\\n7. Emerging trends (from rising queries and low-competition gaps)\\n8. Recommended audience segments\\n9. Seasonal considerations\\n10. Top 5 design directions\\n\\nReturn ONLY a JSON object. No markdown, no explanation.\\nShape:\\n{\\n  \"recurringColors\": [],\\n  \"typographyStyles\": [],\\n  \"illustrations\": [],\\n  \"layouts\": [],\\n  \"underservedOpportunities\": [],\\n  \"saturatedIdeas\": [],\\n  \"emergingTrends\": [],\\n  \"audienceSegments\": [],\\n  \"seasonality\": {},\\n  \"topDesignDirections\": []\\n}`\n    }]\n  }],\n  generationConfig: { temperature: 0.4, maxOutputTokens: 2048 }\n}) }}"
+      },
+      "id": "gemini-analyst",
+      "name": "Gemini Trend Analysis",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [220, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json?.candidates?.[0]?.content?.parts?.[0]?.text || '{}';\nconst match = raw.match(/\\{[\\s\\S]*\\}/);\nlet analysis = {};\ntry { analysis = JSON.parse(match?.[0] || '{}'); } catch (_) {}\n\nconst niche = (() => {\n  try { return JSON.parse($('Execute Workflow Trigger').first().json.trendReport || '{}').niche; } catch(_) { return ''; }\n})();\n\nreturn [{ json: { niche, ...analysis } }];"
+      },
+      "id": "parse-analysis",
+      "name": "Parse Trend Analysis",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 300]
+    }
+  ],
+  "connections": {
+    "Execute Workflow Trigger": { "main": [[{ "node": "Gemini Trend Analysis", "type": "main", "index": 0 }]] },
+    "Gemini Trend Analysis":   { "main": [[{ "node": "Parse Trend Analysis",  "type": "main", "index": 0 }]] }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "tags": ["pod", "gemini", "analyst", "r0merch"]
+}

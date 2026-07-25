@@ -1,0 +1,50 @@
+{
+  "name": "r0merch — Google Search Agent",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "trigger-input",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [0, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://serpapi.com/search.json",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "engine",  "value": "google" },
+            { "name": "q",       "value": "={{ $json.niche + ' t-shirt trending 2025' }}" },
+            { "name": "api_key", "value": "={{ $vars.SERPAPI_KEY }}" },
+            { "name": "num",     "value": "20" }
+          ]
+        }
+      },
+      "id": "google-search-fetch",
+      "name": "SerpAPI Google Search",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [220, 300],
+      "notes": "Set SERPAPI_KEY in n8n Variables. Free tier: 100 searches/month"
+    },
+    {
+      "parameters": {
+        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche;\nconst results = $input.first().json?.organic_results || [];\n\nconst data = results.map(r => ({\n  title:   r.title   || '',\n  url:     r.link    || '',\n  snippet: r.snippet || ''\n}));\n\nreturn [{ json: { source: 'google_search', niche, data } }];"
+      },
+      "id": "parse-google-search",
+      "name": "Parse Google Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 300]
+    }
+  ],
+  "connections": {
+    "Execute Workflow Trigger": { "main": [[{ "node": "SerpAPI Google Search",  "type": "main", "index": 0 }]] },
+    "SerpAPI Google Search":    { "main": [[{ "node": "Parse Google Results",   "type": "main", "index": 0 }]] }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "tags": ["pod", "research", "google", "r0merch"]
+}
