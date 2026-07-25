@@ -1,8 +1,8 @@
 {
-  "updatedAt": "2026-07-25T15:41:11.420Z",
+  "updatedAt": "2026-07-25T15:48:51.921Z",
   "createdAt": "2026-07-25T15:18:35.734Z",
   "id": "09597748-4eb1-4b4c-a646-d802f2156694",
-  "name": "r0merch — Pinterest Agent",
+  "name": "r0merch \u2014 Pinterest Agent",
   "description": null,
   "active": false,
   "isArchived": false,
@@ -20,19 +20,27 @@
     },
     {
       "parameters": {
-        "method": "GET",
-        "url": "https://api.pinterest.com/v5/search/pins",
+        "url": "https://api.pinterest.com/pins?",
         "sendQuery": true,
         "queryParameters": {
           "parameters": [
-            { "name": "query",     "value": "={{ $json.niche + ' t-shirt design' }}" },
-            { "name": "page_size", "value": "25" }
+            {
+              "name": "query",
+              "value": "={{ $json.niche + ' t-shirt design' }}"
+            },
+            {
+              "name": "page_size",
+              "value": "25"
+            }
           ]
         },
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "Authorization", "value": "={{ 'Bearer ' + $vars.PINTEREST_ACCESS_TOKEN }}" }
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + $vars.PINTEREST_ACCESS_TOKEN }}"
+            }
           ]
         },
         "options": {}
@@ -52,9 +60,18 @@
         "sendQuery": true,
         "queryParameters": {
           "parameters": [
-            { "name": "engine",  "value": "pinterest" },
-            { "name": "q",       "value": "={{ $json.niche + ' t-shirt' }}" },
-            { "name": "api_key", "value": "={{ $vars.SERPAPI_KEY }}" }
+            {
+              "name": "engine",
+              "value": "pinterest"
+            },
+            {
+              "name": "q",
+              "value": "={{ $json.niche + ' t-shirt' }}"
+            },
+            {
+              "name": "api_key",
+              "value": "={{ $vars.SERPAPI_KEY }}"
+            }
           ]
         },
         "options": {}
@@ -129,9 +146,9 @@
   "staticData": null,
   "meta": null,
   "pinData": {},
-  "versionId": "0ce8b908-78cb-4105-8f9a-52450d0d312f",
+  "versionId": "bda3c825-9bb1-4eea-abe3-f2dd96eb4abc",
   "activeVersionId": null,
-  "versionCounter": 19,
+  "versionCounter": 27,
   "triggerCount": 0,
   "tags": [],
   "shared": [
