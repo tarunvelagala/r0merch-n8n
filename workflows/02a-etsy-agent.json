@@ -2,7 +2,7 @@
   "updatedAt": "2026-07-25T15:18:33.804Z",
   "createdAt": "2026-07-25T15:18:33.804Z",
   "id": "25b7d461-1692-4fab-8739-5419bed842c5",
-  "name": "r0merch — Etsy Agent",
+  "name": "r0merch \u2014 Etsy Agent",
   "description": null,
   "active": false,
   "isArchived": false,
@@ -20,61 +20,97 @@
     },
     {
       "parameters": {
-        "url": "https://openapi.etsy.com/v3/application/listings/active",
+        "url": "https://serpapi.com/search.json",
         "sendQuery": true,
         "queryParameters": {
           "parameters": [
             {
-              "name": "keywords",
-              "value": "={{ $json.niche + ' t-shirt' }}"
+              "name": "engine",
+              "value": "google_shopping"
             },
             {
-              "name": "limit",
-              "value": "25"
+              "name": "q",
+              "value": "={{ $json.niche + ' t-shirt site:etsy.com' }}"
             },
             {
-              "name": "sort_on",
-              "value": "score"
+              "name": "api_key",
+              "value": "={{ $env.SERPAPI_KEY }}"
             },
             {
-              "name": "sort_order",
-              "value": "desc"
+              "name": "gl",
+              "value": "us"
             },
             {
-              "name": "includes",
-              "value": "Images,Tags"
-            }
-          ]
-        },
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
+              "name": "hl",
+              "value": "en"
+            },
             {
-              "name": "x-api-key",
-              "value": "={{ $vars.ETSY_API_KEY }}"
+              "name": "num",
+              "value": "40"
             }
           ]
         },
         "options": {
-          "response": {
-            "response": {
-              "responseFormat": "json"
-            }
-          }
+          "timeout": 20000
         }
       },
-      "id": "etsy-fetch",
-      "name": "Etsy API Search",
+      "id": "etsy-shopping-fetch",
+      "name": "SerpAPI Etsy Shopping",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
         220,
-        300
+        150
       ]
     },
     {
       "parameters": {
-        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche;\nconst results = $input.first().json?.results || [];\n\nconst data = results.map(listing => ({\n  title:       listing.title || '',\n  url:         `https://www.etsy.com/listing/${listing.listing_id}`,\n  price:       listing.price\n               ? `${(listing.price.amount / listing.price.divisor).toFixed(2)} ${listing.price.currency_code}`\n               : '',\n  image:       listing.Images?.[0]?.url_570xN || '',\n  tags:        listing.tags || [],\n  description: (listing.description || '').slice(0, 300),\n  views:       listing.views || 0,\n  favCount:    listing.num_favorers || 0\n}));\n\nreturn [{ json: { source: 'etsy', niche, data } }];"
+        "url": "https://serpapi.com/search.json",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "engine",
+              "value": "google"
+            },
+            {
+              "name": "q",
+              "value": "={{ 'site:etsy.com ' + $json.niche + ' t-shirt bestseller' }}"
+            },
+            {
+              "name": "api_key",
+              "value": "={{ $env.SERPAPI_KEY }}"
+            },
+            {
+              "name": "gl",
+              "value": "us"
+            },
+            {
+              "name": "hl",
+              "value": "en"
+            },
+            {
+              "name": "num",
+              "value": "20"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 20000
+        }
+      },
+      "id": "etsy-organic-fetch",
+      "name": "SerpAPI Etsy Organic",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        220,
+        450
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche;\nconst shoppingRaw = $('SerpAPI Etsy Shopping').first().json;\nconst organicRaw  = $('SerpAPI Etsy Organic').first().json;\n\n// Shopping results \u2014 have price, image, rating\nconst shopping = (shoppingRaw?.shopping_results || []).map(r => ({\n  title:    r.title   || '',\n  url:      r.link    || '',\n  price:    r.price   || '',\n  image:    r.thumbnail || '',\n  rating:   r.rating  || 0,\n  reviews:  r.reviews || 0,\n  tags:     [],\n  source:   'google_shopping'\n}));\n\n// Organic results \u2014 extract tags from title keywords\nconst organic = (organicRaw?.organic_results || [])\n  .filter(r => r.link?.includes('etsy.com'))\n  .map(r => ({\n    title:    r.title   || '',\n    url:      r.link    || '',\n    price:    '',\n    image:    r.thumbnail || '',\n    rating:   0,\n    reviews:  0,\n    tags:     (r.title || '').toLowerCase().split(/[\\s,|\u2013-]+/).filter(t => t.length > 3),\n    source:   'google_organic'\n  }));\n\nconst data = [...shopping, ...organic].slice(0, 30);\n\nreturn [{ json: { source: 'etsy', niche, data } }];"
       },
       "id": "parse-etsy",
       "name": "Parse Etsy Results",
@@ -91,20 +127,36 @@
       "main": [
         [
           {
-            "node": "Etsy API Search",
+            "node": "SerpAPI Etsy Shopping",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "SerpAPI Etsy Organic",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Etsy API Search": {
+    "SerpAPI Etsy Shopping": {
       "main": [
         [
           {
             "node": "Parse Etsy Results",
             "type": "main",
             "index": 0
+          }
+        ]
+      ]
+    },
+    "SerpAPI Etsy Organic": {
+      "main": [
+        [
+          {
+            "node": "Parse Etsy Results",
+            "type": "main",
+            "index": 1
           }
         ]
       ]
@@ -116,9 +168,9 @@
   "staticData": null,
   "meta": null,
   "pinData": null,
-  "versionId": "f3de5a36-35c0-42d5-bf5f-4e9c704e428b",
+  "versionId": "60bbd0ce-57d0-4454-a6ad-8f73f1bda2f1",
   "activeVersionId": null,
-  "versionCounter": 7,
+  "versionCounter": 10,
   "triggerCount": 0,
   "tags": [],
   "shared": [
