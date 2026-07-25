@@ -1,0 +1,272 @@
+{
+  "updatedAt": "2026-07-25T16:19:41.459Z",
+  "createdAt": "2026-07-25T16:19:41.459Z",
+  "id": "3d7e9f12-a841-4c56-b234-8f1e2a3b4c5d",
+  "name": "r0merch — Twitter Agent",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "trigger-input",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://serpapi.com/search.json",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "engine",
+              "value": "google"
+            },
+            {
+              "name": "q",
+              "value": "={{ 'site:x.com OR site:twitter.com ' + $json.niche + ' t-shirt' }}"
+            },
+            {
+              "name": "api_key",
+              "value": "={{ $env.SERPAPI_KEY }}"
+            },
+            {
+              "name": "gl",
+              "value": "us"
+            },
+            {
+              "name": "hl",
+              "value": "en"
+            },
+            {
+              "name": "num",
+              "value": "20"
+            },
+            {
+              "name": "tbs",
+              "value": "qdr:w"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 20000
+        }
+      },
+      "id": "twitter-fetch",
+      "name": "SerpAPI Twitter Search",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        220,
+        150
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://serpapi.com/search.json",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "engine",
+              "value": "google"
+            },
+            {
+              "name": "q",
+              "value": "={{ 'site:x.com OR site:twitter.com ' + $json.niche + ' trending viral meme' }}"
+            },
+            {
+              "name": "api_key",
+              "value": "={{ $env.SERPAPI_KEY }}"
+            },
+            {
+              "name": "gl",
+              "value": "us"
+            },
+            {
+              "name": "hl",
+              "value": "en"
+            },
+            {
+              "name": "num",
+              "value": "20"
+            },
+            {
+              "name": "tbs",
+              "value": "qdr:w"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 20000
+        }
+      },
+      "id": "twitter-viral-fetch",
+      "name": "SerpAPI Twitter Viral",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        220,
+        450
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche;\nconst twitterRaw = $('SerpAPI Twitter Search').first().json;\nconst viralRaw   = $('SerpAPI Twitter Viral').first().json;\n\nconst allSnippets = [\n  ...(twitterRaw?.organic_results || []),\n  ...(viralRaw?.organic_results   || [])\n].map(r => r.title + ' ' + (r.snippet || '')).join('\\n');\n\nreturn [{ json: { niche, rawSnippets: allSnippets } }];"
+      },
+      "id": "collect-snippets",
+      "name": "Collect Tweet Snippets",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + $env.GROQ_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'llama-3.1-8b-instant', messages: [{ role: 'user', content: 'You are a trend analyst for print-on-demand merchandise.\\n\\nHere are recent tweets and posts from Twitter/X about the \"' + $json.niche + '\" niche:\\n\\n' + $json.rawSnippets + '\\n\\nExtract trending signals useful for t-shirt design. Return ONLY a raw JSON object, no markdown, no code fences.\\nShape:\\n{\\n  \"trendingPhrases\": [],\\n  \"slang\": [],\\n  \"hashtags\": [],\\n  \"memes\": [],\\n  \"culturalSignals\": [],\\n  \"emotions\": [],\\n  \"keywords\": []\\n}' }], max_tokens: 600, temperature: 0.4 }) }}"
+      },
+      "id": "groq-analyze",
+      "name": "Groq Trend Analyzer",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        660,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const niche = $('Collect Tweet Snippets').first().json.niche;\nconst raw = $input.first().json?.choices?.[0]?.message?.content || '{}';\nconst clean = raw.replace(/```json|```/g, '').trim();\nconst match = clean.match(/\\{[\\s\\S]*\\}/);\nlet analysis = {};\ntry { analysis = JSON.parse(match?.[0] || '{}'); } catch(_) {}\n\nreturn [{ json: { source: 'twitter', niche, data: analysis } }];"
+      },
+      "id": "parse-twitter",
+      "name": "Parse Twitter Trends",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "SerpAPI Twitter Search",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "SerpAPI Twitter Viral",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SerpAPI Twitter Search": {
+      "main": [
+        [
+          {
+            "node": "Collect Tweet Snippets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SerpAPI Twitter Viral": {
+      "main": [
+        [
+          {
+            "node": "Collect Tweet Snippets",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Collect Tweet Snippets": {
+      "main": [
+        [
+          {
+            "node": "Groq Trend Analyzer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Trend Analyzer": {
+      "main": [
+        [
+          {
+            "node": "Parse Twitter Trends",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": null,
+  "versionId": "660183aa-fc7c-4c1b-b0e9-fa54fcd33de1",
+  "activeVersionId": null,
+  "versionCounter": 1,
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-07-25T16:19:41.461Z",
+      "createdAt": "2026-07-25T16:19:41.461Z",
+      "role": "workflow:owner",
+      "workflowId": "3d7e9f12-a841-4c56-b234-8f1e2a3b4c5d",
+      "projectId": "A5qWeG5doYXJG0tr",
+      "project": {
+        "updatedAt": "2026-03-29T08:57:26.442Z",
+        "createdAt": "2026-03-29T08:55:38.920Z",
+        "id": "A5qWeG5doYXJG0tr",
+        "name": "Tarun Velagala <tarunvelagala80@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "7a3b5da8-30cb-4aea-98f3-9838086695e3"
+      }
+    }
+  ],
+  "versionMetadata": {
+    "name": null,
+    "description": null
+  }
+}
