@@ -2,7 +2,7 @@
   "updatedAt": "2026-07-25T15:18:33.804Z",
   "createdAt": "2026-07-25T15:18:33.804Z",
   "id": "25b7d461-1692-4fab-8739-5419bed842c5",
-  "name": "r0merch \u2014 Etsy Agent",
+  "name": "r0merch — Etsy Agent",
   "description": null,
   "active": false,
   "isArchived": false,
@@ -110,7 +110,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche;\nconst shoppingRaw = $('SerpAPI Etsy Shopping').first().json;\nconst organicRaw  = $('SerpAPI Etsy Organic').first().json;\n\n// Shopping results \u2014 have price, image, rating\nconst shopping = (shoppingRaw?.shopping_results || []).map(r => ({\n  title:    r.title   || '',\n  url:      r.link    || '',\n  price:    r.price   || '',\n  image:    r.thumbnail || '',\n  rating:   r.rating  || 0,\n  reviews:  r.reviews || 0,\n  tags:     [],\n  source:   'google_shopping'\n}));\n\n// Organic results \u2014 extract tags from title keywords\nconst organic = (organicRaw?.organic_results || [])\n  .filter(r => r.link?.includes('etsy.com'))\n  .map(r => ({\n    title:    r.title   || '',\n    url:      r.link    || '',\n    price:    '',\n    image:    r.thumbnail || '',\n    rating:   0,\n    reviews:  0,\n    tags:     (r.title || '').toLowerCase().split(/[\\s,|\u2013-]+/).filter(t => t.length > 3),\n    source:   'google_organic'\n  }));\n\nconst data = [...shopping, ...organic].slice(0, 30);\n\nreturn [{ json: { source: 'etsy', niche, data } }];"
+        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche;\nconst shoppingRaw = $('SerpAPI Etsy Shopping').first().json;\nconst organicRaw  = $('SerpAPI Etsy Organic').first().json;\n\n// Shopping results — have price, image, rating\nconst shopping = (shoppingRaw?.shopping_results || []).map(r => ({\n  title:    r.title   || '',\n  url:      r.link    || '',\n  price:    r.price   || '',\n  image:    r.thumbnail || '',\n  rating:   r.rating  || 0,\n  reviews:  r.reviews || 0,\n  tags:     [],\n  source:   'google_shopping'\n}));\n\n// Organic results — extract tags from title keywords\nconst organic = (organicRaw?.organic_results || [])\n  .filter(r => r.link?.includes('etsy.com'))\n  .map(r => ({\n    title:    r.title   || '',\n    url:      r.link    || '',\n    price:    '',\n    image:    r.thumbnail || '',\n    rating:   0,\n    reviews:  0,\n    tags:     (r.title || '').toLowerCase().split(/[\\s,|–-]+/).filter(t => t.length > 3),\n    source:   'google_organic'\n  }));\n\nconst data = [...shopping, ...organic].slice(0, 30);\n\nreturn [{ json: { source: 'etsy', niche, data } }];"
       },
       "id": "parse-etsy",
       "name": "Parse Etsy Results",
@@ -168,9 +168,9 @@
   "staticData": null,
   "meta": null,
   "pinData": null,
-  "versionId": "60bbd0ce-57d0-4454-a6ad-8f73f1bda2f1",
+  "versionId": "cc01fc6f-b0b9-44d8-bf9b-a79f3b8c570f",
   "activeVersionId": null,
-  "versionCounter": 10,
+  "versionCounter": 17,
   "triggerCount": 0,
   "tags": [],
   "shared": [
