@@ -2,7 +2,7 @@
   "name": "r0merch \u2014 POD Pipeline (Full)",
   "id": "1790571d-754c-4445-be73-1c370705998b",
   "active": false,
-  "updatedAt": "2026-07-26T15:51:06.000Z",
+  "updatedAt": "2026-07-26T15:55:04.000Z",
   "settings": {
     "executionOrder": "v1"
   },
@@ -2025,7 +2025,7 @@
       "main": [
         [
           {
-            "node": "Vision Has Images?",
+            "node": "Has Images?",
             "type": "main",
             "index": 0
           }
@@ -2738,6 +2738,24 @@
           },
           {
             "node": "Twitter Viral",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Images?": {
+      "main": [
+        [
+          {
+            "node": "Parse Vision",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Vision Download",
             "type": "main",
             "index": 0
           }
