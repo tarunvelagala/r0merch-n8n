@@ -1,7 +1,41 @@
 {
-  "name": "r0merch \u2014 Main Orchestrator",
+  "name": "r0merch \u2014 POD Pipeline (Full)",
+  "id": "1790571d-754c-4445-be73-1c370705998b",
+  "active": false,
+  "updatedAt": "2026-07-26T14:35:27.000Z",
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [
+    "pod",
+    "r0merch"
+  ],
   "nodes": [
     {
+      "id": "sticky-trigger",
+      "name": "\ud83d\udcc5 TRIGGER",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -260,
+        280
+      ],
+      "parameters": {
+        "content": "## \ud83d\udcc5 Trigger\nRuns every Monday 9am\nor manually",
+        "height": 600,
+        "width": 420,
+        "color": 1
+      }
+    },
+    {
+      "id": "trigger-schedule",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -160,
+        500
+      ],
       "parameters": {
         "rule": {
           "interval": [
@@ -11,46 +45,62 @@
             }
           ]
         }
-      },
-      "id": "trigger-schedule",
-      "name": "Schedule Trigger",
-      "type": "n8n-nodes-base.scheduleTrigger",
-      "typeVersion": 1.2,
-      "position": [
-        0,
-        300
-      ]
+      }
     },
     {
-      "parameters": {
-        "jsCode": "// Load niches from CSV or hardcode here.\n// Each item: { niche, marketing_pages }\nreturn [\n  { json: { niche: 'christian', marketing_pages: 'r/Christianity,r/Bible,@christianmemes' } },\n  { json: { niche: 'nurse', marketing_pages: 'r/nursing,r/nurses,@nursehumor' } },\n  { json: { niche: 'cat-lovers', marketing_pages: 'r/cats,r/CatMemes,@catlovers' } }\n];"
-      },
       "id": "read-niches",
       "name": "Read Niches",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        220,
-        300
-      ]
+        60,
+        500
+      ],
+      "parameters": {
+        "jsCode": "return [\n  { json: { niche: 'christian', marketing_pages: 'r/Christianity,r/Bible' } },\n  { json: { niche: 'nurse',     marketing_pages: 'r/nursing,r/nurses' } },\n  { json: { niche: 'cat-lovers',marketing_pages: 'r/cats,r/CatMemes' } }\n];"
+      }
     },
     {
-      "parameters": {
-        "batchSize": 1,
-        "options": {}
-      },
       "id": "split-batches",
       "name": "Split In Batches",
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        440,
-        300
-      ]
+        280,
+        500
+      ],
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      }
     },
     {
+      "id": "sticky-research",
+      "name": "\ud83d\udd0d RESEARCH",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        440,
+        280
+      ],
       "parameters": {
-        "workflowId": "f978e116-7fe9-465d-8bb2-c61587fae2b9",
+        "content": "## \ud83d\udd0d Parallel Research\n8 sources run simultaneously:\nEtsy \u00b7 Amazon \u00b7 Google Images\nReddit \u00b7 Google Search\nGoogle Trends \u00b7 Vision \u00b7 Twitter/X\n\nAll use SerpAPI + Gemini + Groq\nNo OAuth required",
+        "height": 600,
+        "width": 1380,
+        "color": 2
+      }
+    },
+    {
+      "id": "etsy-agent",
+      "name": "Etsy Agent",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        540,
+        260
+      ],
+      "parameters": {
+        "workflowId": "25b7d461-1692-4fab-8739-5419bed842c5",
         "workflowInputs": {
           "values": [
             {
@@ -63,164 +113,593 @@
             }
           ]
         }
-      },
-      "id": "exec-research",
-      "name": "Research Agent",
-      "type": "n8n-nodes-base.executeWorkflow",
-      "typeVersion": 1,
-      "position": [
-        660,
-        300
-      ]
+      }
     },
     {
-      "parameters": {
-        "workflowId": "bfa7568e-33a0-4ab6-8494-667e213eea00",
-        "workflowInputs": {
-          "values": [
-            {
-              "name": "researchData",
-              "stringValue": "={{ JSON.stringify($json) }}"
-            }
-          ]
-        }
-      },
-      "id": "exec-trend-agg",
-      "name": "Trend Aggregator",
+      "id": "amazon-agent",
+      "name": "Amazon Agent",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        880,
-        300
-      ]
-    },
-    {
-      "parameters": {
-        "workflowId": "56d91c94-825f-4b48-90eb-08625926ef3e",
-        "workflowInputs": {
-          "values": [
-            {
-              "name": "trendReport",
-              "stringValue": "={{ JSON.stringify($json) }}"
-            }
-          ]
-        }
-      },
-      "id": "exec-gemini-analyst",
-      "name": "Gemini Trend Analyst",
-      "type": "n8n-nodes-base.executeWorkflow",
-      "typeVersion": 1,
-      "position": [
-        1100,
-        300
-      ]
-    },
-    {
-      "parameters": {
-        "workflowId": "6673d7e3-9b47-450e-81c9-b470e83e7230",
-        "workflowInputs": {
-          "values": [
-            {
-              "name": "trendAnalysis",
-              "stringValue": "={{ JSON.stringify($json) }}"
-            }
-          ]
-        }
-      },
-      "id": "exec-prompt-gen",
-      "name": "Generate Image Prompts",
-      "type": "n8n-nodes-base.executeWorkflow",
-      "typeVersion": 1,
-      "position": [
-        1320,
-        300
-      ]
-    },
-    {
-      "parameters": {
-        "workflowId": "a7e13a5f-b228-40c9-b37a-c91545985814",
-        "workflowInputs": {
-          "values": [
-            {
-              "name": "concepts",
-              "stringValue": "={{ JSON.stringify($json) }}"
-            }
-          ]
-        }
-      },
-      "id": "exec-image-gen",
-      "name": "Generate PNG Designs",
-      "type": "n8n-nodes-base.executeWorkflow",
-      "typeVersion": 1,
-      "position": [
-        1540,
-        300
-      ]
-    },
-    {
-      "parameters": {
-        "workflowId": "70f2fdb2-215a-4dd5-968b-aceac3989e2f",
-        "workflowInputs": {
-          "values": [
-            {
-              "name": "designs",
-              "stringValue": "={{ JSON.stringify($json) }}"
-            }
-          ]
-        }
-      },
-      "id": "exec-seo-gen",
-      "name": "Generate SEO Metadata",
-      "type": "n8n-nodes-base.executeWorkflow",
-      "typeVersion": 1,
-      "position": [
-        1760,
-        300
-      ]
-    },
-    {
-      "parameters": {
-        "workflowId": "5be92a45-a579-44e8-bf9c-7443d99080c5",
-        "workflowInputs": {
-          "values": [
-            {
-              "name": "records",
-              "stringValue": "={{ JSON.stringify($json) }}"
-            }
-          ]
-        }
-      },
-      "id": "exec-database",
-      "name": "Save to Database",
-      "type": "n8n-nodes-base.executeWorkflow",
-      "typeVersion": 1,
-      "position": [
-        1980,
-        300
-      ]
-    },
-    {
-      "parameters": {
-        "workflowId": "8770f81f-e7ce-469e-a60b-410df33f951f",
-        "workflowInputs": {
-          "values": [
-            {
-              "name": "listings",
-              "stringValue": "={{ JSON.stringify($json) }}"
-            }
-          ]
-        }
-      },
-      "id": "exec-publisher",
-      "name": "Publish to Etsy / Amazon",
-      "type": "n8n-nodes-base.executeWorkflow",
-      "typeVersion": 1,
-      "position": [
-        2200,
-        300
+        540,
+        440
       ],
-      "disabled": true,
-      "notes": "Optional \u2014 enable when ready to publish"
+      "parameters": {
+        "workflowId": "5263dc0c-b3cc-4962-b9d0-de12fb260b56",
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "niche",
+              "stringValue": "={{ $json.niche }}"
+            },
+            {
+              "name": "marketing_pages",
+              "stringValue": "={{ $json.marketing_pages }}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "google-images-agent",
+      "name": "Google Images Agent",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        540,
+        620
+      ],
+      "parameters": {
+        "workflowId": "09597748-4eb1-4b4c-a646-d802f2156694",
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "niche",
+              "stringValue": "={{ $json.niche }}"
+            },
+            {
+              "name": "marketing_pages",
+              "stringValue": "={{ $json.marketing_pages }}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "reddit-agent",
+      "name": "Reddit Agent",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        540,
+        800
+      ],
+      "parameters": {
+        "workflowId": "8c4e70a0-cdfa-4f6e-9345-f2895b55ab04",
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "niche",
+              "stringValue": "={{ $json.niche }}"
+            },
+            {
+              "name": "marketing_pages",
+              "stringValue": "={{ $json.marketing_pages }}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "google-search-agent",
+      "name": "Google Search Agent",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        540,
+        980
+      ],
+      "parameters": {
+        "workflowId": "1fb17f86-9092-4ea6-b5cd-4631ca01134c",
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "niche",
+              "stringValue": "={{ $json.niche }}"
+            },
+            {
+              "name": "marketing_pages",
+              "stringValue": "={{ $json.marketing_pages }}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "google-trends-agent",
+      "name": "Google Trends Agent",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        540,
+        1160
+      ],
+      "parameters": {
+        "workflowId": "4a5b9883-f228-4502-a93b-ae5197d28d30",
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "niche",
+              "stringValue": "={{ $json.niche }}"
+            },
+            {
+              "name": "marketing_pages",
+              "stringValue": "={{ $json.marketing_pages }}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "vision-agent",
+      "name": "Vision Agent",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        540,
+        1340
+      ],
+      "parameters": {
+        "workflowId": "b7a2e73f-4388-431e-9bb3-737dfd7cf77d",
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "niche",
+              "stringValue": "={{ $json.niche }}"
+            },
+            {
+              "name": "marketing_pages",
+              "stringValue": "={{ $json.marketing_pages }}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "twitter-agent",
+      "name": "Twitter Agent",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        540,
+        1520
+      ],
+      "parameters": {
+        "workflowId": "3d7e9f12-a841-4c56-b234-8f1e2a3b4c5d",
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "niche",
+              "stringValue": "={{ $json.niche }}"
+            },
+            {
+              "name": "marketing_pages",
+              "stringValue": "={{ $json.marketing_pages }}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "merge-results",
+      "name": "Merge Research Results",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        1400,
+        890
+      ],
+      "parameters": {
+        "mode": "append",
+        "options": {}
+      }
+    },
+    {
+      "id": "combine-research",
+      "name": "Combine Research",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1640,
+        890
+      ],
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst niche = $('Split In Batches').first().json.niche || '';\nconst find = (source) => {\n  const item = items.find(i => i.json.source === source);\n  if (!item) return source === 'twitter' ? {} : [];\n  return item.json.data || (source === 'twitter' ? {} : []);\n};\nreturn [{ json: {\n  niche,\n  etsy:         find('etsy'),\n  amazon:       find('amazon'),\n  pinterest:    find('pinterest'),\n  reddit:       find('reddit'),\n  googleSearch: find('google_search'),\n  googleTrends: find('google_trends'),\n  vision:       find('vision'),\n  twitter:      find('twitter'),\n  collectedAt:  new Date().toISOString()\n} }];"
+      }
+    },
+    {
+      "id": "sticky-analysis",
+      "name": "\ud83d\udcca ANALYSIS",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1880,
+        280
+      ],
+      "parameters": {
+        "content": "## \ud83d\udcca Trend Analysis\nNormalizes all 8 sources\ninto structured signals:\ncolors \u00b7 fonts \u00b7 icons\nkeywords \u00b7 audience\nseasonality \u00b7 competition\n\nThen Gemini identifies\nopportunities + gaps",
+        "height": 600,
+        "width": 880,
+        "color": 3
+      }
+    },
+    {
+      "id": "trend-aggregator-inline",
+      "name": "Trend Aggregator",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1960,
+        890
+      ],
+      "parameters": {
+        "jsCode": "const research = $input.first().json;\nconst { niche, etsy, amazon, pinterest, reddit, googleSearch, googleTrends, vision, twitter } = research;\nconst freq = arr => { const m={}; arr.filter(Boolean).forEach(v=>{m[v]=(m[v]||0)+1;}); return Object.entries(m).sort((a,b)=>b[1]-a[1]).map(([k])=>k); };\nconst n = s => (s||'').toLowerCase().trim();\nconst tw = twitter || {};\nconst allTags = [...(etsy||[]).flatMap(i=>i.tags||[]), ...(pinterest?.trendingKeywords||[])].map(n).filter(Boolean);\nconst risingQ = (googleTrends?.risingQueries||[]); const topQ = (googleTrends?.topQueries||[]);\nconst related = (googleSearch?.relatedSearches||[]); const paa = (googleSearch?.peopleAlsoAsk||[]);\nconst allColors = (vision||[]).flatMap(i=>i.colors||[]).map(n);\nconst redditPosts = (reddit||[]).filter(p=>p.score>50);\nconst audience = freq([...freq(redditPosts.map(p=>p.flair).filter(Boolean)).slice(0,5), ...(tw.emotions||[]).map(n)]).slice(0,8);\nconst season = googleTrends?.trendDirection ? { peakMonths:(googleTrends.peakMonths||[]), lowMonths:(googleTrends.lowMonths||[]), trendDirection:googleTrends.trendDirection } : { trendDirection:'stable' };\nreturn [{ json: { niche,\n  colors: freq(allColors).slice(0,10), fonts: freq((vision||[]).map(i=>i.fonts).filter(Boolean)).slice(0,5),\n  icons: freq((vision||[]).flatMap(i=>i.icons||[]).map(n)).slice(0,15),\n  styles: freq((vision||[]).map(i=>i.style).filter(Boolean)).slice(0,5),\n  moods: freq((vision||[]).map(i=>i.mood).filter(Boolean)).slice(0,5),\n  keywords: freq([...allTags,...risingQ,...topQ,...related,...(tw.trendingPhrases||[]).map(n),...(tw.slang||[]).map(n)]).slice(0,40),\n  quotes: [...(etsy||[]).map(i=>i.title),...(amazon||[]).map(i=>i.title)].filter(Boolean).slice(0,20),\n  audience, seasonality: season,\n  competition: { etsyCount:(etsy||[]).length, amazonCount:(amazon||[]).length },\n  twitter: { trendingPhrases:(tw.trendingPhrases||[]).slice(0,15), slang:(tw.slang||[]).slice(0,10), hashtags:(tw.hashtags||[]).slice(0,10), memes:(tw.memes||[]).slice(0,10) },\n  peopleAlsoAsk: paa.slice(0,10), aggregatedAt: new Date().toISOString()\n} }];"
+      }
+    },
+    {
+      "id": "gemini-analyst-inline",
+      "name": "Gemini Trend Analyst",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2220,
+        890
+      ],
+      "parameters": {
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "key",
+              "value": "={{ $env.GEMINI_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ contents: [{ parts: [{ text: \"You are a POD trend analyst.\\n\\nResearch for \\\"\" + $json.niche + \"\\\":\\n\" + JSON.stringify($json, null, 2) + \"\\n\\nReturn ONLY JSON:\\n{\\n  \\\"recurringColors\\\": [],\\n  \\\"typographyStyles\\\": [],\\n  \\\"illustrations\\\": [],\\n  \\\"underservedOpportunities\\\": [],\\n  \\\"saturatedIdeas\\\": [],\\n  \\\"emergingTrends\\\": [],\\n  \\\"audienceSegments\\\": [],\\n  \\\"seasonality\\\": {},\\n  \\\"twitterDerivedConcepts\\\": [],\\n  \\\"topDesignDirections\\\": []\\n}\" }] }], generationConfig: { temperature: 0.4, maxOutputTokens: 2048 } }) }}",
+        "options": {
+          "timeout": 60000
+        }
+      }
+    },
+    {
+      "id": "parse-analyst",
+      "name": "Parse Trend Analysis",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2460,
+        890
+      ],
+      "parameters": {
+        "jsCode": "const raw = $input.first().json?.candidates?.[0]?.content?.parts?.[0]?.text || '{}';\nconst clean = raw.replace(/```json|```/g,'').trim();\nconst match = clean.match(/\\{[\\s\\S]*\\}/);\nlet a = {}; try { a = JSON.parse(match?.[0]||'{}'); } catch(_){}\nconst niche = $('Trend Aggregator').first().json.niche || '';\nreturn [{ json: { niche, ...a } }];"
+      }
+    },
+    {
+      "id": "sticky-design",
+      "name": "\ud83c\udfa8 DESIGN GENERATION",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2700,
+        280
+      ],
+      "parameters": {
+        "content": "## \ud83c\udfa8 Design Generation\n**10 concepts** generated with:\n- 3 Twitter-inspired\n- 3 Underserved opportunities\n- 2 Seasonal/Emerging\n- 2 Evergreen\n\nEach gets a detailed\nimage prompt for Imagen 3\n\n**Image Gen:**\nGemini Imagen 3 (free)\n\u2193 fallback\nIdeogram HF Space",
+        "height": 600,
+        "width": 1380,
+        "color": 4
+      }
+    },
+    {
+      "id": "prompt-gen-inline",
+      "name": "Generate 10 Concepts",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2800,
+        890
+      ],
+      "parameters": {
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "key",
+              "value": "={{ $env.GEMINI_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ contents: [{ parts: [{ text: \"You are a POD creative director for niche: \\\"\" + $json.niche + \"\\\"\\n\\nTrend brief:\\n- Top directions: \" + ($json.topDesignDirections||[]).join(\", \") + \"\\n- Twitter concepts: \" + ($json.twitterDerivedConcepts||[]).join(\", \") + \"\\n- Emerging: \" + ($json.emergingTrends||[]).join(\", \") + \"\\n- Opportunities: \" + ($json.underservedOpportunities||[]).join(\", \") + \"\\n\\nGenerate EXACTLY 10 t-shirt concepts. Diversity: 3 Twitter-inspired, 3 opportunity-based, 2 seasonal, 2 evergreen. Mix tones.\\n\\nReturn ONLY a JSON array of 10 objects:\\n[{\\n  \\\"id\\\": 1, \\\"title\\\": \\\"\\\", \\\"phrase\\\": \\\"\\\", \\\"concept\\\": \\\"\\\",\\n  \\\"targetAudience\\\": \\\"\\\", \\\"sellingAngle\\\": \\\"\\\",\\n  \\\"tone\\\": \\\"motivational|ironic|raw|minimalist|bold\\\",\\n  \\\"imagePrompt\\\": \\\"detailed prompt for AI image gen\\\",\\n  \\\"colors\\\": [], \\\"typography\\\": \\\"\\\", \\\"icons\\\": [],\\n  \\\"source\\\": \\\"twitter|opportunity|seasonal|evergreen\\\"\\n}]\" }] }], generationConfig: { temperature: 0.85, maxOutputTokens: 4000 } }) }}",
+        "options": {
+          "timeout": 60000
+        }
+      }
+    },
+    {
+      "id": "parse-concepts-inline",
+      "name": "Parse 10 Concepts",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3040,
+        890
+      ],
+      "parameters": {
+        "jsCode": "const raw = $input.first().json?.candidates?.[0]?.content?.parts?.[0]?.text || '[]';\nconst clean = raw.replace(/```json|```/g,'').trim();\nconst match = clean.match(/\\[[\\s\\S]*\\]/);\nlet concepts = []; try { concepts = JSON.parse(match?.[0]||'[]'); } catch(_){}\nconst niche = $('Parse Trend Analysis').first().json.niche || '';\nreturn concepts.map(c => ({ json: { niche, ...c } }));"
+      }
+    },
+    {
+      "id": "gemini-imagen-inline",
+      "name": "Gemini Imagen 3",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3280,
+        890
+      ],
+      "onError": "continueErrorOutput",
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "key",
+              "value": "={{ $env.GEMINI_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ instances: [{ prompt: $json.imagePrompt + \". T-shirt graphic, transparent background, bold flat vector, print-ready, high contrast.\" }], parameters: { sampleCount: 1, aspectRatio: \"1:1\", safetyFilterLevel: \"block_few\" } }) }}",
+        "options": {
+          "timeout": 60000
+        }
+      }
+    },
+    {
+      "id": "check-imagen",
+      "name": "Image Generated?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        3520,
+        890
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.predictions?.[0]?.bytesBase64Encoded ? true : false }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "ideogram-fallback",
+      "name": "Ideogram Fallback",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3760,
+        1040
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://multimodalart-ideogram4.hf.space/gradio_api/call/infer",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ $env.HF_TOKEN ? 'Bearer ' + $env.HF_TOKEN : '' }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ data: [$json.imagePrompt + \". T-shirt graphic, transparent background.\", \"None\", 1024, 1024, 3] }) }}",
+        "options": {
+          "timeout": 120000
+        }
+      }
+    },
+    {
+      "id": "prepare-design-record",
+      "name": "Prepare Design Record",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4000,
+        890
+      ],
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nconst ctx = $('Parse 10 Concepts').first().json;\nconst b64 = item.predictions?.[0]?.bytesBase64Encoded || '';\nconst imgUrl = item.data?.[0]?.[0]?.url || item.data?.[0]?.url || '';\nconst ts = new Date().toISOString().replace(/[:.]/g,'-');\nreturn [{ json: {\n  niche: ctx.niche||'', conceptId: ctx.id||0, title: ctx.title||'',\n  phrase: ctx.phrase||'', tone: ctx.tone||'', source: ctx.source||'',\n  targetAudience: ctx.targetAudience||'', sellingAngle: ctx.sellingAngle||'',\n  imagePrompt: ctx.imagePrompt||'', imageBase64: b64, imageUrl: imgUrl,\n  provider: b64 ? 'gemini' : (imgUrl ? 'ideogram' : 'none'),\n  fileName: `design_${ctx.niche||'x'}_${ctx.id||0}_${ts}.png`,\n  generatedAt: new Date().toISOString()\n} }];"
+      }
+    },
+    {
+      "id": "collect-designs-inline",
+      "name": "Collect All Designs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4240,
+        890
+      ],
+      "parameters": {
+        "jsCode": "return [{ json: { designs: $input.all().map(i => i.json) } }];"
+      }
+    },
+    {
+      "id": "sticky-output",
+      "name": "\ud83d\udcdd SEO + DATABASE",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        4420,
+        280
+      ],
+      "parameters": {
+        "content": "## \ud83d\udcdd SEO + Database\nFor each design:\n- Etsy title (140 chars)\n- Etsy 13 tags\n- Etsy description\n- Amazon title + 5 bullets\n- Amazon backend keywords\n- Search terms\n- Alt text\n\nSaved to Google Sheets\nNotion + Airtable optional",
+        "height": 600,
+        "width": 1160,
+        "color": 5
+      }
+    },
+    {
+      "id": "split-designs-inline",
+      "name": "Split Designs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4500,
+        890
+      ],
+      "parameters": {
+        "jsCode": "const designs = $input.first().json.designs || [];\nreturn designs.map(d => ({ json: d }));"
+      }
+    },
+    {
+      "id": "gemini-seo-inline",
+      "name": "Gemini SEO Generation",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        4740,
+        890
+      ],
+      "parameters": {
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "key",
+              "value": "={{ $env.GEMINI_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ contents: [{ parts: [{ text: \"SEO expert for POD t-shirts.\\nNiche: \" + $json.niche + \"\\nTitle: \" + $json.title + \"\\nPhrase: \" + $json.phrase + \"\\nAudience: \" + $json.targetAudience + \"\\nAngle: \" + $json.sellingAngle + \"\\nTone: \" + $json.tone + \"\\n\\nReturn ONLY JSON:\\n{\\n  \\\"etsyTitle\\\": \\\"max 140 chars\\\",\\n  \\\"etsyDescription\\\": \\\"150 words\\\",\\n  \\\"etsyTags\\\": [\\\"13 tags max 20 chars each\\\"],\\n  \\\"amazonTitle\\\": \\\"max 200 chars\\\",\\n  \\\"amazonBulletPoints\\\": [\\\"5 bullets\\\"],\\n  \\\"amazonKeywords\\\": \\\"250 chars\\\",\\n  \\\"fileName\\\": \\\"slug\\\",\\n  \\\"altText\\\": \\\"125 chars\\\",\\n  \\\"searchTerms\\\": [\\\"10 buyer phrases\\\"]\\n}\" }] }], generationConfig: { temperature: 0.3, maxOutputTokens: 2000 } }) }}",
+        "options": {
+          "timeout": 30000
+        }
+      }
+    },
+    {
+      "id": "parse-seo-inline",
+      "name": "Parse SEO Metadata",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4980,
+        890
+      ],
+      "parameters": {
+        "jsCode": "const ctx = $('Split Designs').first().json;\nconst raw = $input.first().json?.candidates?.[0]?.content?.parts?.[0]?.text || '{}';\nconst clean = raw.replace(/```json|```/g,'').trim();\nconst match = clean.match(/\\{[\\s\\S]*\\}/);\nlet seo = {}; try { seo = JSON.parse(match?.[0]||'{}'); } catch(_){}\nreturn [{ json: { ...ctx, etsyTitle: seo.etsyTitle||'', etsyDescription: seo.etsyDescription||'',\n  etsyTags: seo.etsyTags||[], amazonTitle: seo.amazonTitle||'',\n  amazonBulletPoints: seo.amazonBulletPoints||[], amazonKeywords: seo.amazonKeywords||'',\n  seoFileName: seo.fileName||'', altText: seo.altText||'', searchTerms: seo.searchTerms||[] } }];"
+      }
+    },
+    {
+      "id": "collect-records-inline",
+      "name": "Collect All Records",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5220,
+        890
+      ],
+      "parameters": {
+        "jsCode": "return [{ json: { records: $input.all().map(i => i.json) } }];"
+      }
+    },
+    {
+      "id": "sticky-publish",
+      "name": "\ud83d\ude80 PUBLISH",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        5460,
+        280
+      ],
+      "parameters": {
+        "content": "## \ud83d\ude80 Save + Publish\nGoogle Sheets \u2192 always on\n\nNotion + Airtable \u2192 disabled\n(enable in node settings)\n\nEtsy + Amazon publisher\n\u2192 disabled by default\nEnable when ready to go live",
+        "height": 600,
+        "width": 820,
+        "color": 6
+      }
+    },
+    {
+      "id": "save-sheets",
+      "name": "Save to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        5540,
+        740
+      ],
+      "parameters": {
+        "operation": "append",
+        "documentId": "={{ $env.GOOGLE_SHEET_ID }}",
+        "sheetName": "Designs",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Niche": "={{ $json.niche }}",
+            "Title": "={{ $json.etsyTitle||$json.title }}",
+            "Phrase": "={{ $json.phrase }}",
+            "Tone": "={{ $json.tone }}",
+            "Source": "={{ $json.source }}",
+            "Audience": "={{ $json.targetAudience }}",
+            "PNG URL": "={{ $json.imageUrl }}",
+            "Etsy Tags": "={{ ($json.etsyTags||[]).join(', ') }}",
+            "Amazon Keywords": "={{ $json.amazonKeywords }}",
+            "SEO Filename": "={{ $json.seoFileName }}",
+            "Created": "={{ $json.generatedAt }}"
+          }
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "end-node",
+      "name": "Done \u2705",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        5780,
+        740
+      ],
+      "parameters": {}
     }
   ],
   "connections": {
@@ -250,14 +729,148 @@
       "main": [
         [
           {
-            "node": "Research Agent",
+            "node": "Etsy Agent",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Amazon Agent",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Images Agent",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Reddit Agent",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Search Agent",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Trends Agent",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Vision Agent",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Twitter Agent",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Research Agent": {
+    "Etsy Agent": {
+      "main": [
+        [
+          {
+            "node": "Merge Research Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Amazon Agent": {
+      "main": [
+        [
+          {
+            "node": "Merge Research Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Images Agent": {
+      "main": [
+        [
+          {
+            "node": "Merge Research Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reddit Agent": {
+      "main": [
+        [
+          {
+            "node": "Merge Research Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Search Agent": {
+      "main": [
+        [
+          {
+            "node": "Merge Research Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Trends Agent": {
+      "main": [
+        [
+          {
+            "node": "Merge Research Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vision Agent": {
+      "main": [
+        [
+          {
+            "node": "Merge Research Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Twitter Agent": {
+      "main": [
+        [
+          {
+            "node": "Merge Research Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Research Results": {
+      "main": [
+        [
+          {
+            "node": "Combine Research",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Combine Research": {
       "main": [
         [
           {
@@ -283,69 +896,169 @@
       "main": [
         [
           {
-            "node": "Generate Image Prompts",
+            "node": "Parse Trend Analysis",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Generate Image Prompts": {
+    "Parse Trend Analysis": {
       "main": [
         [
           {
-            "node": "Generate PNG Designs",
+            "node": "Generate 10 Concepts",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Generate PNG Designs": {
+    "Generate 10 Concepts": {
       "main": [
         [
           {
-            "node": "Generate SEO Metadata",
+            "node": "Parse 10 Concepts",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Generate SEO Metadata": {
+    "Parse 10 Concepts": {
       "main": [
         [
           {
-            "node": "Save to Database",
+            "node": "Gemini Imagen 3",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Save to Database": {
+    "Gemini Imagen 3": {
       "main": [
         [
           {
-            "node": "Publish to Etsy / Amazon",
+            "node": "Image Generated?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ideogram Fallback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image Generated?": {
+      "main": [
+        [
+          {
+            "node": "Prepare Design Record",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ideogram Fallback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ideogram Fallback": {
+      "main": [
+        [
+          {
+            "node": "Prepare Design Record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Design Record": {
+      "main": [
+        [
+          {
+            "node": "Collect All Designs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect All Designs": {
+      "main": [
+        [
+          {
+            "node": "Split Designs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Designs": {
+      "main": [
+        [
+          {
+            "node": "Gemini SEO Generation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini SEO Generation": {
+      "main": [
+        [
+          {
+            "node": "Parse SEO Metadata",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse SEO Metadata": {
+      "main": [
+        [
+          {
+            "node": "Collect All Records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect All Records": {
+      "main": [
+        [
+          {
+            "node": "Save to Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save to Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Done \u2705",
             "type": "main",
             "index": 0
           }
         ]
       ]
     }
-  },
-  "active": false,
-  "settings": {
-    "executionOrder": "v1"
-  },
-  "meta": {
-    "instanceId": ""
-  },
-  "tags": [
-    "pod",
-    "orchestrator",
-    "r0merch"
-  ],
-  "id": "1790571d-754c-4445-be73-1c370705998b"
+  }
 }
