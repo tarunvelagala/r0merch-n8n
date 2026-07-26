@@ -2,7 +2,7 @@
   "name": "r0merch \u2014 POD Pipeline (Full)",
   "id": "1790571d-754c-4445-be73-1c370705998b",
   "active": false,
-  "updatedAt": "2026-07-26T14:58:10.000Z",
+  "updatedAt": "2026-07-26T15:08:08.000Z",
   "settings": {
     "executionOrder": "v1"
   },
@@ -970,7 +970,7 @@
         1200
       ],
       "parameters": {
-        "jsCode": "const items=$input.all();\nconst niche=($('Split In Batches').first()?.json?.niche || $input.first()?.json?.niche || '')||'';\nconst find=(src,def)=>{\n  const item=items.find(i=>i.json.source===src);\n  if(!item)return def;\n  return item.json.data||def;\n};\nreturn [{json:{\n  niche,\n  etsy:find('etsy',[]),\n  amazon:find('amazon',[]),\n  pinterest:find('pinterest',{pins:[],trendingKeywords:[]}),\n  reddit:find('reddit',[]),\n  googleSearch:find('google_search',{organic:[],relatedSearches:[],peopleAlsoAsk:[]}),\n  googleTrends:find('google_trends',{timeline:[],trendDirection:'stable',risingQueries:[],topQueries:[]}),\n  vision:find('vision',[]),\n  twitter:find('twitter',{}),\n  collectedAt:new Date().toISOString()\n}}];"
+        "jsCode": "const items = $input.all();\nconst niche = ($('Split In Batches').first()?.json?.niche || items.find(i=>i.json?.niche)?.json?.niche || '');\n\nconst find = (source, def) => {\n  const item = items.find(i => i.json?.source === source);\n  if (!item) return def;\n  return item.json.data ?? def;\n};\n\nreturn [{ json: {\n  niche,\n  etsy:         find('etsy',          []),\n  amazon:       find('amazon',         []),\n  pinterest:    find('pinterest',      {pins:[],trendingKeywords:[]}),\n  reddit:       find('reddit',         []),\n  googleSearch: find('google_search',  {organic:[],relatedSearches:[],peopleAlsoAsk:[]}),\n  googleTrends: find('google_trends',  {timeline:[],trendDirection:'stable',risingQueries:[],topQueries:[]}),\n  vision:       find('vision',         []),\n  twitter:      find('twitter',        {}),\n  collectedAt:  new Date().toISOString()\n} }];"
       }
     },
     {
@@ -1359,6 +1359,17 @@
         500
       ],
       "parameters": {}
+    },
+    {
+      "id": "skip-error",
+      "name": "Skip Error",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1400,
+        2600
+      ],
+      "parameters": {}
     }
   ],
   "connections": {
@@ -1395,7 +1406,7 @@
         ],
         [
           {
-            "node": "Parse Etsy",
+            "node": "Skip Error",
             "type": "main",
             "index": 0
           }
@@ -1413,9 +1424,9 @@
         ],
         [
           {
-            "node": "Parse Etsy",
+            "node": "Skip Error",
             "type": "main",
-            "index": 1
+            "index": 0
           }
         ]
       ]
@@ -1431,7 +1442,7 @@
         ],
         [
           {
-            "node": "Parse Amazon",
+            "node": "Skip Error",
             "type": "main",
             "index": 0
           }
@@ -1449,7 +1460,7 @@
         ],
         [
           {
-            "node": "Parse Google Images",
+            "node": "Skip Error",
             "type": "main",
             "index": 0
           }
@@ -1467,9 +1478,9 @@
         ],
         [
           {
-            "node": "Parse Google Images",
+            "node": "Skip Error",
             "type": "main",
-            "index": 1
+            "index": 0
           }
         ]
       ]
@@ -1485,7 +1496,7 @@
         ],
         [
           {
-            "node": "Parse Reddit",
+            "node": "Skip Error",
             "type": "main",
             "index": 0
           }
@@ -1503,9 +1514,9 @@
         ],
         [
           {
-            "node": "Parse Reddit",
+            "node": "Skip Error",
             "type": "main",
-            "index": 1
+            "index": 0
           }
         ]
       ]
@@ -1521,7 +1532,7 @@
         ],
         [
           {
-            "node": "Parse Google Search",
+            "node": "Skip Error",
             "type": "main",
             "index": 0
           }
@@ -1539,9 +1550,9 @@
         ],
         [
           {
-            "node": "Parse Google Search",
+            "node": "Skip Error",
             "type": "main",
-            "index": 1
+            "index": 0
           }
         ]
       ]
@@ -1557,7 +1568,7 @@
         ],
         [
           {
-            "node": "Parse Google Trends",
+            "node": "Skip Error",
             "type": "main",
             "index": 0
           }
@@ -1575,9 +1586,9 @@
         ],
         [
           {
-            "node": "Parse Google Trends",
+            "node": "Skip Error",
             "type": "main",
-            "index": 1
+            "index": 0
           }
         ]
       ]
@@ -1644,7 +1655,7 @@
         ],
         [
           {
-            "node": "Parse Vision",
+            "node": "Skip Error",
             "type": "main",
             "index": 0
           }
@@ -1662,7 +1673,7 @@
         ],
         [
           {
-            "node": "Collect Tweets",
+            "node": "Skip Error",
             "type": "main",
             "index": 0
           }
@@ -1680,9 +1691,9 @@
         ],
         [
           {
-            "node": "Collect Tweets",
+            "node": "Skip Error",
             "type": "main",
-            "index": 1
+            "index": 0
           }
         ]
       ]
@@ -1709,7 +1720,7 @@
         ],
         [
           {
-            "node": "Parse Twitter",
+            "node": "Skip Error",
             "type": "main",
             "index": 0
           }
