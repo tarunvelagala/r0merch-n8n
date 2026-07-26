@@ -2,7 +2,7 @@
   "updatedAt": "2026-07-25T15:18:43.428Z",
   "createdAt": "2026-07-25T15:18:43.428Z",
   "id": "a7e13a5f-b228-40c9-b37a-c91545985814",
-  "name": "r0merch \u2014 Image Generator",
+  "name": "r0merch — Image Generator",
   "description": null,
   "active": false,
   "isArchived": false,
@@ -68,7 +68,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const geminiResult = $input.first();\nconst ctx = $('Split Into Concepts').first().json;\n// Gemini Imagen returns base64 in predictions[0].bytesBase64Encoded\nconst b64 = geminiResult.json?.predictions?.[0]?.bytesBase64Encoded;\nif (b64) {\n  return [{ json: { ...ctx, imageBase64: b64, imageUrl: '', provider: 'gemini', success: true } }];\n}\n// Failed \u2014 pass to Ideogram fallback\nreturn [{ json: { ...ctx, imageBase64: '', imageUrl: '', provider: '', success: false } }];"
+        "jsCode": "const geminiResult = $input.first();\nconst ctx = $('Split Into Concepts').first().json;\n// Gemini Imagen returns base64 in predictions[0].bytesBase64Encoded\nconst b64 = geminiResult.json?.predictions?.[0]?.bytesBase64Encoded;\nif (b64) {\n  return [{ json: { ...ctx, imageBase64: b64, imageUrl: '', provider: 'gemini', success: true } }];\n}\n// Failed — pass to Ideogram fallback\nreturn [{ json: { ...ctx, imageBase64: '', imageUrl: '', provider: '', success: false } }];"
       },
       "id": "check-gemini",
       "name": "Check Gemini Result",
@@ -319,9 +319,9 @@
   "staticData": null,
   "meta": null,
   "pinData": null,
-  "versionId": "7d152d5c-c318-41f4-9549-cb6d4492183c",
+  "versionId": "a6e32e5c-23f1-49e6-b785-0d56c29e9126",
   "activeVersionId": null,
-  "versionCounter": 18,
+  "versionCounter": 19,
   "triggerCount": 0,
   "tags": [],
   "shared": [
