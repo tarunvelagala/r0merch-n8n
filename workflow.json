@@ -2,7 +2,7 @@
   "name": "r0merch \u2014 POD Pipeline (Full)",
   "id": "1790571d-754c-4445-be73-1c370705998b",
   "active": false,
-  "updatedAt": "2026-07-26T15:55:04.000Z",
+  "updatedAt": "2026-07-26T16:00:44.000Z",
   "settings": {
     "executionOrder": "v1"
   },
@@ -721,7 +721,7 @@
         1980
       ],
       "parameters": {
-        "jsCode": "const input=$input.first().json;\nconst niche=input.niche||'';\nconst urls=[...(input.etsy||[]).map(i=>i.image),...(input.amazon||[]).map(i=>i.image)].filter(Boolean).slice(0,6);\nif(!urls.length)return [{json:{source:'vision',niche,data:[],skipped:true}}];\nreturn urls.map((url,index)=>({json:{niche,imageUrl:url,index,skipped:false}}));"
+        "jsCode": "const input = $input.first().json;\nconst niche = input.niche || '';\nconst urls = [...(input.etsy||[]).map(i=>i.image), ...(input.amazon||[]).map(i=>i.image)].filter(Boolean).slice(0,6);\nif (!urls.length) return [{ json: { source: 'vision', niche, data: [], skipped: true } }];\nreturn urls.map((url, index) => ({ json: { niche, imageUrl: url, index, skipped: false } }));"
       }
     },
     {
@@ -824,7 +824,7 @@
         1980
       ],
       "parameters": {
-        "jsCode": "const niche=($('Read Niches').first()?.json?.niche || $input.first()?.json?.niche || '')||'';\nconst items=$input.all();\nconst data=items.map((item,i)=>{const raw=item.json?.candidates?.[0]?.content?.parts?.[0]?.text||'{}';\nconst clean=raw.replace(/```json|```/g,'').trim();\nconst match=clean.match(/\\{[\\s\\S]*\\}/);\nlet a={};try{a=JSON.parse(match?.[0]||'{}')}catch(_){}\nreturn{imageIndex:i,...a};}).filter(a=>a.style||a.layout);\nreturn [{json:{source:'vision',niche,data}}];"
+        "jsCode": "const niche = ($('Read Niches').first()?.json?.niche || $input.first()?.json?.niche || '');\nconst items = $input.all();\n// If skipped (no images), just pass through\nif (items.length === 1 && items[0].json?.skipped) {\n  return [{ json: { source: 'vision', niche, data: [] } }];\n}\nconst data = items.map((item, i) => {\n  const raw = item.json?.candidates?.[0]?.content?.parts?.[0]?.text || '{}';\n  const clean = raw.replace(/```json|```/g, '').trim();\n  const match = clean.match(/\\{[\\s\\S]*\\}/);\n  let a = {}; try { a = JSON.parse(match?.[0] || '{}'); } catch(_) {}\n  return { imageIndex: i, ...a };\n}).filter(a => a.style || a.layout);\nreturn [{ json: { source: 'vision', niche, data } }];"
       }
     },
     {
