@@ -2,7 +2,7 @@
   "name": "r0merch \u2014 POD Pipeline (Full)",
   "id": "1790571d-754c-4445-be73-1c370705998b",
   "active": false,
-  "updatedAt": "2026-07-26T16:00:44.000Z",
+  "updatedAt": "2026-07-26T16:05:16.000Z",
   "settings": {
     "executionOrder": "v1"
   },
@@ -1754,7 +1754,7 @@
     },
     {
       "id": "w4",
-      "name": "Wait 2s (Vision\u2192GSearch)",
+      "name": "Wait (Trends\u2192Twitter)",
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
@@ -1768,7 +1768,7 @@
     },
     {
       "id": "w5",
-      "name": "Wait 2s (Reddit\u2192Trends)",
+      "name": "Wait (Reddit\u2192GSearch)",
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
@@ -1782,7 +1782,7 @@
     },
     {
       "id": "w6",
-      "name": "Wait 2s (GSearch\u2192Twitter)",
+      "name": "Wait (GSearch\u2192Trends)",
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
@@ -2212,7 +2212,7 @@
             "index": 0
           },
           {
-            "node": "Wait 2s (Reddit\u2192Trends)",
+            "node": "Wait (Reddit\u2192GSearch)",
             "type": "main",
             "index": 0
           }
@@ -2228,7 +2228,7 @@
             "index": 0
           },
           {
-            "node": "Wait 2s (GSearch\u2192Twitter)",
+            "node": "Wait (GSearch\u2192Trends)",
             "type": "main",
             "index": 0
           }
@@ -2242,6 +2242,11 @@
             "node": "Merge All Research",
             "type": "main",
             "index": 0
+          },
+          {
+            "node": "Wait (Trends\u2192Twitter)",
+            "type": "main",
+            "index": 0
           }
         ]
       ]
@@ -2251,11 +2256,6 @@
         [
           {
             "node": "Merge All Research",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Wait 2s (Vision\u2192GSearch)",
             "type": "main",
             "index": 0
           }
@@ -2696,7 +2696,23 @@
         ]
       ]
     },
-    "Wait 2s (Vision\u2192GSearch)": {
+    "Wait (Trends\u2192Twitter)": {
+      "main": [
+        [
+          {
+            "node": "Twitter Search",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Twitter Viral",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait (Reddit\u2192GSearch)": {
       "main": [
         [
           {
@@ -2712,7 +2728,7 @@
         ]
       ]
     },
-    "Wait 2s (Reddit\u2192Trends)": {
+    "Wait (GSearch\u2192Trends)": {
       "main": [
         [
           {
@@ -2722,22 +2738,6 @@
           },
           {
             "node": "Trends Related Queries",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Wait 2s (GSearch\u2192Twitter)": {
-      "main": [
-        [
-          {
-            "node": "Twitter Search",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Twitter Viral",
             "type": "main",
             "index": 0
           }
