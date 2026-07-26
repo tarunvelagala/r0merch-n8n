@@ -2,7 +2,7 @@
   "updatedAt": "2026-07-25T15:18:36.697Z",
   "createdAt": "2026-07-25T15:18:36.697Z",
   "id": "8c4e70a0-cdfa-4f6e-9345-f2895b55ab04",
-  "name": "r0merch — Reddit Agent",
+  "name": "r0merch \u2014 Reddit Agent",
   "description": null,
   "active": false,
   "isArchived": false,
@@ -20,7 +20,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const { niche, subreddits } = $input.first().json;\nconst subs = (subreddits || '')\n  .split(',')\n  .map(s => s.trim())\n  .filter(s => s.startsWith('r/'))\n  .map(s => s.replace('r/', ''));\n\nif (subs.length === 0) {\n  throw new Error(`No valid subreddits for niche \"${niche}\". Expected comma-separated r/name entries.`);\n}\n\nreturn subs.map(sub => ({ json: { niche, sub } }));"
+        "jsCode": "const { niche, subreddits } = $input.first().json;\nconst subs = (subreddits || '')\n  .split(',')\n  .map(s => s.trim())\n  .filter(s => s.startsWith('r/'))\n  .map(s => s.replace('r/', ''));\n\n// Fallback: use niche name as subreddit if none provided\nconst finalSubs = subs.length > 0 ? subs : [niche.replace(/\\s+/g, '')];\n\nreturn finalSubs.map(sub => ({ json: { niche: niche || sub, sub } }));"
       },
       "id": "split-subreddits",
       "name": "Split Subreddits",
@@ -196,9 +196,9 @@
   "staticData": null,
   "meta": null,
   "pinData": null,
-  "versionId": "bf883496-919c-46aa-b639-022252470bb5",
+  "versionId": "db5b2c83-e03c-480b-abe1-8bdbfbc5e841",
   "activeVersionId": null,
-  "versionCounter": 21,
+  "versionCounter": 23,
   "triggerCount": 0,
   "tags": [],
   "shared": [

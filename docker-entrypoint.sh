@@ -67,6 +67,20 @@ do_export() {
       fs.writeFileSync('/workflows/' + filename, JSON.stringify(w, null, 2));
       saved++;
     });
+
+    // Sanitize: replace any $vars. the UI wrote back with $env.
+    let sanitized = 0;
+    fs.readdirSync('/workflows').forEach(f => {
+      if (!/^[0-9]/.test(f) || !f.endsWith('.json')) return;
+      const fpath = '/workflows/' + f;
+      const content = fs.readFileSync(fpath, 'utf8');
+      if (content.includes('$vars.')) {
+        fs.writeFileSync(fpath, content.replaceAll('$vars.', '$env.'));
+        sanitized++;
+      }
+    });
+    if (sanitized > 0) console.log('[r0merch] Sanitized $vars. -> $env. in ' + sanitized + ' files.');
+
     console.log('[r0merch] Exported ' + saved + ' r0merch workflows.');
   " 2>&1 || echo "[r0merch] WARN: export failed, will retry in 60s"
 }
