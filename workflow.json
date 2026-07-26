@@ -2,7 +2,7 @@
   "name": "r0merch \u2014 POD Pipeline (Full)",
   "id": "1790571d-754c-4445-be73-1c370705998b",
   "active": false,
-  "updatedAt": "2026-07-26T16:48:46.000Z",
+  "updatedAt": "2026-07-26T16:49:55.000Z",
   "settings": {
     "executionOrder": "v1"
   },
@@ -1402,11 +1402,11 @@
           ]
         },
         "sendBody": true,
-        "specifyBody": "string",
+        "specifyBody": "json",
         "options": {
           "timeout": 30000
         },
-        "body": "={{ $json.groqBody }}"
+        "jsonBody": "={{ $json.groqBody }}"
       }
     },
     {
@@ -1478,11 +1478,11 @@
           ]
         },
         "sendBody": true,
-        "specifyBody": "string",
+        "specifyBody": "json",
         "options": {
           "timeout": 30000
         },
-        "body": "={{ $json.groqBody }}"
+        "jsonBody": "={{ $json.groqBody }}"
       }
     },
     {
@@ -1554,11 +1554,11 @@
           ]
         },
         "sendBody": true,
-        "specifyBody": "string",
+        "specifyBody": "json",
         "options": {
           "timeout": 30000
         },
-        "body": "={{ $json.groqBody }}"
+        "jsonBody": "={{ $json.groqBody }}"
       }
     },
     {
@@ -1701,7 +1701,7 @@
         680
       ],
       "parameters": {
-        "jsCode": "const d = $('Trend Aggregator').first().json;\nconst body = JSON.stringify({\n  model: 'llama-3.1-8b-instant',\n  messages: [{ role: 'user', content:\n    'POD trend analyst for ' + (d.niche||'') + ' niche.\\n' +\n    'Keywords: ' + (d.keywords||[]).slice(0,15).join(', ') + '\\n' +\n    'Twitter phrases: ' + ((d.twitter||{}).trendingPhrases||[]).slice(0,5).join(', ') + '\\n' +\n    'Return ONLY JSON with these keys: underservedOpportunities (array of 3), saturatedIdeas (array of 2), emergingTrends (array of 3), audienceSegments (array of 3), twitterDerivedConcepts (array of 3), topDesignDirections (array of 5), recurringColors (array), typographyStyles (array), illustrations (array), seasonality (object)'\n  }],\n  max_tokens: 800,\n  temperature: 0.4\n});\nreturn [{ json: { ...d, groqBody: body } }];"
+        "jsCode": "const d = $('Trend Aggregator').first().json;\nconst payload = {\n  model: 'llama-3.1-8b-instant',\n  messages: [{ role: 'user', content:\n    'POD trend analyst for ' + (d.niche||'') + ' niche.\\n' +\n    'Keywords: ' + (d.keywords||[]).slice(0,15).join(', ') + '\\n' +\n    'Twitter phrases: ' + ((d.twitter||{}).trendingPhrases||[]).slice(0,5).join(', ') + '\\n' +\n    'Return ONLY JSON with keys: underservedOpportunities, saturatedIdeas, emergingTrends, audienceSegments, twitterDerivedConcepts, topDesignDirections, recurringColors, typographyStyles, illustrations, seasonality'\n  }],\n  max_tokens: 800,\n  temperature: 0.4\n};\nreturn [{ json: { ...d, groqBody: JSON.stringify(payload) } }];"
       }
     },
     {
@@ -1714,7 +1714,7 @@
         680
       ],
       "parameters": {
-        "jsCode": "const d = $('Parse Analysis').first().json;\nconst body = JSON.stringify({\n  model: 'llama-3.1-8b-instant',\n  messages: [{ role: 'user', content:\n    'POD creative director for ' + (d.niche||'') + ' niche.\\n' +\n    'Directions: ' + (d.topDesignDirections||[]).slice(0,3).join(', ') + '\\n' +\n    'Opportunities: ' + (d.underservedOpportunities||[]).slice(0,2).join(', ') + '\\n' +\n    'Generate 10 t-shirt concepts. Return ONLY a JSON array of 10 objects, each with: id, title, phrase, concept, targetAudience, sellingAngle, tone, imagePrompt, colors, typography, icons, source'\n  }],\n  max_tokens: 1500,\n  temperature: 0.7\n});\nreturn [{ json: { ...d, groqBody: body } }];"
+        "jsCode": "const d = $('Parse Analysis').first().json;\nconst payload = {\n  model: 'llama-3.1-8b-instant',\n  messages: [{ role: 'user', content:\n    'POD creative director for ' + (d.niche||'') + ' niche.\\n' +\n    'Directions: ' + (d.topDesignDirections||[]).slice(0,3).join(', ') + '\\n' +\n    'Opportunities: ' + (d.underservedOpportunities||[]).slice(0,2).join(', ') + '\\n' +\n    'Generate 10 t-shirt concepts as JSON array of 10 objects with: id, title, phrase, concept, targetAudience, sellingAngle, tone, imagePrompt, colors, typography, icons, source'\n  }],\n  max_tokens: 1500,\n  temperature: 0.7\n};\nreturn [{ json: { ...d, groqBody: JSON.stringify(payload) } }];"
       }
     },
     {
@@ -1727,7 +1727,7 @@
         680
       ],
       "parameters": {
-        "jsCode": "const d = $('Split Designs').first().json;\nconst body = JSON.stringify({\n  model: 'llama-3.1-8b-instant',\n  messages: [{ role: 'user', content:\n    'Etsy/Amazon SEO for: ' + (d.phrase||d.title||'') + ' (' + (d.niche||'') + ' niche, ' + (d.tone||'') + ' tone, audience: ' + (d.targetAudience||'') + ')\\n' +\n    'Return ONLY JSON with: etsyTitle (max 140 chars), etsyDescription (150 words), etsyTags (13 tags array), amazonTitle (max 200 chars), amazonBulletPoints (5 bullets array), amazonKeywords (250 chars), fileName (slug), altText (125 chars), searchTerms (5 phrases array)'\n  }],\n  max_tokens: 600,\n  temperature: 0.3\n});\nreturn [{ json: { ...d, groqBody: body } }];"
+        "jsCode": "const d = $('Split Designs').first().json;\nconst payload = {\n  model: 'llama-3.1-8b-instant',\n  messages: [{ role: 'user', content:\n    'Etsy/Amazon SEO for: ' + (d.phrase||d.title||'') + ' (' + (d.niche||'') + ', ' + (d.tone||'') + ', audience: ' + (d.targetAudience||'') + ')\\n' +\n    'Return ONLY JSON with: etsyTitle, etsyDescription, etsyTags (13 tags), amazonTitle, amazonBulletPoints (5), amazonKeywords, fileName, altText, searchTerms (5)'\n  }],\n  max_tokens: 600,\n  temperature: 0.3\n};\nreturn [{ json: { ...d, groqBody: JSON.stringify(payload) } }];"
       }
     }
   ],
