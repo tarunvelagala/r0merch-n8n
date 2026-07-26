@@ -2,7 +2,7 @@
   "name": "r0merch \u2014 POD Pipeline (Full)",
   "id": "1790571d-754c-4445-be73-1c370705998b",
   "active": false,
-  "updatedAt": "2026-07-26T14:35:27.000Z",
+  "updatedAt": "2026-07-26T14:50:01.000Z",
   "settings": {
     "executionOrder": "v1"
   },
@@ -12,28 +12,28 @@
   ],
   "nodes": [
     {
-      "id": "sticky-trigger",
+      "id": "s1",
       "name": "\ud83d\udcc5 TRIGGER",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -260,
-        280
+        -80,
+        200
       ],
       "parameters": {
-        "content": "## \ud83d\udcc5 Trigger\nRuns every Monday 9am\nor manually",
-        "height": 600,
-        "width": 420,
+        "content": "## \ud83d\udcc5 Trigger\nEvery Monday 9am\nor run manually\n\n**Niches:**\nchristian \u00b7 nurse \u00b7 cat-lovers\n(edit Read Niches to add more)",
+        "height": 560,
+        "width": 520,
         "color": 1
       }
     },
     {
-      "id": "trigger-schedule",
+      "id": "trigger",
       "name": "Schedule Trigger",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
       "position": [
-        -160,
+        0,
         500
       ],
       "parameters": {
@@ -53,11 +53,11 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        60,
+        240,
         500
       ],
       "parameters": {
-        "jsCode": "return [\n  { json: { niche: 'christian', marketing_pages: 'r/Christianity,r/Bible' } },\n  { json: { niche: 'nurse',     marketing_pages: 'r/nursing,r/nurses' } },\n  { json: { niche: 'cat-lovers',marketing_pages: 'r/cats,r/CatMemes' } }\n];"
+        "jsCode": "return [\n  { json: { niche: 'christian', marketing_pages: 'r/Christianity,r/Bible' } },\n  { json: { niche: 'nurse', marketing_pages: 'r/nursing,r/nurses' } },\n  { json: { niche: 'cat-lovers', marketing_pages: 'r/cats,r/CatMemes' } }\n];"
       }
     },
     {
@@ -66,7 +66,7 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        280,
+        480,
         500
       ],
       "parameters": {
@@ -75,229 +75,885 @@
       }
     },
     {
-      "id": "sticky-research",
-      "name": "\ud83d\udd0d RESEARCH",
+      "id": "s2",
+      "name": "\ud83d\udd0d PARALLEL RESEARCH",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        440,
-        280
+        620,
+        80
       ],
       "parameters": {
-        "content": "## \ud83d\udd0d Parallel Research\n8 sources run simultaneously:\nEtsy \u00b7 Amazon \u00b7 Google Images\nReddit \u00b7 Google Search\nGoogle Trends \u00b7 Vision \u00b7 Twitter/X\n\nAll use SerpAPI + Gemini + Groq\nNo OAuth required",
-        "height": 600,
-        "width": 1380,
+        "content": "## \ud83d\udd0d Parallel Research\n8 sources run simultaneously\n\n\u2022 Etsy (Google Shopping + Organic)\n\u2022 Amazon (SerpAPI Amazon engine)\n\u2022 Google Images (visual trends)\n\u2022 Reddit (site:reddit.com)\n\u2022 Google Search (2 queries)\n\u2022 Google Trends (timeseries + queries)\n\u2022 Vision (Gemini 1.5 Flash)\n\u2022 Twitter/X (SerpAPI + Groq)\n\nAll errors handled gracefully",
+        "height": 2560,
+        "width": 1820,
         "color": 2
       }
     },
     {
-      "id": "etsy-agent",
-      "name": "Etsy Agent",
-      "type": "n8n-nodes-base.executeWorkflow",
-      "typeVersion": 1,
+      "id": "etsy-shop",
+      "name": "Etsy Shopping",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
       "position": [
-        540,
+        800,
+        180
+      ],
+      "parameters": {
+        "url": "https://serpapi.com/search.json",
+        "options": {
+          "timeout": 30000
+        },
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "engine",
+              "value": "google_shopping"
+            },
+            {
+              "name": "q",
+              "value": "={{ $json.niche + ' t-shirt site:etsy.com' }}"
+            },
+            {
+              "name": "api_key",
+              "value": "={{ $env.SERPAPI_KEY }}"
+            },
+            {
+              "name": "gl",
+              "value": "us"
+            },
+            {
+              "name": "hl",
+              "value": "en"
+            },
+            {
+              "name": "num",
+              "value": "40"
+            }
+          ]
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "etsy-org",
+      "name": "Etsy Organic",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        800,
+        340
+      ],
+      "parameters": {
+        "url": "https://serpapi.com/search.json",
+        "options": {
+          "timeout": 30000
+        },
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "engine",
+              "value": "google"
+            },
+            {
+              "name": "q",
+              "value": "={{ 'site:etsy.com ' + $json.niche + ' t-shirt bestseller' }}"
+            },
+            {
+              "name": "api_key",
+              "value": "={{ $env.SERPAPI_KEY }}"
+            },
+            {
+              "name": "gl",
+              "value": "us"
+            },
+            {
+              "name": "hl",
+              "value": "en"
+            },
+            {
+              "name": "num",
+              "value": "20"
+            }
+          ]
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "parse-etsy",
+      "name": "Parse Etsy",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1100,
         260
       ],
       "parameters": {
-        "workflowId": "25b7d461-1692-4fab-8739-5419bed842c5",
-        "workflowInputs": {
-          "values": [
-            {
-              "name": "niche",
-              "stringValue": "={{ $json.niche }}"
-            },
-            {
-              "name": "marketing_pages",
-              "stringValue": "={{ $json.marketing_pages }}"
-            }
-          ]
-        }
+        "jsCode": "const niche=$('Split In Batches').first().json.niche;\nconst sr=$('Etsy Shopping').first().json;\nconst or_=$('Etsy Organic').first().json;\nconst shopping=(sr?.shopping_results||[]).map(r=>({title:r.title||'',url:r.link||'',price:r.price||'',image:r.thumbnail||'',rating:r.rating||0,reviews:r.reviews||0,tags:[],source:'google_shopping'}));\nconst organic=(or_?.organic_results||[]).filter(r=>r.link?.includes('etsy.com')).map(r=>({title:r.title||'',url:r.link||'',price:'',image:r.thumbnail||'',rating:0,reviews:0,tags:(r.title||'').toLowerCase().split(/[\\s,|]+/).filter(t=>t.length>3),source:'google_organic'}));\nreturn [{json:{source:'etsy',niche,data:[...shopping,...organic].slice(0,30)}}];"
       }
     },
     {
-      "id": "amazon-agent",
-      "name": "Amazon Agent",
-      "type": "n8n-nodes-base.executeWorkflow",
-      "typeVersion": 1,
+      "id": "amazon-s",
+      "name": "Amazon Search",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
       "position": [
-        540,
-        440
+        800,
+        480
       ],
       "parameters": {
-        "workflowId": "5263dc0c-b3cc-4962-b9d0-de12fb260b56",
-        "workflowInputs": {
-          "values": [
+        "url": "https://serpapi.com/search.json",
+        "options": {
+          "timeout": 30000
+        },
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
             {
-              "name": "niche",
-              "stringValue": "={{ $json.niche }}"
+              "name": "engine",
+              "value": "amazon"
             },
             {
-              "name": "marketing_pages",
-              "stringValue": "={{ $json.marketing_pages }}"
+              "name": "k",
+              "value": "={{ $json.niche + ' t-shirt' }}"
+            },
+            {
+              "name": "amazon_domain",
+              "value": "amazon.com"
+            },
+            {
+              "name": "api_key",
+              "value": "={{ $env.SERPAPI_KEY }}"
+            },
+            {
+              "name": "department",
+              "value": "fashion-mens-graphic-tees"
             }
           ]
         }
-      }
+      },
+      "onError": "continueErrorOutput"
     },
     {
-      "id": "google-images-agent",
-      "name": "Google Images Agent",
-      "type": "n8n-nodes-base.executeWorkflow",
-      "typeVersion": 1,
+      "id": "parse-amazon",
+      "name": "Parse Amazon",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
-        540,
-        620
+        1100,
+        480
       ],
       "parameters": {
-        "workflowId": "09597748-4eb1-4b4c-a646-d802f2156694",
-        "workflowInputs": {
-          "values": [
-            {
-              "name": "niche",
-              "stringValue": "={{ $json.niche }}"
-            },
-            {
-              "name": "marketing_pages",
-              "stringValue": "={{ $json.marketing_pages }}"
-            }
-          ]
-        }
+        "jsCode": "const niche=$('Split In Batches').first().json.niche;\nconst r=$input.first().json?.organic_results||[];\nconst data=r.map(i=>({title:i.title||'',url:i.link||`https://www.amazon.com/dp/${i.asin}`,price:i.price?.raw||i.price||'',image:i.thumbnail||'',rating:i.rating||0,reviews:i.reviews?.total||0,asin:i.asin||''}));\nreturn [{json:{source:'amazon',niche,data}}];"
       }
     },
     {
-      "id": "reddit-agent",
-      "name": "Reddit Agent",
-      "type": "n8n-nodes-base.executeWorkflow",
-      "typeVersion": 1,
+      "id": "gimg-design",
+      "name": "Google Images Design",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
       "position": [
-        540,
-        800
+        800,
+        780
       ],
       "parameters": {
-        "workflowId": "8c4e70a0-cdfa-4f6e-9345-f2895b55ab04",
-        "workflowInputs": {
-          "values": [
+        "url": "https://serpapi.com/search.json",
+        "options": {
+          "timeout": 30000
+        },
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
             {
-              "name": "niche",
-              "stringValue": "={{ $json.niche }}"
+              "name": "engine",
+              "value": "google_images"
             },
             {
-              "name": "marketing_pages",
-              "stringValue": "={{ $json.marketing_pages }}"
+              "name": "q",
+              "value": "={{ $json.niche + ' t-shirt design' }}"
+            },
+            {
+              "name": "api_key",
+              "value": "={{ $env.SERPAPI_KEY }}"
+            },
+            {
+              "name": "hl",
+              "value": "en"
+            },
+            {
+              "name": "gl",
+              "value": "us"
             }
           ]
         }
-      }
+      },
+      "onError": "continueErrorOutput"
     },
     {
-      "id": "google-search-agent",
-      "name": "Google Search Agent",
-      "type": "n8n-nodes-base.executeWorkflow",
-      "typeVersion": 1,
+      "id": "gimg-trend",
+      "name": "Google Images Trending",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
       "position": [
-        540,
-        980
+        800,
+        940
       ],
       "parameters": {
-        "workflowId": "1fb17f86-9092-4ea6-b5cd-4631ca01134c",
-        "workflowInputs": {
-          "values": [
+        "url": "https://serpapi.com/search.json",
+        "options": {
+          "timeout": 30000
+        },
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
             {
-              "name": "niche",
-              "stringValue": "={{ $json.niche }}"
+              "name": "engine",
+              "value": "google_images"
             },
             {
-              "name": "marketing_pages",
-              "stringValue": "={{ $json.marketing_pages }}"
+              "name": "q",
+              "value": "={{ $json.niche + ' t-shirt trending' }}"
+            },
+            {
+              "name": "api_key",
+              "value": "={{ $env.SERPAPI_KEY }}"
+            },
+            {
+              "name": "hl",
+              "value": "en"
+            },
+            {
+              "name": "gl",
+              "value": "us"
             }
           ]
         }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "parse-gimg",
+      "name": "Parse Google Images",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1100,
+        860
+      ],
+      "parameters": {
+        "jsCode": "const niche=$('Split In Batches').first().json.niche;\nconst ir=$('Google Images Design').first().json;\nconst tr=$('Google Images Trending').first().json;\nconst m=r=>({title:r.title||'',url:r.link||r.original||'',image:r.original||r.thumbnail||''});\nconst pins=(ir?.images_results||[]).map(m).slice(0,20);\nconst trending=(tr?.images_results||[]).map(m).slice(0,10);\nconst trendingKeywords=[...(ir?.suggested_searches||[]).map(s=>s.name||s.q||s),...(tr?.suggested_searches||[]).map(s=>s.name||s.q||s)].slice(0,20);\nreturn [{json:{source:'pinterest',niche,data:{pins:[...pins,...trending],trendingKeywords}}}];"
       }
     },
     {
-      "id": "google-trends-agent",
-      "name": "Google Trends Agent",
-      "type": "n8n-nodes-base.executeWorkflow",
-      "typeVersion": 1,
+      "id": "reddit-s",
+      "name": "Reddit Search",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
       "position": [
-        540,
+        800,
+        1080
+      ],
+      "parameters": {
+        "url": "https://serpapi.com/search.json",
+        "options": {
+          "timeout": 30000
+        },
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "engine",
+              "value": "google"
+            },
+            {
+              "name": "q",
+              "value": "={{ 'site:reddit.com ' + ($json.niche||'') + ' t-shirt' }}"
+            },
+            {
+              "name": "api_key",
+              "value": "={{ $env.SERPAPI_KEY }}"
+            },
+            {
+              "name": "gl",
+              "value": "us"
+            },
+            {
+              "name": "hl",
+              "value": "en"
+            },
+            {
+              "name": "num",
+              "value": "20"
+            },
+            {
+              "name": "tbs",
+              "value": "qdr:m"
+            }
+          ]
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "reddit-c",
+      "name": "Reddit Community",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        800,
+        1240
+      ],
+      "parameters": {
+        "url": "https://serpapi.com/search.json",
+        "options": {
+          "timeout": 30000
+        },
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "engine",
+              "value": "google"
+            },
+            {
+              "name": "q",
+              "value": "={{ 'site:reddit.com ' + ($json.niche||'') + ' merch design community' }}"
+            },
+            {
+              "name": "api_key",
+              "value": "={{ $env.SERPAPI_KEY }}"
+            },
+            {
+              "name": "gl",
+              "value": "us"
+            },
+            {
+              "name": "hl",
+              "value": "en"
+            },
+            {
+              "name": "num",
+              "value": "20"
+            },
+            {
+              "name": "tbs",
+              "value": "qdr:m"
+            }
+          ]
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "parse-reddit",
+      "name": "Parse Reddit",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1100,
         1160
       ],
       "parameters": {
-        "workflowId": "4a5b9883-f228-4502-a93b-ae5197d28d30",
-        "workflowInputs": {
-          "values": [
-            {
-              "name": "niche",
-              "stringValue": "={{ $json.niche }}"
-            },
-            {
-              "name": "marketing_pages",
-              "stringValue": "={{ $json.marketing_pages }}"
-            }
-          ]
-        }
+        "jsCode": "const niche=$('Split In Batches').first().json.niche||'';\nconst sr=$('Reddit Search').first().json;\nconst cr=$('Reddit Community').first().json;\nconst m=r=>({title:r.title||'',url:r.link||'',snippet:r.snippet||'',sub:(r.link||'').match(/reddit\\.com\\/r\\/([^\\/]+)/)?.[1]||''});\nconst seen=new Set();\nconst data=[...(sr?.organic_results||[]).map(m),...(cr?.organic_results||[]).map(m)].filter(r=>{if(!r.title||seen.has(r.url))return false;seen.add(r.url);return true;});\nreturn [{json:{source:'reddit',niche,data}}];"
       }
     },
     {
-      "id": "vision-agent",
-      "name": "Vision Agent",
-      "type": "n8n-nodes-base.executeWorkflow",
-      "typeVersion": 1,
+      "id": "gsearch-main",
+      "name": "Google Search Main",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
       "position": [
-        540,
-        1340
+        800,
+        1380
       ],
       "parameters": {
-        "workflowId": "b7a2e73f-4388-431e-9bb3-737dfd7cf77d",
-        "workflowInputs": {
-          "values": [
+        "url": "https://serpapi.com/search.json",
+        "options": {
+          "timeout": 30000
+        },
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
             {
-              "name": "niche",
-              "stringValue": "={{ $json.niche }}"
+              "name": "engine",
+              "value": "google"
             },
             {
-              "name": "marketing_pages",
-              "stringValue": "={{ $json.marketing_pages }}"
+              "name": "q",
+              "value": "={{ $json.niche + ' t-shirt best selling 2025' }}"
+            },
+            {
+              "name": "api_key",
+              "value": "={{ $env.SERPAPI_KEY }}"
+            },
+            {
+              "name": "num",
+              "value": "20"
+            },
+            {
+              "name": "hl",
+              "value": "en"
+            },
+            {
+              "name": "gl",
+              "value": "us"
             }
           ]
         }
-      }
+      },
+      "onError": "continueErrorOutput"
     },
     {
-      "id": "twitter-agent",
-      "name": "Twitter Agent",
-      "type": "n8n-nodes-base.executeWorkflow",
-      "typeVersion": 1,
+      "id": "gsearch-niche",
+      "name": "Google Search Niche",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
       "position": [
-        540,
-        1520
+        800,
+        1540
       ],
       "parameters": {
-        "workflowId": "3d7e9f12-a841-4c56-b234-8f1e2a3b4c5d",
-        "workflowInputs": {
-          "values": [
+        "url": "https://serpapi.com/search.json",
+        "options": {
+          "timeout": 30000
+        },
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
             {
-              "name": "niche",
-              "stringValue": "={{ $json.niche }}"
+              "name": "engine",
+              "value": "google"
             },
             {
-              "name": "marketing_pages",
-              "stringValue": "={{ $json.marketing_pages }}"
+              "name": "q",
+              "value": "={{ $json.niche + ' t-shirt print on demand niche ideas' }}"
+            },
+            {
+              "name": "api_key",
+              "value": "={{ $env.SERPAPI_KEY }}"
+            },
+            {
+              "name": "num",
+              "value": "10"
+            },
+            {
+              "name": "hl",
+              "value": "en"
+            },
+            {
+              "name": "gl",
+              "value": "us"
             }
           ]
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "parse-gsearch",
+      "name": "Parse Google Search",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1100,
+        1460
+      ],
+      "parameters": {
+        "jsCode": "const niche=$('Split In Batches').first().json.niche;\nconst mr=$('Google Search Main').first().json;\nconst nr=$('Google Search Niche').first().json;\nconst m=r=>({title:r.title||'',url:r.link||'',snippet:r.snippet||''});\nconst organic=(mr?.organic_results||[]).map(m);\nconst relatedSearches=[...(mr?.related_searches||[]).map(s=>s.query),...(nr?.related_searches||[]).map(s=>s.query)].filter(Boolean);\nconst peopleAlsoAsk=(mr?.related_questions||[]).map(q=>q.question).filter(Boolean);\nreturn [{json:{source:'google_search',niche,data:{organic,relatedSearches,peopleAlsoAsk}}}];"
+      }
+    },
+    {
+      "id": "gtrends-ts",
+      "name": "Trends Timeseries",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        800,
+        1680
+      ],
+      "parameters": {
+        "url": "https://serpapi.com/search.json",
+        "options": {
+          "timeout": 30000
+        },
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "engine",
+              "value": "google_trends"
+            },
+            {
+              "name": "q",
+              "value": "={{ $json.niche + ' t-shirt' }}"
+            },
+            {
+              "name": "api_key",
+              "value": "={{ $env.SERPAPI_KEY }}"
+            },
+            {
+              "name": "data_type",
+              "value": "TIMESERIES"
+            },
+            {
+              "name": "date",
+              "value": "today 12-m"
+            },
+            {
+              "name": "geo",
+              "value": "US"
+            }
+          ]
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "gtrends-rq",
+      "name": "Trends Related Queries",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        800,
+        1840
+      ],
+      "parameters": {
+        "url": "https://serpapi.com/search.json",
+        "options": {
+          "timeout": 30000
+        },
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "engine",
+              "value": "google_trends"
+            },
+            {
+              "name": "q",
+              "value": "={{ $json.niche + ' t-shirt' }}"
+            },
+            {
+              "name": "api_key",
+              "value": "={{ $env.SERPAPI_KEY }}"
+            },
+            {
+              "name": "data_type",
+              "value": "RELATED_QUERIES"
+            },
+            {
+              "name": "date",
+              "value": "today 12-m"
+            },
+            {
+              "name": "geo",
+              "value": "US"
+            }
+          ]
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "parse-gtrends",
+      "name": "Parse Google Trends",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1100,
+        1760
+      ],
+      "parameters": {
+        "jsCode": "const niche=$('Split In Batches').first().json.niche;\nconst tr=$('Trends Timeseries').first().json;\nconst rr=$('Trends Related Queries').first().json;\nconst timeline=(tr?.interest_over_time?.timeline_data||[]).map(t=>({date:t.date,value:t.values?.[0]?.extracted_value??0}));\nconst avg=arr=>arr.length?arr.reduce((s,v)=>s+v,0)/arr.length:0;\nconst r4=avg(timeline.slice(-4).map(t=>t.value)),p4=avg(timeline.slice(-8,-4).map(t=>t.value));\nconst trendDirection=r4>p4*1.1?'rising':r4<p4*0.9?'falling':'stable';\nconst byMonth={};\ntimeline.forEach(({date,value})=>{const m=date?.split(' ')?.[0]||'';if(!byMonth[m])byMonth[m]=[];byMonth[m].push(value);});\nconst ma=Object.entries(byMonth).map(([m,v])=>({m,a:avg(v)})).sort((a,b)=>b.a-a.a);\nconst rising=(rr?.related_queries?.rising||[]).map(r=>r.query);\nconst top=(rr?.related_queries?.top||[]).map(r=>r.query);\nreturn [{json:{source:'google_trends',niche,data:{timeline,trendDirection,peakMonths:ma.slice(0,3).map(x=>x.m),lowMonths:ma.slice(-3).map(x=>x.m),risingQueries:rising,topQueries:top}}}];"
+      }
+    },
+    {
+      "id": "vision-prep",
+      "name": "Prepare Images",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        800,
+        1980
+      ],
+      "parameters": {
+        "jsCode": "const input=$input.first().json;\nconst niche=input.niche||'';\nconst urls=[...(input.etsy||[]).map(i=>i.image),...(input.amazon||[]).map(i=>i.image)].filter(Boolean).slice(0,6);\nif(!urls.length)return [{json:{source:'vision',niche,data:[],skipped:true}}];\nreturn urls.map((url,index)=>({json:{niche,imageUrl:url,index,skipped:false}}));"
+      }
+    },
+    {
+      "id": "vision-if",
+      "name": "Vision Has Images?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1000,
+        1980
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.skipped }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
         }
       }
     },
     {
-      "id": "merge-results",
-      "name": "Merge Research Results",
+      "id": "vision-dl",
+      "name": "Vision Download",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1200,
+        1860
+      ],
+      "parameters": {
+        "url": "={{ $json.imageUrl }}",
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "vision-enc",
+      "name": "Vision Encode",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1420,
+        1860
+      ],
+      "parameters": {
+        "jsCode": "const item=$input.first();\nconst ctx=$('Prepare Images').first().json;\nconst bk=Object.keys(item.binary||{})[0]||'data';\nconst b=item.binary?.[bk];\nif(!b?.data)return [{json:{source:'vision',niche:ctx.niche,data:[],skipped:true}}];\nreturn [{json:{niche:ctx.niche,imageUrl:ctx.imageUrl,base64:b.data,mimeType:b.mimeType||'image/jpeg'}}];"
+      }
+    },
+    {
+      "id": "vision-gemini",
+      "name": "Vision Gemini",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1640,
+        1860
+      ],
+      "parameters": {
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent",
+        "options": {
+          "timeout": 30000
+        },
+        "method": "POST",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "key",
+              "value": "={{ $env.GEMINI_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ contents: [{ parts: [{ inline_data: { mime_type: $json.mimeType, data: $json.base64 } }, { text: 'Analyze t-shirt. Return ONLY JSON: {\"style\":\"\",\"layout\":\"\",\"colors\":[],\"fonts\":\"\",\"icons\":[],\"texture\":\"\",\"mood\":\"\"}' }] }], generationConfig: { temperature: 0.1, maxOutputTokens: 512 } }) }}"
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "parse-vision",
+      "name": "Parse Vision",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1860,
+        1980
+      ],
+      "parameters": {
+        "jsCode": "const niche=$('Split In Batches').first().json.niche||'';\nconst items=$input.all();\nconst data=items.map((item,i)=>{const raw=item.json?.candidates?.[0]?.content?.parts?.[0]?.text||'{}';\nconst clean=raw.replace(/```json|```/g,'').trim();\nconst match=clean.match(/\\{[\\s\\S]*\\}/);\nlet a={};try{a=JSON.parse(match?.[0]||'{}')}catch(_){}\nreturn{imageIndex:i,...a};}).filter(a=>a.style||a.layout);\nreturn [{json:{source:'vision',niche,data}}];"
+      }
+    },
+    {
+      "id": "tw-search",
+      "name": "Twitter Search",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        800,
+        2280
+      ],
+      "parameters": {
+        "url": "https://serpapi.com/search.json",
+        "options": {
+          "timeout": 30000
+        },
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "engine",
+              "value": "google"
+            },
+            {
+              "name": "q",
+              "value": "={{ 'site:x.com OR site:twitter.com ' + $json.niche + ' t-shirt' }}"
+            },
+            {
+              "name": "api_key",
+              "value": "={{ $env.SERPAPI_KEY }}"
+            },
+            {
+              "name": "gl",
+              "value": "us"
+            },
+            {
+              "name": "hl",
+              "value": "en"
+            },
+            {
+              "name": "num",
+              "value": "20"
+            },
+            {
+              "name": "tbs",
+              "value": "qdr:w"
+            }
+          ]
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "tw-viral",
+      "name": "Twitter Viral",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        800,
+        2440
+      ],
+      "parameters": {
+        "url": "https://serpapi.com/search.json",
+        "options": {
+          "timeout": 30000
+        },
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "engine",
+              "value": "google"
+            },
+            {
+              "name": "q",
+              "value": "={{ 'site:x.com OR site:twitter.com ' + $json.niche + ' trending viral meme' }}"
+            },
+            {
+              "name": "api_key",
+              "value": "={{ $env.SERPAPI_KEY }}"
+            },
+            {
+              "name": "gl",
+              "value": "us"
+            },
+            {
+              "name": "hl",
+              "value": "en"
+            },
+            {
+              "name": "num",
+              "value": "20"
+            },
+            {
+              "name": "tbs",
+              "value": "qdr:w"
+            }
+          ]
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "tw-collect",
+      "name": "Collect Tweets",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1100,
+        2360
+      ],
+      "parameters": {
+        "jsCode": "const niche=$('Split In Batches').first().json.niche;\nconst tr=$('Twitter Search').first().json;\nconst vr=$('Twitter Viral').first().json;\nconst snippets=[...(tr?.organic_results||[]),...(vr?.organic_results||[])].map(r=>r.title+' '+(r.snippet||'')).join('\\n');\nreturn [{json:{niche,rawSnippets:snippets}}];"
+      }
+    },
+    {
+      "id": "tw-groq",
+      "name": "Groq Trend Analyzer",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1340,
+        2360
+      ],
+      "parameters": {
+        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "options": {
+          "timeout": 30000
+        },
+        "method": "POST",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: \"llama-3.1-8b-instant\", messages: [{ role: \"user\", content: \"POD trend analyst. Twitter/X posts about \\\"\" + $json.niche + \"\\\":\\n\\n\" + $json.rawSnippets + \"\\n\\nReturn ONLY JSON: {\\\"trendingPhrases\\\":[],\\\"slang\\\":[],\\\"hashtags\\\":[],\\\"memes\\\":[],\\\"culturalSignals\\\":[],\\\"emotions\\\":[],\\\"keywords\\\":[]}\" }], max_tokens: 600, temperature: 0.4 }) }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + $env.GROQ_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "parse-twitter",
+      "name": "Parse Twitter",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1580,
+        2360
+      ],
+      "parameters": {
+        "jsCode": "const niche=$('Collect Tweets').first().json.niche;\nconst raw=$input.first().json?.choices?.[0]?.message?.content||'{}';\nconst clean=raw.replace(/```json|```/g,'').trim();\nconst match=clean.match(/\\{[\\s\\S]*\\}/);\nlet a={};try{a=JSON.parse(match?.[0]||'{}')}catch(_){}\nreturn [{json:{source:'twitter',niche,data:a}}];"
+      }
+    },
+    {
+      "id": "merge-all",
+      "name": "Merge All Research",
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3,
       "position": [
-        1400,
-        890
+        2100,
+        1200
       ],
       "parameters": {
         "mode": "append",
@@ -310,53 +966,57 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1640,
-        890
+        2360,
+        1200
       ],
       "parameters": {
-        "jsCode": "const items = $input.all();\nconst niche = $('Split In Batches').first().json.niche || '';\nconst find = (source) => {\n  const item = items.find(i => i.json.source === source);\n  if (!item) return source === 'twitter' ? {} : [];\n  return item.json.data || (source === 'twitter' ? {} : []);\n};\nreturn [{ json: {\n  niche,\n  etsy:         find('etsy'),\n  amazon:       find('amazon'),\n  pinterest:    find('pinterest'),\n  reddit:       find('reddit'),\n  googleSearch: find('google_search'),\n  googleTrends: find('google_trends'),\n  vision:       find('vision'),\n  twitter:      find('twitter'),\n  collectedAt:  new Date().toISOString()\n} }];"
+        "jsCode": "const items=$input.all();\nconst niche=$('Split In Batches').first().json.niche||'';\nconst find=(src,def)=>{\n  const item=items.find(i=>i.json.source===src);\n  if(!item)return def;\n  return item.json.data||def;\n};\nreturn [{json:{\n  niche,\n  etsy:find('etsy',[]),\n  amazon:find('amazon',[]),\n  pinterest:find('pinterest',{pins:[],trendingKeywords:[]}),\n  reddit:find('reddit',[]),\n  googleSearch:find('google_search',{organic:[],relatedSearches:[],peopleAlsoAsk:[]}),\n  googleTrends:find('google_trends',{timeline:[],trendDirection:'stable',risingQueries:[],topQueries:[]}),\n  vision:find('vision',[]),\n  twitter:find('twitter',{}),\n  collectedAt:new Date().toISOString()\n}}];"
       }
     },
     {
-      "id": "sticky-analysis",
-      "name": "\ud83d\udcca ANALYSIS",
+      "id": "s3",
+      "name": "\ud83d\udcca TREND ANALYSIS",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        1880,
-        280
+        2640,
+        200
       ],
       "parameters": {
-        "content": "## \ud83d\udcca Trend Analysis\nNormalizes all 8 sources\ninto structured signals:\ncolors \u00b7 fonts \u00b7 icons\nkeywords \u00b7 audience\nseasonality \u00b7 competition\n\nThen Gemini identifies\nopportunities + gaps",
-        "height": 600,
-        "width": 880,
+        "content": "## \ud83d\udcca Trend Analysis\n**Aggregator** normalizes all sources:\ncolors \u00b7 fonts \u00b7 icons \u00b7 keywords\naudience \u00b7 seasonality \u00b7 competition\nTwitter phrases + slang\n\n**Gemini 1.5 Pro** identifies:\n\u2022 Underserved opportunities\n\u2022 Saturated ideas to avoid\n\u2022 Emerging trends\n\u2022 Top design directions\n\u2022 Twitter-derived concepts",
+        "height": 560,
+        "width": 940,
         "color": 3
       }
     },
     {
-      "id": "trend-aggregator-inline",
+      "id": "trend-agg",
       "name": "Trend Aggregator",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1960,
-        890
+        2740,
+        500
       ],
       "parameters": {
-        "jsCode": "const research = $input.first().json;\nconst { niche, etsy, amazon, pinterest, reddit, googleSearch, googleTrends, vision, twitter } = research;\nconst freq = arr => { const m={}; arr.filter(Boolean).forEach(v=>{m[v]=(m[v]||0)+1;}); return Object.entries(m).sort((a,b)=>b[1]-a[1]).map(([k])=>k); };\nconst n = s => (s||'').toLowerCase().trim();\nconst tw = twitter || {};\nconst allTags = [...(etsy||[]).flatMap(i=>i.tags||[]), ...(pinterest?.trendingKeywords||[])].map(n).filter(Boolean);\nconst risingQ = (googleTrends?.risingQueries||[]); const topQ = (googleTrends?.topQueries||[]);\nconst related = (googleSearch?.relatedSearches||[]); const paa = (googleSearch?.peopleAlsoAsk||[]);\nconst allColors = (vision||[]).flatMap(i=>i.colors||[]).map(n);\nconst redditPosts = (reddit||[]).filter(p=>p.score>50);\nconst audience = freq([...freq(redditPosts.map(p=>p.flair).filter(Boolean)).slice(0,5), ...(tw.emotions||[]).map(n)]).slice(0,8);\nconst season = googleTrends?.trendDirection ? { peakMonths:(googleTrends.peakMonths||[]), lowMonths:(googleTrends.lowMonths||[]), trendDirection:googleTrends.trendDirection } : { trendDirection:'stable' };\nreturn [{ json: { niche,\n  colors: freq(allColors).slice(0,10), fonts: freq((vision||[]).map(i=>i.fonts).filter(Boolean)).slice(0,5),\n  icons: freq((vision||[]).flatMap(i=>i.icons||[]).map(n)).slice(0,15),\n  styles: freq((vision||[]).map(i=>i.style).filter(Boolean)).slice(0,5),\n  moods: freq((vision||[]).map(i=>i.mood).filter(Boolean)).slice(0,5),\n  keywords: freq([...allTags,...risingQ,...topQ,...related,...(tw.trendingPhrases||[]).map(n),...(tw.slang||[]).map(n)]).slice(0,40),\n  quotes: [...(etsy||[]).map(i=>i.title),...(amazon||[]).map(i=>i.title)].filter(Boolean).slice(0,20),\n  audience, seasonality: season,\n  competition: { etsyCount:(etsy||[]).length, amazonCount:(amazon||[]).length },\n  twitter: { trendingPhrases:(tw.trendingPhrases||[]).slice(0,15), slang:(tw.slang||[]).slice(0,10), hashtags:(tw.hashtags||[]).slice(0,10), memes:(tw.memes||[]).slice(0,10) },\n  peopleAlsoAsk: paa.slice(0,10), aggregatedAt: new Date().toISOString()\n} }];"
+        "jsCode": "const r=$input.first().json;\nconst{niche,etsy,amazon,pinterest,reddit,googleSearch,googleTrends,vision,twitter}=r;\nconst freq=arr=>{const m={};arr.filter(Boolean).forEach(v=>{m[v]=(m[v]||0)+1;});return Object.entries(m).sort((a,b)=>b[1]-a[1]).map(([k])=>k);};\nconst n=s=>(s||'').toLowerCase().trim();\nconst tw=twitter||{};\nconst allTags=[...(etsy||[]).flatMap(i=>i.tags||[]),...(pinterest?.trendingKeywords||[])].map(n).filter(Boolean);\nconst rq=googleTrends?.risingQueries||[],tq=googleTrends?.topQueries||[],rs=googleSearch?.relatedSearches||[],paa=googleSearch?.peopleAlsoAsk||[];\nconst allColors=(vision||[]).flatMap(i=>i.colors||[]).map(n);\nconst redditPosts=(reddit||[]).filter(p=>p.score>50);\nconst audience=freq([...freq(redditPosts.map(p=>p.flair).filter(Boolean)).slice(0,5),...(tw.emotions||[]).map(n)]).slice(0,8);\nconst season=googleTrends?.trendDirection?{peakMonths:googleTrends.peakMonths||[],lowMonths:googleTrends.lowMonths||[],trendDirection:googleTrends.trendDirection}:{trendDirection:'stable'};\nreturn [{json:{niche,colors:freq(allColors).slice(0,10),fonts:freq((vision||[]).map(i=>i.fonts).filter(Boolean)).slice(0,5),icons:freq((vision||[]).flatMap(i=>i.icons||[]).map(n)).slice(0,15),styles:freq((vision||[]).map(i=>i.style).filter(Boolean)).slice(0,5),moods:freq((vision||[]).map(i=>i.mood).filter(Boolean)).slice(0,5),keywords:freq([...allTags,...rq,...tq,...rs,...(tw.trendingPhrases||[]).map(n),...(tw.slang||[]).map(n)]).slice(0,40),quotes:[...(etsy||[]).map(i=>i.title),...(amazon||[]).map(i=>i.title)].filter(Boolean).slice(0,20),audience,seasonality:season,competition:{etsyCount:(etsy||[]).length,amazonCount:(amazon||[]).length},twitter:{trendingPhrases:(tw.trendingPhrases||[]).slice(0,15),slang:(tw.slang||[]).slice(0,10),hashtags:(tw.hashtags||[]).slice(0,10),memes:(tw.memes||[]).slice(0,10)},peopleAlsoAsk:paa.slice(0,10),aggregatedAt:new Date().toISOString()}}];"
       }
     },
     {
-      "id": "gemini-analyst-inline",
+      "id": "gemini-analyst",
       "name": "Gemini Trend Analyst",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        2220,
-        890
+        3000,
+        500
       ],
       "parameters": {
         "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent",
+        "options": {
+          "timeout": 60000
+        },
+        "method": "POST",
         "sendQuery": true,
         "queryParameters": {
           "parameters": [
@@ -368,52 +1028,53 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ contents: [{ parts: [{ text: \"You are a POD trend analyst.\\n\\nResearch for \\\"\" + $json.niche + \"\\\":\\n\" + JSON.stringify($json, null, 2) + \"\\n\\nReturn ONLY JSON:\\n{\\n  \\\"recurringColors\\\": [],\\n  \\\"typographyStyles\\\": [],\\n  \\\"illustrations\\\": [],\\n  \\\"underservedOpportunities\\\": [],\\n  \\\"saturatedIdeas\\\": [],\\n  \\\"emergingTrends\\\": [],\\n  \\\"audienceSegments\\\": [],\\n  \\\"seasonality\\\": {},\\n  \\\"twitterDerivedConcepts\\\": [],\\n  \\\"topDesignDirections\\\": []\\n}\" }] }], generationConfig: { temperature: 0.4, maxOutputTokens: 2048 } }) }}",
-        "options": {
-          "timeout": 60000
-        }
+        "jsonBody": "={{ JSON.stringify({ contents: [{ parts: [{ text: \"POD trend analyst. Research for \\\"\" + $json.niche + \"\\\":\\n\\nColors: \" + ($json.colors||[]).join(\", \") + \"\\nKeywords: \" + ($json.keywords||[]).join(\", \") + \"\\nTwitter phrases: \" + ($json.twitter?.trendingPhrases||[]).join(\", \") + \"\\nTwitter slang: \" + ($json.twitter?.slang||[]).join(\", \") + \"\\nTwitter memes: \" + ($json.twitter?.memes||[]).join(\", \") + \"\\nAudience: \" + ($json.audience||[]).join(\", \") + \"\\nSeasonality: \" + ($json.seasonality?.trendDirection||\"stable\") + \"\\nCompetition: etsy=\" + ($json.competition?.etsyCount||0) + \" amazon=\" + ($json.competition?.amazonCount||0) + \"\\n\\nReturn ONLY JSON:\\n{\\n  \\\"recurringColors\\\": [],\\n  \\\"typographyStyles\\\": [],\\n  \\\"illustrations\\\": [],\\n  \\\"underservedOpportunities\\\": [],\\n  \\\"saturatedIdeas\\\": [],\\n  \\\"emergingTrends\\\": [],\\n  \\\"audienceSegments\\\": [],\\n  \\\"seasonality\\\": {},\\n  \\\"twitterDerivedConcepts\\\": [],\\n  \\\"topDesignDirections\\\": []\\n}\" }] }], generationConfig: { temperature: 0.4, maxOutputTokens: 2048 } }) }}"
       }
     },
     {
       "id": "parse-analyst",
-      "name": "Parse Trend Analysis",
+      "name": "Parse Analysis",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2460,
-        890
+        3260,
+        500
       ],
       "parameters": {
-        "jsCode": "const raw = $input.first().json?.candidates?.[0]?.content?.parts?.[0]?.text || '{}';\nconst clean = raw.replace(/```json|```/g,'').trim();\nconst match = clean.match(/\\{[\\s\\S]*\\}/);\nlet a = {}; try { a = JSON.parse(match?.[0]||'{}'); } catch(_){}\nconst niche = $('Trend Aggregator').first().json.niche || '';\nreturn [{ json: { niche, ...a } }];"
+        "jsCode": "const raw=$input.first().json?.candidates?.[0]?.content?.parts?.[0]?.text||'{}';\nconst clean=raw.replace(/```json|```/g,'').trim();\nconst match=clean.match(/\\{[\\s\\S]*\\}/);\nlet a={};try{a=JSON.parse(match?.[0]||'{}')}catch(_){}\nconst niche=$('Trend Aggregator').first().json.niche||'';\nreturn [{json:{niche,...a}}];"
       }
     },
     {
-      "id": "sticky-design",
+      "id": "s4",
       "name": "\ud83c\udfa8 DESIGN GENERATION",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        2700,
-        280
+        3740,
+        200
       ],
       "parameters": {
-        "content": "## \ud83c\udfa8 Design Generation\n**10 concepts** generated with:\n- 3 Twitter-inspired\n- 3 Underserved opportunities\n- 2 Seasonal/Emerging\n- 2 Evergreen\n\nEach gets a detailed\nimage prompt for Imagen 3\n\n**Image Gen:**\nGemini Imagen 3 (free)\n\u2193 fallback\nIdeogram HF Space",
-        "height": 600,
-        "width": 1380,
+        "content": "## \ud83c\udfa8 Design Generation\nGemini generates **10 diverse concepts**\n\n\u2022 3 Twitter slang/meme inspired\n\u2022 3 Underserved opportunity plays\n\u2022 2 Seasonal/emerging trends\n\u2022 2 Timeless evergreen\n\nEach gets detailed image prompt\n\n**Image Gen:**\n1st: Gemini Imagen 3 (free)\n2nd: Ideogram HF Space fallback",
+        "height": 860,
+        "width": 960,
         "color": 4
       }
     },
     {
-      "id": "prompt-gen-inline",
+      "id": "gen-concepts",
       "name": "Generate 10 Concepts",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        2800,
-        890
+        3840,
+        500
       ],
       "parameters": {
         "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent",
+        "options": {
+          "timeout": 60000
+        },
+        "method": "POST",
         "sendQuery": true,
         "queryParameters": {
           "parameters": [
@@ -425,38 +1086,37 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ contents: [{ parts: [{ text: \"You are a POD creative director for niche: \\\"\" + $json.niche + \"\\\"\\n\\nTrend brief:\\n- Top directions: \" + ($json.topDesignDirections||[]).join(\", \") + \"\\n- Twitter concepts: \" + ($json.twitterDerivedConcepts||[]).join(\", \") + \"\\n- Emerging: \" + ($json.emergingTrends||[]).join(\", \") + \"\\n- Opportunities: \" + ($json.underservedOpportunities||[]).join(\", \") + \"\\n\\nGenerate EXACTLY 10 t-shirt concepts. Diversity: 3 Twitter-inspired, 3 opportunity-based, 2 seasonal, 2 evergreen. Mix tones.\\n\\nReturn ONLY a JSON array of 10 objects:\\n[{\\n  \\\"id\\\": 1, \\\"title\\\": \\\"\\\", \\\"phrase\\\": \\\"\\\", \\\"concept\\\": \\\"\\\",\\n  \\\"targetAudience\\\": \\\"\\\", \\\"sellingAngle\\\": \\\"\\\",\\n  \\\"tone\\\": \\\"motivational|ironic|raw|minimalist|bold\\\",\\n  \\\"imagePrompt\\\": \\\"detailed prompt for AI image gen\\\",\\n  \\\"colors\\\": [], \\\"typography\\\": \\\"\\\", \\\"icons\\\": [],\\n  \\\"source\\\": \\\"twitter|opportunity|seasonal|evergreen\\\"\\n}]\" }] }], generationConfig: { temperature: 0.85, maxOutputTokens: 4000 } }) }}",
-        "options": {
-          "timeout": 60000
-        }
+        "jsonBody": "={{ JSON.stringify({ contents: [{ parts: [{ text: \"Creative director for POD brand. Niche: \\\"\" + $json.niche + \"\\\"\\n\\nTop directions: \" + ($json.topDesignDirections||[]).join(\", \") + \"\\nTwitter concepts: \" + ($json.twitterDerivedConcepts||[]).join(\", \") + \"\\nEmerging: \" + ($json.emergingTrends||[]).join(\", \") + \"\\nOpportunities: \" + ($json.underservedOpportunities||[]).join(\", \") + \"\\n\\nGenerate EXACTLY 10 t-shirt concepts. Diversity: 3 Twitter-inspired, 3 opportunity, 2 seasonal, 2 evergreen. Mix tones.\\n\\nReturn ONLY a JSON array of 10:\\n[{\\n  \\\"id\\\": 1, \\\"title\\\": \\\"\\\", \\\"phrase\\\": \\\"\\\", \\\"concept\\\": \\\"\\\",\\n  \\\"targetAudience\\\": \\\"\\\", \\\"sellingAngle\\\": \\\"\\\",\\n  \\\"tone\\\": \\\"motivational|ironic|raw|minimalist|bold\\\",\\n  \\\"imagePrompt\\\": \\\"detailed AI image gen prompt\\\",\\n  \\\"colors\\\": [], \\\"typography\\\": \\\"\\\", \\\"icons\\\": [],\\n  \\\"source\\\": \\\"twitter|opportunity|seasonal|evergreen\\\"\\n}]\" }] }], generationConfig: { temperature: 0.85, maxOutputTokens: 4000 } }) }}"
       }
     },
     {
-      "id": "parse-concepts-inline",
+      "id": "parse-concepts",
       "name": "Parse 10 Concepts",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        3040,
-        890
+        4100,
+        500
       ],
       "parameters": {
-        "jsCode": "const raw = $input.first().json?.candidates?.[0]?.content?.parts?.[0]?.text || '[]';\nconst clean = raw.replace(/```json|```/g,'').trim();\nconst match = clean.match(/\\[[\\s\\S]*\\]/);\nlet concepts = []; try { concepts = JSON.parse(match?.[0]||'[]'); } catch(_){}\nconst niche = $('Parse Trend Analysis').first().json.niche || '';\nreturn concepts.map(c => ({ json: { niche, ...c } }));"
+        "jsCode": "const raw=$input.first().json?.candidates?.[0]?.content?.parts?.[0]?.text||'[]';\nconst clean=raw.replace(/```json|```/g,'').trim();\nconst match=clean.match(/\\[[\\s\\S]*\\]/);\nlet concepts=[];try{concepts=JSON.parse(match?.[0]||'[]')}catch(_){}\nconst niche=$('Parse Analysis').first().json.niche||'';\nreturn concepts.map(c=>({json:{niche,...c}}));"
       }
     },
     {
-      "id": "gemini-imagen-inline",
+      "id": "imagen3",
       "name": "Gemini Imagen 3",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        3280,
-        890
+        4360,
+        500
       ],
-      "onError": "continueErrorOutput",
       "parameters": {
-        "method": "POST",
         "url": "https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict",
+        "options": {
+          "timeout": 60000
+        },
+        "method": "POST",
         "sendQuery": true,
         "queryParameters": {
           "parameters": [
@@ -468,20 +1128,18 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ instances: [{ prompt: $json.imagePrompt + \". T-shirt graphic, transparent background, bold flat vector, print-ready, high contrast.\" }], parameters: { sampleCount: 1, aspectRatio: \"1:1\", safetyFilterLevel: \"block_few\" } }) }}",
-        "options": {
-          "timeout": 60000
-        }
-      }
+        "jsonBody": "={{ JSON.stringify({ instances: [{ prompt: $json.imagePrompt + \". T-shirt graphic, transparent background, bold flat vector, print-ready, high contrast.\" }], parameters: { sampleCount: 1, aspectRatio: \"1:1\", safetyFilterLevel: \"block_few\" } }) }}"
+      },
+      "onError": "continueErrorOutput"
     },
     {
-      "id": "check-imagen",
-      "name": "Image Generated?",
+      "id": "check-img",
+      "name": "Image OK?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
       "position": [
-        3520,
-        890
+        4600,
+        500
       ],
       "parameters": {
         "conditions": {
@@ -505,17 +1163,23 @@
       }
     },
     {
-      "id": "ideogram-fallback",
+      "id": "ideogram",
       "name": "Ideogram Fallback",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        3760,
-        1040
+        4800,
+        680
       ],
       "parameters": {
-        "method": "POST",
         "url": "https://multimodalart-ideogram4.hf.space/gradio_api/call/infer",
+        "options": {
+          "timeout": 120000
+        },
+        "method": "POST",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ data: [$json.imagePrompt + \". T-shirt graphic, transparent background.\", \"None\", 1024, 1024, 3] }) }}",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
@@ -524,81 +1188,79 @@
               "value": "={{ $env.HF_TOKEN ? 'Bearer ' + $env.HF_TOKEN : '' }}"
             }
           ]
-        },
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ data: [$json.imagePrompt + \". T-shirt graphic, transparent background.\", \"None\", 1024, 1024, 3] }) }}",
-        "options": {
-          "timeout": 120000
         }
       }
     },
     {
-      "id": "prepare-design-record",
+      "id": "prep-design",
       "name": "Prepare Design Record",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        4000,
-        890
+        5000,
+        500
       ],
       "parameters": {
-        "jsCode": "const item = $input.first().json;\nconst ctx = $('Parse 10 Concepts').first().json;\nconst b64 = item.predictions?.[0]?.bytesBase64Encoded || '';\nconst imgUrl = item.data?.[0]?.[0]?.url || item.data?.[0]?.url || '';\nconst ts = new Date().toISOString().replace(/[:.]/g,'-');\nreturn [{ json: {\n  niche: ctx.niche||'', conceptId: ctx.id||0, title: ctx.title||'',\n  phrase: ctx.phrase||'', tone: ctx.tone||'', source: ctx.source||'',\n  targetAudience: ctx.targetAudience||'', sellingAngle: ctx.sellingAngle||'',\n  imagePrompt: ctx.imagePrompt||'', imageBase64: b64, imageUrl: imgUrl,\n  provider: b64 ? 'gemini' : (imgUrl ? 'ideogram' : 'none'),\n  fileName: `design_${ctx.niche||'x'}_${ctx.id||0}_${ts}.png`,\n  generatedAt: new Date().toISOString()\n} }];"
+        "jsCode": "const item=$input.first().json;\nconst ctx=$('Parse 10 Concepts').first().json;\nconst b64=item.predictions?.[0]?.bytesBase64Encoded||'';\nconst imgUrl=item.data?.[0]?.[0]?.url||item.data?.[0]?.url||'';\nconst ts=new Date().toISOString().replace(/[:.]/g,'-');\nreturn [{json:{niche:ctx.niche||'',conceptId:ctx.id||0,title:ctx.title||'',phrase:ctx.phrase||'',tone:ctx.tone||'',source:ctx.source||'',targetAudience:ctx.targetAudience||'',sellingAngle:ctx.sellingAngle||'',imagePrompt:ctx.imagePrompt||'',imageBase64:b64,imageUrl:imgUrl,provider:b64?'gemini':(imgUrl?'ideogram':'none'),fileName:`design_${ctx.niche||'x'}_${ctx.id||0}_${ts}.png`,generatedAt:new Date().toISOString()}}];"
       }
     },
     {
-      "id": "collect-designs-inline",
+      "id": "collect-designs",
       "name": "Collect All Designs",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        4240,
-        890
+        5260,
+        500
       ],
       "parameters": {
-        "jsCode": "return [{ json: { designs: $input.all().map(i => i.json) } }];"
+        "jsCode": "return [{json:{designs:$input.all().map(i=>i.json)}}];"
       }
     },
     {
-      "id": "sticky-output",
+      "id": "s5",
       "name": "\ud83d\udcdd SEO + DATABASE",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        4420,
-        280
+        5540,
+        200
       ],
       "parameters": {
-        "content": "## \ud83d\udcdd SEO + Database\nFor each design:\n- Etsy title (140 chars)\n- Etsy 13 tags\n- Etsy description\n- Amazon title + 5 bullets\n- Amazon backend keywords\n- Search terms\n- Alt text\n\nSaved to Google Sheets\nNotion + Airtable optional",
-        "height": 600,
-        "width": 1160,
+        "content": "## \ud83d\udcdd SEO + Database\nGemini 1.5 Flash per design:\n\u2022 Etsy title (140 chars)\n\u2022 Etsy 13 tags\n\u2022 Etsy description\n\u2022 Amazon title + 5 bullets\n\u2022 Amazon backend keywords\n\u2022 10 buyer search terms\n\u2022 Alt text\n\nSaved to **Google Sheets**\nNotion + Airtable: enable in node",
+        "height": 660,
+        "width": 980,
         "color": 5
       }
     },
     {
-      "id": "split-designs-inline",
+      "id": "split-des",
       "name": "Split Designs",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        4500,
-        890
+        5640,
+        500
       ],
       "parameters": {
-        "jsCode": "const designs = $input.first().json.designs || [];\nreturn designs.map(d => ({ json: d }));"
+        "jsCode": "const designs=$input.first().json.designs||[];\nreturn designs.map(d=>({json:d}));"
       }
     },
     {
-      "id": "gemini-seo-inline",
-      "name": "Gemini SEO Generation",
+      "id": "gemini-seo",
+      "name": "Gemini SEO",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        4740,
-        890
+        5880,
+        500
       ],
       "parameters": {
         "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent",
+        "options": {
+          "timeout": 30000
+        },
+        "method": "POST",
         "sendQuery": true,
         "queryParameters": {
           "parameters": [
@@ -610,51 +1272,48 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ contents: [{ parts: [{ text: \"SEO expert for POD t-shirts.\\nNiche: \" + $json.niche + \"\\nTitle: \" + $json.title + \"\\nPhrase: \" + $json.phrase + \"\\nAudience: \" + $json.targetAudience + \"\\nAngle: \" + $json.sellingAngle + \"\\nTone: \" + $json.tone + \"\\n\\nReturn ONLY JSON:\\n{\\n  \\\"etsyTitle\\\": \\\"max 140 chars\\\",\\n  \\\"etsyDescription\\\": \\\"150 words\\\",\\n  \\\"etsyTags\\\": [\\\"13 tags max 20 chars each\\\"],\\n  \\\"amazonTitle\\\": \\\"max 200 chars\\\",\\n  \\\"amazonBulletPoints\\\": [\\\"5 bullets\\\"],\\n  \\\"amazonKeywords\\\": \\\"250 chars\\\",\\n  \\\"fileName\\\": \\\"slug\\\",\\n  \\\"altText\\\": \\\"125 chars\\\",\\n  \\\"searchTerms\\\": [\\\"10 buyer phrases\\\"]\\n}\" }] }], generationConfig: { temperature: 0.3, maxOutputTokens: 2000 } }) }}",
-        "options": {
-          "timeout": 30000
-        }
+        "jsonBody": "={{ JSON.stringify({ contents: [{ parts: [{ text: \"Etsy/Amazon SEO expert for POD t-shirts.\\nNiche: \" + $json.niche + \"\\nTitle: \" + $json.title + \"\\nPhrase: \" + $json.phrase + \"\\nAudience: \" + $json.targetAudience + \"\\nAngle: \" + $json.sellingAngle + \"\\nTone: \" + $json.tone + \"\\n\\nReturn ONLY JSON:\\n{\\n  \\\"etsyTitle\\\": \\\"max 140 chars\\\",\\n  \\\"etsyDescription\\\": \\\"150 words\\\",\\n  \\\"etsyTags\\\": [\\\"13 tags max 20 chars\\\"],\\n  \\\"amazonTitle\\\": \\\"max 200 chars\\\",\\n  \\\"amazonBulletPoints\\\": [\\\"5 bullets\\\"],\\n  \\\"amazonKeywords\\\": \\\"250 chars\\\",\\n  \\\"fileName\\\": \\\"slug\\\",\\n  \\\"altText\\\": \\\"125 chars\\\",\\n  \\\"searchTerms\\\": [\\\"10 buyer phrases\\\"]\\n}\" }] }], generationConfig: { temperature: 0.3, maxOutputTokens: 2000 } }) }}"
       }
     },
     {
-      "id": "parse-seo-inline",
-      "name": "Parse SEO Metadata",
+      "id": "parse-seo",
+      "name": "Parse SEO",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        4980,
-        890
+        6140,
+        500
       ],
       "parameters": {
-        "jsCode": "const ctx = $('Split Designs').first().json;\nconst raw = $input.first().json?.candidates?.[0]?.content?.parts?.[0]?.text || '{}';\nconst clean = raw.replace(/```json|```/g,'').trim();\nconst match = clean.match(/\\{[\\s\\S]*\\}/);\nlet seo = {}; try { seo = JSON.parse(match?.[0]||'{}'); } catch(_){}\nreturn [{ json: { ...ctx, etsyTitle: seo.etsyTitle||'', etsyDescription: seo.etsyDescription||'',\n  etsyTags: seo.etsyTags||[], amazonTitle: seo.amazonTitle||'',\n  amazonBulletPoints: seo.amazonBulletPoints||[], amazonKeywords: seo.amazonKeywords||'',\n  seoFileName: seo.fileName||'', altText: seo.altText||'', searchTerms: seo.searchTerms||[] } }];"
+        "jsCode": "const ctx=$('Split Designs').first().json;\nconst raw=$input.first().json?.candidates?.[0]?.content?.parts?.[0]?.text||'{}';\nconst clean=raw.replace(/```json|```/g,'').trim();\nconst match=clean.match(/\\{[\\s\\S]*\\}/);\nlet seo={};try{seo=JSON.parse(match?.[0]||'{}')}catch(_){}\nreturn [{json:{...ctx,etsyTitle:seo.etsyTitle||'',etsyDescription:seo.etsyDescription||'',etsyTags:seo.etsyTags||[],amazonTitle:seo.amazonTitle||'',amazonBulletPoints:seo.amazonBulletPoints||[],amazonKeywords:seo.amazonKeywords||'',seoFileName:seo.fileName||'',altText:seo.altText||'',searchTerms:seo.searchTerms||[]}}];"
       }
     },
     {
-      "id": "collect-records-inline",
-      "name": "Collect All Records",
+      "id": "collect-rec",
+      "name": "Collect Records",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        5220,
-        890
+        6380,
+        500
       ],
       "parameters": {
-        "jsCode": "return [{ json: { records: $input.all().map(i => i.json) } }];"
+        "jsCode": "return [{json:{records:$input.all().map(i=>i.json)}}];"
       }
     },
     {
-      "id": "sticky-publish",
+      "id": "s6",
       "name": "\ud83d\ude80 PUBLISH",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        5460,
-        280
+        6800,
+        200
       ],
       "parameters": {
-        "content": "## \ud83d\ude80 Save + Publish\nGoogle Sheets \u2192 always on\n\nNotion + Airtable \u2192 disabled\n(enable in node settings)\n\nEtsy + Amazon publisher\n\u2192 disabled by default\nEnable when ready to go live",
-        "height": 600,
-        "width": 820,
+        "content": "## \ud83d\ude80 Save + Publish\n**Google Sheets** \u2014 always on\nRequires: GOOGLE_SHEET_ID in .env\n\n**Publisher** \u2014 disabled\nEnable when ready to go live\nRequires Etsy + Amazon API keys",
+        "height": 560,
+        "width": 760,
         "color": 6
       }
     },
@@ -664,8 +1323,8 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4,
       "position": [
-        5540,
-        740
+        6900,
+        500
       ],
       "parameters": {
         "operation": "append",
@@ -691,13 +1350,13 @@
       }
     },
     {
-      "id": "end-node",
-      "name": "Done \u2705",
+      "id": "done",
+      "name": "\u2705 Done",
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
       "position": [
-        5780,
-        740
+        7160,
+        500
       ],
       "parameters": {}
     }
@@ -725,141 +1384,503 @@
         ]
       ]
     },
+    "Etsy Shopping": {
+      "main": [
+        [
+          {
+            "node": "Parse Etsy",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Parse Etsy",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Etsy Organic": {
+      "main": [
+        [
+          {
+            "node": "Parse Etsy",
+            "type": "main",
+            "index": 1
+          }
+        ],
+        [
+          {
+            "node": "Parse Etsy",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Amazon Search": {
+      "main": [
+        [
+          {
+            "node": "Parse Amazon",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Parse Amazon",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Images Design": {
+      "main": [
+        [
+          {
+            "node": "Parse Google Images",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Parse Google Images",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Images Trending": {
+      "main": [
+        [
+          {
+            "node": "Parse Google Images",
+            "type": "main",
+            "index": 1
+          }
+        ],
+        [
+          {
+            "node": "Parse Google Images",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reddit Search": {
+      "main": [
+        [
+          {
+            "node": "Parse Reddit",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Parse Reddit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reddit Community": {
+      "main": [
+        [
+          {
+            "node": "Parse Reddit",
+            "type": "main",
+            "index": 1
+          }
+        ],
+        [
+          {
+            "node": "Parse Reddit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Search Main": {
+      "main": [
+        [
+          {
+            "node": "Parse Google Search",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Parse Google Search",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Search Niche": {
+      "main": [
+        [
+          {
+            "node": "Parse Google Search",
+            "type": "main",
+            "index": 1
+          }
+        ],
+        [
+          {
+            "node": "Parse Google Search",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trends Timeseries": {
+      "main": [
+        [
+          {
+            "node": "Parse Google Trends",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Parse Google Trends",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trends Related Queries": {
+      "main": [
+        [
+          {
+            "node": "Parse Google Trends",
+            "type": "main",
+            "index": 1
+          }
+        ],
+        [
+          {
+            "node": "Parse Google Trends",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Images": {
+      "main": [
+        [
+          {
+            "node": "Vision Has Images?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vision Has Images?": {
+      "main": [
+        [
+          {
+            "node": "Parse Vision",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Vision Download",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vision Download": {
+      "main": [
+        [
+          {
+            "node": "Vision Encode",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vision Encode": {
+      "main": [
+        [
+          {
+            "node": "Vision Gemini",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vision Gemini": {
+      "main": [
+        [
+          {
+            "node": "Parse Vision",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Parse Vision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Twitter Search": {
+      "main": [
+        [
+          {
+            "node": "Collect Tweets",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Collect Tweets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Twitter Viral": {
+      "main": [
+        [
+          {
+            "node": "Collect Tweets",
+            "type": "main",
+            "index": 1
+          }
+        ],
+        [
+          {
+            "node": "Collect Tweets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Tweets": {
+      "main": [
+        [
+          {
+            "node": "Groq Trend Analyzer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Trend Analyzer": {
+      "main": [
+        [
+          {
+            "node": "Parse Twitter",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Parse Twitter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
     "Split In Batches": {
       "main": [
         [
           {
-            "node": "Etsy Agent",
+            "node": "Etsy Shopping",
             "type": "main",
             "index": 0
           },
           {
-            "node": "Amazon Agent",
+            "node": "Amazon Search",
             "type": "main",
             "index": 0
           },
           {
-            "node": "Google Images Agent",
+            "node": "Google Images Design",
             "type": "main",
             "index": 0
           },
           {
-            "node": "Reddit Agent",
+            "node": "Reddit Search",
             "type": "main",
             "index": 0
           },
           {
-            "node": "Google Search Agent",
+            "node": "Google Search Main",
             "type": "main",
             "index": 0
           },
           {
-            "node": "Google Trends Agent",
+            "node": "Trends Timeseries",
             "type": "main",
             "index": 0
           },
           {
-            "node": "Vision Agent",
+            "node": "Prepare Images",
             "type": "main",
             "index": 0
           },
           {
-            "node": "Twitter Agent",
+            "node": "Twitter Search",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Etsy Organic",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Images Trending",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Reddit Community",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Search Niche",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Trends Related Queries",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Twitter Viral",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Etsy Agent": {
+    "Parse Etsy": {
       "main": [
         [
           {
-            "node": "Merge Research Results",
+            "node": "Merge All Research",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Amazon Agent": {
+    "Parse Amazon": {
       "main": [
         [
           {
-            "node": "Merge Research Results",
+            "node": "Merge All Research",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Google Images Agent": {
+    "Parse Google Images": {
       "main": [
         [
           {
-            "node": "Merge Research Results",
+            "node": "Merge All Research",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Reddit Agent": {
+    "Parse Reddit": {
       "main": [
         [
           {
-            "node": "Merge Research Results",
+            "node": "Merge All Research",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Google Search Agent": {
+    "Parse Google Search": {
       "main": [
         [
           {
-            "node": "Merge Research Results",
+            "node": "Merge All Research",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Google Trends Agent": {
+    "Parse Google Trends": {
       "main": [
         [
           {
-            "node": "Merge Research Results",
+            "node": "Merge All Research",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Vision Agent": {
+    "Parse Vision": {
       "main": [
         [
           {
-            "node": "Merge Research Results",
+            "node": "Merge All Research",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Twitter Agent": {
+    "Parse Twitter": {
       "main": [
         [
           {
-            "node": "Merge Research Results",
+            "node": "Merge All Research",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Merge Research Results": {
+    "Merge All Research": {
       "main": [
         [
           {
@@ -896,14 +1917,14 @@
       "main": [
         [
           {
-            "node": "Parse Trend Analysis",
+            "node": "Parse Analysis",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Parse Trend Analysis": {
+    "Parse Analysis": {
       "main": [
         [
           {
@@ -940,7 +1961,7 @@
       "main": [
         [
           {
-            "node": "Image Generated?",
+            "node": "Image OK?",
             "type": "main",
             "index": 0
           }
@@ -954,7 +1975,7 @@
         ]
       ]
     },
-    "Image Generated?": {
+    "Image OK?": {
       "main": [
         [
           {
@@ -1009,36 +2030,36 @@
       "main": [
         [
           {
-            "node": "Gemini SEO Generation",
+            "node": "Gemini SEO",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Gemini SEO Generation": {
+    "Gemini SEO": {
       "main": [
         [
           {
-            "node": "Parse SEO Metadata",
+            "node": "Parse SEO",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Parse SEO Metadata": {
+    "Parse SEO": {
       "main": [
         [
           {
-            "node": "Collect All Records",
+            "node": "Collect Records",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Collect All Records": {
+    "Collect Records": {
       "main": [
         [
           {
@@ -1053,7 +2074,7 @@
       "main": [
         [
           {
-            "node": "Done \u2705",
+            "node": "\u2705 Done",
             "type": "main",
             "index": 0
           }
