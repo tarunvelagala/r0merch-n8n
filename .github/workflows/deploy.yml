@@ -6,62 +6,14 @@ on:
   workflow_dispatch:
 
 jobs:
-  # ── Remote deploy (VPS/server) ──────────────────────────────────────────────
-  # Only runs when DEPLOY_HOST secret is set.
-  deploy-remote:
+  deploy:
     runs-on: ubuntu-latest
-    if: ${{ secrets.DEPLOY_HOST != '' }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: SSH deploy + write .env from secrets
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.DEPLOY_HOST }}
-          username: ${{ secrets.DEPLOY_USER }}
-          key: ${{ secrets.DEPLOY_SSH_KEY }}
-          script: |
-            set -e
-            cd ${{ secrets.DEPLOY_PATH }}
-
-            git pull origin ${{ github.ref_name }}
-
-            # Regenerate .env entirely from GitHub Secrets on every deploy
-            cat > .env << 'ENVEOF'
-            GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
-            GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}
-            SERPAPI_KEY=${{ secrets.SERPAPI_KEY }}
-            HF_TOKEN=${{ secrets.HF_TOKEN }}
-            OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
-            REDDIT_ACCESS_TOKEN=${{ secrets.REDDIT_ACCESS_TOKEN }}
-            REDDIT_USERNAME=${{ secrets.REDDIT_USERNAME }}
-            GOOGLE_SHEET_ID=${{ secrets.GOOGLE_SHEET_ID }}
-            NOTION_DATABASE_ID=${{ secrets.NOTION_DATABASE_ID }}
-            AIRTABLE_BASE_ID=${{ secrets.AIRTABLE_BASE_ID }}
-            ETSY_API_KEY=${{ secrets.ETSY_API_KEY }}
-            ETSY_SHOP_ID=${{ secrets.ETSY_SHOP_ID }}
-            ETSY_ACCESS_TOKEN=${{ secrets.ETSY_ACCESS_TOKEN }}
-            ETSY_SHIPPING_PROFILE_ID=${{ secrets.ETSY_SHIPPING_PROFILE_ID }}
-            AMAZON_SELLER_ID=${{ secrets.AMAZON_SELLER_ID }}
-            AMAZON_ACCESS_TOKEN=${{ secrets.AMAZON_ACCESS_TOKEN }}
-            ENVEOF
-
-            docker compose down && docker compose up -d
-            echo "Remote deploy complete"
-
-  # ── Local / no-server notice ────────────────────────────────────────────────
-  # Runs when DEPLOY_HOST is not set — just validates the workflow files.
-  validate-local:
-    runs-on: ubuntu-latest
-    if: ${{ secrets.DEPLOY_HOST == '' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Validate workflow JSON files
         run: |
-          echo "No DEPLOY_HOST set — running in local mode."
           echo "Validating workflow JSON..."
           for f in workflows/*.json; do
             python3 -c "import json,sys; json.load(open('$f'))" \
@@ -70,7 +22,67 @@ jobs:
           done
           echo "All workflow files valid."
 
-      - name: Summary
+      - name: SSH deploy + write .env from secrets
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          REDDIT_ACCESS_TOKEN: ${{ secrets.REDDIT_ACCESS_TOKEN }}
+          REDDIT_USERNAME: ${{ secrets.REDDIT_USERNAME }}
+          GOOGLE_SHEET_ID: ${{ secrets.GOOGLE_SHEET_ID }}
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+          AIRTABLE_BASE_ID: ${{ secrets.AIRTABLE_BASE_ID }}
+          ETSY_API_KEY: ${{ secrets.ETSY_API_KEY }}
+          ETSY_SHOP_ID: ${{ secrets.ETSY_SHOP_ID }}
+          ETSY_ACCESS_TOKEN: ${{ secrets.ETSY_ACCESS_TOKEN }}
+          ETSY_SHIPPING_PROFILE_ID: ${{ secrets.ETSY_SHIPPING_PROFILE_ID }}
+          AMAZON_SELLER_ID: ${{ secrets.AMAZON_SELLER_ID }}
+          AMAZON_ACCESS_TOKEN: ${{ secrets.AMAZON_ACCESS_TOKEN }}
         run: |
-          echo "To enable remote deploy, add these secrets in GitHub:"
-          echo "  DEPLOY_HOST, DEPLOY_USER, DEPLOY_SSH_KEY, DEPLOY_PATH"
+          if [ -z "$DEPLOY_HOST" ]; then
+            echo "No DEPLOY_HOST set — skipping remote deploy."
+            echo "To enable: add DEPLOY_HOST, DEPLOY_USER, DEPLOY_SSH_KEY, DEPLOY_PATH to GitHub Secrets."
+            exit 0
+          fi
+
+          # Write SSH key
+          echo "$DEPLOY_SSH_KEY" > /tmp/deploy_key
+          chmod 600 /tmp/deploy_key
+
+          # Build .env content
+          ENV_CONTENT="GEMINI_API_KEY=${GEMINI_API_KEY}
+          GROQ_API_KEY=${GROQ_API_KEY}
+          SERPAPI_KEY=${SERPAPI_KEY}
+          HF_TOKEN=${HF_TOKEN}
+          OPENAI_API_KEY=${OPENAI_API_KEY}
+          REDDIT_ACCESS_TOKEN=${REDDIT_ACCESS_TOKEN}
+          REDDIT_USERNAME=${REDDIT_USERNAME}
+          GOOGLE_SHEET_ID=${GOOGLE_SHEET_ID}
+          NOTION_DATABASE_ID=${NOTION_DATABASE_ID}
+          AIRTABLE_BASE_ID=${AIRTABLE_BASE_ID}
+          ETSY_API_KEY=${ETSY_API_KEY}
+          ETSY_SHOP_ID=${ETSY_SHOP_ID}
+          ETSY_ACCESS_TOKEN=${ETSY_ACCESS_TOKEN}
+          ETSY_SHIPPING_PROFILE_ID=${ETSY_SHIPPING_PROFILE_ID}
+          AMAZON_SELLER_ID=${AMAZON_SELLER_ID}
+          AMAZON_ACCESS_TOKEN=${AMAZON_ACCESS_TOKEN}"
+
+          # Copy .env to server
+          echo "$ENV_CONTENT" | ssh -i /tmp/deploy_key \
+            -o StrictHostKeyChecking=no \
+            "${DEPLOY_USER}@${DEPLOY_HOST}" \
+            "cat > ${DEPLOY_PATH}/.env"
+
+          # Pull + restart
+          ssh -i /tmp/deploy_key \
+            -o StrictHostKeyChecking=no \
+            "${DEPLOY_USER}@${DEPLOY_HOST}" \
+            "cd ${DEPLOY_PATH} && git pull origin ${{ github.ref_name }} && docker compose down && docker compose up -d"
+
+          echo "Remote deploy complete."
