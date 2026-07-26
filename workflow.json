@@ -2,7 +2,7 @@
   "name": "r0merch \u2014 POD Pipeline (Full)",
   "id": "1790571d-754c-4445-be73-1c370705998b",
   "active": false,
-  "updatedAt": "2026-07-26T16:40:10.000Z",
+  "updatedAt": "2026-07-26T16:45:06.000Z",
   "settings": {
     "executionOrder": "v1"
   },
@@ -145,7 +145,7 @@
             },
             {
               "name": "q",
-              "value": "={{ 'site:etsy.com ' + $('Read Niches').first().json.niche + ' t-shirt bestseller' }}"
+              "value": "={{ 'site:etsy.com ' + $json.niche + ' t-shirt bestseller' }}"
             },
             {
               "name": "api_key",
@@ -301,7 +301,7 @@
             },
             {
               "name": "q",
-              "value": "={{ $('Read Niches').first().json.niche + ' t-shirt print on demand trending' }}"
+              "value": "={{ $json.niche + ' t-shirt print on demand trending' }}"
             },
             {
               "name": "api_key",
@@ -406,7 +406,7 @@
             },
             {
               "name": "q",
-              "value": "={{ 'site:reddit.com ' + $('Read Niches').first().json.niche + ' merch design community' }}"
+              "value": "={{ 'site:reddit.com ' + $json.niche + ' merch design community' }}"
             },
             {
               "name": "api_key",
@@ -515,7 +515,7 @@
             },
             {
               "name": "q",
-              "value": "={{ $('Read Niches').first().json.niche + ' t-shirt print on demand niche ideas' }}"
+              "value": "={{ $json.niche + ' t-shirt print on demand niche ideas' }}"
             },
             {
               "name": "api_key",
@@ -620,7 +620,7 @@
             },
             {
               "name": "q",
-              "value": "={{ $('Read Niches').first().json.niche + ' t-shirt' }}"
+              "value": "={{ $json.niche + ' t-shirt' }}"
             },
             {
               "name": "api_key",
@@ -845,7 +845,7 @@
             },
             {
               "name": "q",
-              "value": "={{ 'site:x.com OR site:twitter.com ' + $('Read Niches').first().json.niche + ' trending viral' }}"
+              "value": "={{ 'site:x.com OR site:twitter.com ' + $json.niche + ' trending viral' }}"
             },
             {
               "name": "api_key",
@@ -1750,6 +1750,11 @@
             "node": "Etsy Shopping",
             "type": "main",
             "index": 0
+          },
+          {
+            "node": "Etsy Organic",
+            "type": "main",
+            "index": 0
           }
         ]
       ]
@@ -1759,11 +1764,6 @@
         [
           {
             "node": "Parse Etsy",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Etsy Organic",
             "type": "main",
             "index": 0
           }
@@ -1820,11 +1820,6 @@
             "node": "Parse Google Images",
             "type": "main",
             "index": 0
-          },
-          {
-            "node": "Google Images Trending",
-            "type": "main",
-            "index": 0
           }
         ],
         [
@@ -1859,11 +1854,6 @@
         [
           {
             "node": "Parse Reddit",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Reddit Community",
             "type": "main",
             "index": 0
           }
@@ -1902,11 +1892,6 @@
             "node": "Parse Google Search",
             "type": "main",
             "index": 0
-          },
-          {
-            "node": "Google Search Niche",
-            "type": "main",
-            "index": 0
           }
         ],
         [
@@ -1941,11 +1926,6 @@
         [
           {
             "node": "Parse Google Trends",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Trends Related Queries",
             "type": "main",
             "index": 0
           }
@@ -2051,11 +2031,6 @@
         [
           {
             "node": "Collect Tweets",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Twitter Viral",
             "type": "main",
             "index": 0
           }
@@ -2585,6 +2560,11 @@
             "node": "Google Images Design",
             "type": "main",
             "index": 0
+          },
+          {
+            "node": "Google Images Trending",
+            "type": "main",
+            "index": 0
           }
         ]
       ]
@@ -2594,6 +2574,11 @@
         [
           {
             "node": "Reddit Search",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Reddit Community",
             "type": "main",
             "index": 0
           }
@@ -2607,6 +2592,11 @@
             "node": "Twitter Search",
             "type": "main",
             "index": 0
+          },
+          {
+            "node": "Twitter Viral",
+            "type": "main",
+            "index": 0
           }
         ]
       ]
@@ -2618,6 +2608,11 @@
             "node": "Google Search Main",
             "type": "main",
             "index": 0
+          },
+          {
+            "node": "Google Search Niche",
+            "type": "main",
+            "index": 0
           }
         ]
       ]
@@ -2627,6 +2622,11 @@
         [
           {
             "node": "Trends Timeseries",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Trends Related Queries",
             "type": "main",
             "index": 0
           }
