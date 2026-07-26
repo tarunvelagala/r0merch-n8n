@@ -2,7 +2,7 @@
   "name": "r0merch \u2014 POD Pipeline (Full)",
   "id": "1790571d-754c-4445-be73-1c370705998b",
   "active": false,
-  "updatedAt": "2026-07-26T15:11:20.000Z",
+  "updatedAt": "2026-07-26T15:15:19.000Z",
   "settings": {
     "executionOrder": "v1"
   },
@@ -739,7 +739,7 @@
         1860
       ],
       "parameters": {
-        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
         "options": {
           "timeout": 30000
         },
@@ -998,7 +998,7 @@
         500
       ],
       "parameters": {
-        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
         "options": {
           "timeout": 60000
         },
@@ -1056,7 +1056,7 @@
         500
       ],
       "parameters": {
-        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
         "options": {
           "timeout": 60000
         },
@@ -1242,7 +1242,7 @@
         500
       ],
       "parameters": {
-        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
         "options": {
           "timeout": 30000
         },
