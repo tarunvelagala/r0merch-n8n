@@ -6,29 +6,34 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy:
+  # ── Remote deploy (VPS/server) ──────────────────────────────────────────────
+  # Only runs when DEPLOY_HOST secret is set.
+  deploy-remote:
     runs-on: ubuntu-latest
+    if: ${{ secrets.DEPLOY_HOST != '' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Write .env from GitHub Secrets
+      - name: SSH deploy + write .env from secrets
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           script: |
+            set -e
             cd ${{ secrets.DEPLOY_PATH }}
 
-            # Write .env from secrets — never stored in git
+            git pull origin ${{ github.ref_name }}
+
+            # Regenerate .env entirely from GitHub Secrets on every deploy
             cat > .env << 'ENVEOF'
-            PINTEREST_ACCESS_TOKEN=${{ secrets.PINTEREST_ACCESS_TOKEN }}
             GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
-            OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
             GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}
             SERPAPI_KEY=${{ secrets.SERPAPI_KEY }}
             HF_TOKEN=${{ secrets.HF_TOKEN }}
+            OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
             REDDIT_ACCESS_TOKEN=${{ secrets.REDDIT_ACCESS_TOKEN }}
             REDDIT_USERNAME=${{ secrets.REDDIT_USERNAME }}
             GOOGLE_SHEET_ID=${{ secrets.GOOGLE_SHEET_ID }}
@@ -42,10 +47,30 @@ jobs:
             AMAZON_ACCESS_TOKEN=${{ secrets.AMAZON_ACCESS_TOKEN }}
             ENVEOF
 
-            # Pull latest workflows
-            git pull origin ${{ github.ref_name }}
-
-            # Restart n8n (imports all workflows on startup)
             docker compose down && docker compose up -d
+            echo "Remote deploy complete"
 
-            echo "Deploy complete"
+  # ── Local / no-server notice ────────────────────────────────────────────────
+  # Runs when DEPLOY_HOST is not set — just validates the workflow files.
+  validate-local:
+    runs-on: ubuntu-latest
+    if: ${{ secrets.DEPLOY_HOST == '' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate workflow JSON files
+        run: |
+          echo "No DEPLOY_HOST set — running in local mode."
+          echo "Validating workflow JSON..."
+          for f in workflows/*.json; do
+            python3 -c "import json,sys; json.load(open('$f'))" \
+              && echo "OK: $f" \
+              || { echo "INVALID JSON: $f"; exit 1; }
+          done
+          echo "All workflow files valid."
+
+      - name: Summary
+        run: |
+          echo "To enable remote deploy, add these secrets in GitHub:"
+          echo "  DEPLOY_HOST, DEPLOY_USER, DEPLOY_SSH_KEY, DEPLOY_PATH"
