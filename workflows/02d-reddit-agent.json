@@ -52,11 +52,11 @@
           "parameters": [
             {
               "name": "Authorization",
-              "value": "Bearer {{ $vars.REDDIT_ACCESS_TOKEN }}"
+              "value": "Bearer {{ $env.REDDIT_ACCESS_TOKEN }}"
             },
             {
               "name": "User-Agent",
-              "value": "r0merch-bot/1.0 by u/{{ $vars.REDDIT_USERNAME }}"
+              "value": "r0merch-bot/1.0 by u/{{ $env.REDDIT_USERNAME }}"
             }
           ]
         },
@@ -99,11 +99,11 @@
           "parameters": [
             {
               "name": "Authorization",
-              "value": "Bearer {{ $vars.REDDIT_ACCESS_TOKEN }}"
+              "value": "Bearer {{ $env.REDDIT_ACCESS_TOKEN }}"
             },
             {
               "name": "User-Agent",
-              "value": "r0merch-bot/1.0 by u/{{ $vars.REDDIT_USERNAME }}"
+              "value": "r0merch-bot/1.0 by u/{{ $env.REDDIT_USERNAME }}"
             }
           ]
         },
@@ -196,9 +196,9 @@
   "staticData": null,
   "meta": null,
   "pinData": null,
-  "versionId": "e7d41128-a61f-4de3-8877-5cc72086c7a6",
+  "versionId": "bf883496-919c-46aa-b639-022252470bb5",
   "activeVersionId": null,
-  "versionCounter": 19,
+  "versionCounter": 21,
   "triggerCount": 0,
   "tags": [],
   "shared": [

@@ -33,7 +33,7 @@
     },
     {
       "parameters": {
-        "documentId": "={{ $vars.GOOGLE_SHEET_ID }}",
+        "documentId": "={{ $env.GOOGLE_SHEET_ID }}",
         "sheetName": "Designs",
         "columns": {
           "mappingMode": "defineBelow",
@@ -71,7 +71,7 @@
       "parameters": {
         "resource": "page",
         "operation": "create",
-        "databaseId": "={{ $vars.NOTION_DATABASE_ID }}",
+        "databaseId": "={{ $env.NOTION_DATABASE_ID }}",
         "title": "={{ $json.etsyTitle || $json.title }}",
         "propertiesUi": {
           "propertyValues": [
@@ -122,7 +122,7 @@
     {
       "parameters": {
         "operation": "create",
-        "baseId": "={{ $vars.AIRTABLE_BASE_ID }}",
+        "baseId": "={{ $env.AIRTABLE_BASE_ID }}",
         "tableId": "Designs",
         "columns": {
           "mappingMode": "defineBelow",
@@ -189,9 +189,9 @@
   "staticData": null,
   "meta": null,
   "pinData": null,
-  "versionId": "600fe868-c0cb-4910-881e-098e8baf1a33",
+  "versionId": "d9de4336-f2a3-4b97-b239-64d8a8ad725e",
   "activeVersionId": null,
-  "versionCounter": 19,
+  "versionCounter": 21,
   "triggerCount": 0,
   "tags": [],
   "shared": [

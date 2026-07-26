@@ -2,7 +2,7 @@
   "updatedAt": "2026-07-25T15:18:44.396Z",
   "createdAt": "2026-07-25T15:18:44.396Z",
   "id": "70f2fdb2-215a-4dd5-968b-aceac3989e2f",
-  "name": "r0merch \u2014 SEO Generator",
+  "name": "r0merch — SEO Generator",
   "description": null,
   "active": false,
   "isArchived": false,
@@ -45,7 +45,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({\n  contents: [{\n    parts: [{\n      text: (() => {\n        const d = $json;\n        return `You are an expert Etsy and Amazon SEO strategist for print-on-demand t-shirts.\n\nDesign Details:\n- Niche: ${d.niche}\n- Title: ${d.title}\n- Phrase on shirt: ${d.phrase}\n- Concept: ${d.concept || \"\"}\n- Target Audience: ${d.targetAudience}\n- Selling Angle: ${d.sellingAngle}\n- Tone: ${d.tone}\n- Source: ${d.source || \"\"}\n- Colors: ${(d.colors || []).join(\", \")}\n- Icons: ${(d.icons || []).join(\", \")}\n\nGenerate complete SEO metadata optimised for maximum discoverability.\nReturn ONLY a raw JSON object. No markdown, no code fences.\n\nShape:\n{\n  \"etsyTitle\": \"max 140 chars \u2014 lead with strongest keyword\",\n  \"etsyDescription\": \"150-200 word description with natural keyword integration, include size/material info placeholder\",\n  \"etsyTags\": [\"exactly 13 tags\", \"each max 20 chars\", \"mix long-tail and short\"],\n  \"amazonTitle\": \"max 200 chars \u2014 Brand + Keywords + Product Type\",\n  \"amazonBulletPoints\": [\"exactly 5 bullets\", \"start each with benefit\", \"include keywords naturally\"],\n  \"amazonKeywords\": \"backend keywords space-separated max 250 chars\",\n  \"fileName\": \"url-safe-slug-no-spaces\",\n  \"altText\": \"descriptive alt text for accessibility and SEO max 125 chars\",\n  \"searchTerms\": [\"10 buyer-intent search phrases people use to find this design\"]\n}`;\n      })()\n    }]\n  }],\n  generationConfig: { temperature: 0.3, maxOutputTokens: 2000 }\n}) }}"
+        "jsonBody": "={{ JSON.stringify({\n  contents: [{\n    parts: [{\n      text: (() => {\n        const d = $json;\n        return `You are an expert Etsy and Amazon SEO strategist for print-on-demand t-shirts.\n\nDesign Details:\n- Niche: ${d.niche}\n- Title: ${d.title}\n- Phrase on shirt: ${d.phrase}\n- Concept: ${d.concept || \"\"}\n- Target Audience: ${d.targetAudience}\n- Selling Angle: ${d.sellingAngle}\n- Tone: ${d.tone}\n- Source: ${d.source || \"\"}\n- Colors: ${(d.colors || []).join(\", \")}\n- Icons: ${(d.icons || []).join(\", \")}\n\nGenerate complete SEO metadata optimised for maximum discoverability.\nReturn ONLY a raw JSON object. No markdown, no code fences.\n\nShape:\n{\n  \"etsyTitle\": \"max 140 chars — lead with strongest keyword\",\n  \"etsyDescription\": \"150-200 word description with natural keyword integration, include size/material info placeholder\",\n  \"etsyTags\": [\"exactly 13 tags\", \"each max 20 chars\", \"mix long-tail and short\"],\n  \"amazonTitle\": \"max 200 chars — Brand + Keywords + Product Type\",\n  \"amazonBulletPoints\": [\"exactly 5 bullets\", \"start each with benefit\", \"include keywords naturally\"],\n  \"amazonKeywords\": \"backend keywords space-separated max 250 chars\",\n  \"fileName\": \"url-safe-slug-no-spaces\",\n  \"altText\": \"descriptive alt text for accessibility and SEO max 125 chars\",\n  \"searchTerms\": [\"10 buyer-intent search phrases people use to find this design\"]\n}`;\n      })()\n    }]\n  }],\n  generationConfig: { temperature: 0.3, maxOutputTokens: 2000 }\n}) }}"
       },
       "id": "gemini-seo",
       "name": "Gemini SEO Generation",
@@ -135,9 +135,9 @@
   "staticData": null,
   "meta": null,
   "pinData": null,
-  "versionId": "16b85917-5edf-43a0-a965-951a46fb5a63",
+  "versionId": "3f876bb1-9967-47e3-a33b-668cfa938568",
   "activeVersionId": null,
-  "versionCounter": 19,
+  "versionCounter": 21,
   "triggerCount": 0,
   "tags": [],
   "shared": [

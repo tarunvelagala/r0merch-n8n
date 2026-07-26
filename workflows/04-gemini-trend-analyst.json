@@ -26,7 +26,7 @@
           "parameters": [
             {
               "name": "key",
-              "value": "={{ $vars.GEMINI_API_KEY }}"
+              "value": "={{ $env.GEMINI_API_KEY }}"
             }
           ]
         },
@@ -87,9 +87,9 @@
   "staticData": null,
   "meta": null,
   "pinData": null,
-  "versionId": "0b933f44-0a7c-49ba-bfdb-206fa9c304b6",
+  "versionId": "3bab4add-18f3-4fe4-bc4c-311e5c5aed88",
   "activeVersionId": null,
-  "versionCounter": 19,
+  "versionCounter": 21,
   "triggerCount": 0,
   "tags": [],
   "shared": [

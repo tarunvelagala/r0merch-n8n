@@ -34,7 +34,7 @@
             },
             {
               "name": "api_key",
-              "value": "={{ $vars.SERPAPI_KEY }}"
+              "value": "={{ $env.SERPAPI_KEY }}"
             },
             {
               "name": "num",
@@ -79,7 +79,7 @@
             },
             {
               "name": "api_key",
-              "value": "={{ $vars.SERPAPI_KEY }}"
+              "value": "={{ $env.SERPAPI_KEY }}"
             },
             {
               "name": "num",
@@ -168,9 +168,9 @@
   "staticData": null,
   "meta": null,
   "pinData": null,
-  "versionId": "fbfca1a9-ee27-49af-8a07-7a96b8f04fec",
+  "versionId": "a345d344-4a6f-4cc9-9169-b2405be8e7ef",
   "activeVersionId": null,
-  "versionCounter": 19,
+  "versionCounter": 21,
   "triggerCount": 0,
   "tags": [],
   "shared": [

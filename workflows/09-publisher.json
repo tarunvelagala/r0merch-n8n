@@ -34,17 +34,17 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "https://openapi.etsy.com/v3/application/shops/{{ $vars.ETSY_SHOP_ID }}/listings",
+        "url": "https://openapi.etsy.com/v3/application/shops/{{ $env.ETSY_SHOP_ID }}/listings",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
             {
               "name": "x-api-key",
-              "value": "={{ $vars.ETSY_API_KEY }}"
+              "value": "={{ $env.ETSY_API_KEY }}"
             },
             {
               "name": "Authorization",
-              "value": "Bearer {{ $vars.ETSY_ACCESS_TOKEN }}"
+              "value": "Bearer {{ $env.ETSY_ACCESS_TOKEN }}"
             },
             {
               "name": "Content-Type",
@@ -54,7 +54,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({\n  quantity: 999,\n  title: $json.etsyTitle,\n  description: $json.etsyDescription,\n  price: 24.99,\n  who_made: 'i_did',\n  when_made: 'made_to_order',\n  taxonomy_id: 1103,\n  tags: ($json.etsyTags || []).slice(0, 13),\n  type: 'physical',\n  shipping_profile_id: $vars.ETSY_SHIPPING_PROFILE_ID\n}) }}"
+        "jsonBody": "={{ JSON.stringify({\n  quantity: 999,\n  title: $json.etsyTitle,\n  description: $json.etsyDescription,\n  price: 24.99,\n  who_made: 'i_did',\n  when_made: 'made_to_order',\n  taxonomy_id: 1103,\n  tags: ($json.etsyTags || []).slice(0, 13),\n  type: 'physical',\n  shipping_profile_id: $env.ETSY_SHIPPING_PROFILE_ID\n}) }}"
       },
       "id": "etsy-create-listing",
       "name": "Etsy: Create Listing",
@@ -70,13 +70,13 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "https://sellingpartnerapi-na.amazon.com/listings/2021-08-01/items/{{ $vars.AMAZON_SELLER_ID }}/{{ $json.seoFileName }}",
+        "url": "https://sellingpartnerapi-na.amazon.com/listings/2021-08-01/items/{{ $env.AMAZON_SELLER_ID }}/{{ $json.seoFileName }}",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
             {
               "name": "x-amz-access-token",
-              "value": "={{ $vars.AMAZON_ACCESS_TOKEN }}"
+              "value": "={{ $env.AMAZON_ACCESS_TOKEN }}"
             },
             {
               "name": "Content-Type",
@@ -135,9 +135,9 @@
   "staticData": null,
   "meta": null,
   "pinData": null,
-  "versionId": "4ad34619-e353-4669-9553-024e18d25db4",
+  "versionId": "e9599c93-c250-4b7b-9e03-811622c06813",
   "activeVersionId": null,
-  "versionCounter": 19,
+  "versionCounter": 21,
   "triggerCount": 0,
   "tags": [],
   "shared": [
