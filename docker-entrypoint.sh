@@ -63,8 +63,23 @@ do_export() {
     workflows.forEach(w => {
       if (!w.name || !w.name.startsWith('r0merch')) return;
       const filename = nameToFile[w.name];
-      if (!filename) return; // unknown workflow — skip, don't create new UUID file
-      fs.writeFileSync('/workflows/' + filename, JSON.stringify(w, null, 2));
+      if (!filename) return;
+
+      // Only overwrite the file if the DB version is NEWER than what's on disk.
+      // This prevents the export loop from clobbering fixes made to the files.
+      const fpath = '/workflows/' + filename;
+      let diskUpdatedAt = '';
+      try {
+        const disk = JSON.parse(fs.readFileSync(fpath, 'utf8'));
+        diskUpdatedAt = disk.updatedAt || '';
+      } catch(_) {}
+
+      const dbUpdatedAt = w.updatedAt || '';
+      if (diskUpdatedAt && dbUpdatedAt && dbUpdatedAt <= diskUpdatedAt) {
+        return; // file is same age or newer — skip
+      }
+
+      fs.writeFileSync(fpath, JSON.stringify(w, null, 2));
       saved++;
     });
 

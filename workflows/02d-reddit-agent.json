@@ -1,8 +1,8 @@
 {
-  "updatedAt": "2026-07-25T15:18:36.697Z",
+  "updatedAt": "2026-07-26T02:27:50.000Z",
   "createdAt": "2026-07-25T15:18:36.697Z",
   "id": "8c4e70a0-cdfa-4f6e-9345-f2895b55ab04",
-  "name": "r0merch — Reddit Agent",
+  "name": "r0merch \u2014 Reddit Agent",
   "description": null,
   "active": false,
   "isArchived": false,
@@ -20,7 +20,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const input = $input.first().json;\nconst niche = (input.niche || input.query || '').trim();\nconst subreddits = input.subreddits || input.marketing_pages || '';\n\nconst subs = subreddits\n  .split(',')\n  .map(s => s.trim())\n  .filter(s => s.startsWith('r/'))\n  .map(s => s.replace('r/', ''));\n\n// Fallback: derive subreddit from niche name\nconst finalSubs = subs.length > 0\n  ? subs\n  : [niche.toLowerCase().replace(/[^a-z0-9]/g, '')];\n\nif (!finalSubs[0]) throw new Error('Could not determine subreddit — provide niche or subreddits input.');\n\nreturn finalSubs.map(sub => ({ json: { niche: niche || sub, sub } }));"
+        "jsCode": "const input = $input.first().json;\nconst niche = (input.niche || input.query || '').trim();\nconst subreddits = input.subreddits || input.marketing_pages || '';\n\nconst subs = subreddits\n  .split(',')\n  .map(s => s.trim())\n  .filter(s => s.startsWith('r/'))\n  .map(s => s.replace('r/', ''));\n\nconst fallback = niche.toLowerCase().replace(/[^a-z0-9]/g, '') || 'all';\nconst finalSubs = subs.length > 0 ? subs : [fallback];\n\nreturn finalSubs.map(sub => ({ json: { niche: niche || sub, sub } }));"
       },
       "id": "split-subreddits",
       "name": "Split Subreddits",
@@ -196,9 +196,9 @@
   "staticData": null,
   "meta": null,
   "pinData": null,
-  "versionId": "f2988727-dd96-41f5-a37b-9d1da192f073",
+  "versionId": "428a173a-b239-4e74-b22b-0caffcf1e50e",
   "activeVersionId": null,
-  "versionCounter": 25,
+  "versionCounter": 26,
   "triggerCount": 0,
   "tags": [],
   "shared": [
