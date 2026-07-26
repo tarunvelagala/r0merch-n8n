@@ -2,7 +2,7 @@
   "name": "r0merch \u2014 POD Pipeline (Full)",
   "id": "1790571d-754c-4445-be73-1c370705998b",
   "active": false,
-  "updatedAt": "2026-07-26T16:45:06.000Z",
+  "updatedAt": "2026-07-26T16:48:46.000Z",
   "settings": {
     "executionOrder": "v1"
   },
@@ -1402,11 +1402,11 @@
           ]
         },
         "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={{ $json.groqBody }}",
+        "specifyBody": "string",
         "options": {
           "timeout": 30000
-        }
+        },
+        "body": "={{ $json.groqBody }}"
       }
     },
     {
@@ -1478,11 +1478,11 @@
           ]
         },
         "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={{ $json.groqBody }}",
+        "specifyBody": "string",
         "options": {
           "timeout": 30000
-        }
+        },
+        "body": "={{ $json.groqBody }}"
       }
     },
     {
@@ -1554,11 +1554,11 @@
           ]
         },
         "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={{ $json.groqBody }}",
+        "specifyBody": "string",
         "options": {
           "timeout": 30000
-        }
+        },
+        "body": "={{ $json.groqBody }}"
       }
     },
     {
