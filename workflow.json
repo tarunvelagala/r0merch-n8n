@@ -2,7 +2,7 @@
   "name": "r0merch \u2014 POD Pipeline (Full)",
   "id": "1790571d-754c-4445-be73-1c370705998b",
   "active": false,
-  "updatedAt": "2026-07-26T16:30:23.000Z",
+  "updatedAt": "2026-07-26T16:32:26.000Z",
   "settings": {
     "executionOrder": "v1"
   },
@@ -145,7 +145,7 @@
             },
             {
               "name": "q",
-              "value": "={{ 'site:etsy.com ' + (($json.niche || 'christian') || 'general') + ' t-shirt bestseller' }}"
+              "value": "={{ 'site:etsy.com ' + ($('Read Niches').first()?.json?.niche || 'christian') + ' t-shirt bestseller' }}"
             },
             {
               "name": "api_key",
@@ -301,7 +301,7 @@
             },
             {
               "name": "q",
-              "value": "={{ (($json.niche || 'christian') || 'general') + ' t-shirt trending' }}"
+              "value": "={{ (($('Wait 2s (Amazon\u2192GImages)').first()?.json?.niche || 'christian') + ' t-shirt trending') }}"
             },
             {
               "name": "api_key",
@@ -406,7 +406,7 @@
             },
             {
               "name": "q",
-              "value": "={{ 'site:reddit.com ' + ((($json.niche || 'christian') || 'general')||'') + ' merch design community' }}"
+              "value": "={{ 'site:reddit.com ' + ($('Wait 2s (GImages\u2192Reddit)').first()?.json?.niche || 'christian') + ' merch design community' }}"
             },
             {
               "name": "api_key",
@@ -515,7 +515,7 @@
             },
             {
               "name": "q",
-              "value": "={{ (($json.niche || 'christian') || 'general') + ' t-shirt print on demand niche ideas' }}"
+              "value": "={{ (($('Wait (Reddit\u2192GSearch)').first()?.json?.niche || 'christian') + ' t-shirt print on demand niche ideas') }}"
             },
             {
               "name": "api_key",
@@ -620,7 +620,7 @@
             },
             {
               "name": "q",
-              "value": "={{ ($json.searchQuery || ($json.niche || 'christian') + ' t-shirt') }}"
+              "value": "={{ ($('Wait (GSearch\u2192Trends)').first()?.json?.searchQuery || ($('Wait (GSearch\u2192Trends)').first()?.json?.niche || 'christian') + ' t-shirt') }}"
             },
             {
               "name": "api_key",
@@ -845,7 +845,7 @@
             },
             {
               "name": "q",
-              "value": "={{ 'site:x.com OR site:twitter.com ' + ($json.niche || $json.searchQuery || 'christian') + ' trending viral' }}"
+              "value": "={{ 'site:x.com OR site:twitter.com ' + ($('Wait (Trends\u2192Twitter)').first()?.json?.niche || 'christian') + ' trending viral' }}"
             },
             {
               "name": "api_key",
