@@ -2,7 +2,7 @@
   "name": "r0merch \u2014 POD Pipeline (Full)",
   "id": "1790571d-754c-4445-be73-1c370705998b",
   "active": false,
-  "updatedAt": "2026-07-26T15:08:08.000Z",
+  "updatedAt": "2026-07-26T15:11:20.000Z",
   "settings": {
     "executionOrder": "v1"
   },
@@ -58,20 +58,6 @@
       ],
       "parameters": {
         "jsCode": "return [\n  { json: { niche: 'christian', marketing_pages: 'r/Christianity,r/Bible' } },\n  { json: { niche: 'nurse', marketing_pages: 'r/nursing,r/nurses' } },\n  { json: { niche: 'cat-lovers', marketing_pages: 'r/cats,r/CatMemes' } }\n];"
-      }
-    },
-    {
-      "id": "split-batches",
-      "name": "Split In Batches",
-      "type": "n8n-nodes-base.splitInBatches",
-      "typeVersion": 3,
-      "position": [
-        480,
-        500
-      ],
-      "parameters": {
-        "batchSize": 1,
-        "options": {}
       }
     },
     {
@@ -192,7 +178,7 @@
         260
       ],
       "parameters": {
-        "jsCode": "const niche=($('Split In Batches').first()?.json?.niche || $input.first()?.json?.niche || '');\nconst sr=$('Etsy Shopping').first().json;\nconst or_=$('Etsy Organic').first().json;\nconst shopping=(sr?.shopping_results||[]).map(r=>({title:r.title||'',url:r.link||'',price:r.price||'',image:r.thumbnail||'',rating:r.rating||0,reviews:r.reviews||0,tags:[],source:'google_shopping'}));\nconst organic=(or_?.organic_results||[]).filter(r=>r.link?.includes('etsy.com')).map(r=>({title:r.title||'',url:r.link||'',price:'',image:r.thumbnail||'',rating:0,reviews:0,tags:(r.title||'').toLowerCase().split(/[\\s,|]+/).filter(t=>t.length>3),source:'google_organic'}));\nreturn [{json:{source:'etsy',niche,data:[...shopping,...organic].slice(0,30)}}];"
+        "jsCode": "const niche=($('Read Niches').first()?.json?.niche || $input.first()?.json?.niche || '');\nconst sr=$('Etsy Shopping').first().json;\nconst or_=$('Etsy Organic').first().json;\nconst shopping=(sr?.shopping_results||[]).map(r=>({title:r.title||'',url:r.link||'',price:r.price||'',image:r.thumbnail||'',rating:r.rating||0,reviews:r.reviews||0,tags:[],source:'google_shopping'}));\nconst organic=(or_?.organic_results||[]).filter(r=>r.link?.includes('etsy.com')).map(r=>({title:r.title||'',url:r.link||'',price:'',image:r.thumbnail||'',rating:0,reviews:0,tags:(r.title||'').toLowerCase().split(/[\\s,|]+/).filter(t=>t.length>3),source:'google_organic'}));\nreturn [{json:{source:'etsy',niche,data:[...shopping,...organic].slice(0,30)}}];"
       }
     },
     {
@@ -247,7 +233,7 @@
         480
       ],
       "parameters": {
-        "jsCode": "const niche=($('Split In Batches').first()?.json?.niche || $input.first()?.json?.niche || '');\nconst r=$input.first().json?.organic_results||[];\nconst data=r.map(i=>({title:i.title||'',url:i.link||`https://www.amazon.com/dp/${i.asin}`,price:i.price?.raw||i.price||'',image:i.thumbnail||'',rating:i.rating||0,reviews:i.reviews?.total||0,asin:i.asin||''}));\nreturn [{json:{source:'amazon',niche,data}}];"
+        "jsCode": "const niche=($('Read Niches').first()?.json?.niche || $input.first()?.json?.niche || '');\nconst r=$input.first().json?.organic_results||[];\nconst data=r.map(i=>({title:i.title||'',url:i.link||`https://www.amazon.com/dp/${i.asin}`,price:i.price?.raw||i.price||'',image:i.thumbnail||'',rating:i.rating||0,reviews:i.reviews?.total||0,asin:i.asin||''}));\nreturn [{json:{source:'amazon',niche,data}}];"
       }
     },
     {
@@ -344,7 +330,7 @@
         860
       ],
       "parameters": {
-        "jsCode": "const niche=($('Split In Batches').first()?.json?.niche || $input.first()?.json?.niche || '');\nconst ir=$('Google Images Design').first().json;\nconst tr=$('Google Images Trending').first().json;\nconst m=r=>({title:r.title||'',url:r.link||r.original||'',image:r.original||r.thumbnail||''});\nconst pins=(ir?.images_results||[]).map(m).slice(0,20);\nconst trending=(tr?.images_results||[]).map(m).slice(0,10);\nconst trendingKeywords=[...(ir?.suggested_searches||[]).map(s=>s.name||s.q||s),...(tr?.suggested_searches||[]).map(s=>s.name||s.q||s)].slice(0,20);\nreturn [{json:{source:'pinterest',niche,data:{pins:[...pins,...trending],trendingKeywords}}}];"
+        "jsCode": "const niche=($('Read Niches').first()?.json?.niche || $input.first()?.json?.niche || '');\nconst ir=$('Google Images Design').first().json;\nconst tr=$('Google Images Trending').first().json;\nconst m=r=>({title:r.title||'',url:r.link||r.original||'',image:r.original||r.thumbnail||''});\nconst pins=(ir?.images_results||[]).map(m).slice(0,20);\nconst trending=(tr?.images_results||[]).map(m).slice(0,10);\nconst trendingKeywords=[...(ir?.suggested_searches||[]).map(s=>s.name||s.q||s),...(tr?.suggested_searches||[]).map(s=>s.name||s.q||s)].slice(0,20);\nreturn [{json:{source:'pinterest',niche,data:{pins:[...pins,...trending],trendingKeywords}}}];"
       }
     },
     {
@@ -457,7 +443,7 @@
         1160
       ],
       "parameters": {
-        "jsCode": "const niche=($('Split In Batches').first()?.json?.niche || $input.first()?.json?.niche || '')||'';\nconst sr=$('Reddit Search').first().json;\nconst cr=$('Reddit Community').first().json;\nconst m=r=>({title:r.title||'',url:r.link||'',snippet:r.snippet||'',sub:(r.link||'').match(/reddit\\.com\\/r\\/([^\\/]+)/)?.[1]||''});\nconst seen=new Set();\nconst data=[...(sr?.organic_results||[]).map(m),...(cr?.organic_results||[]).map(m)].filter(r=>{if(!r.title||seen.has(r.url))return false;seen.add(r.url);return true;});\nreturn [{json:{source:'reddit',niche,data}}];"
+        "jsCode": "const niche=($('Read Niches').first()?.json?.niche || $input.first()?.json?.niche || '')||'';\nconst sr=$('Reddit Search').first().json;\nconst cr=$('Reddit Community').first().json;\nconst m=r=>({title:r.title||'',url:r.link||'',snippet:r.snippet||'',sub:(r.link||'').match(/reddit\\.com\\/r\\/([^\\/]+)/)?.[1]||''});\nconst seen=new Set();\nconst data=[...(sr?.organic_results||[]).map(m),...(cr?.organic_results||[]).map(m)].filter(r=>{if(!r.title||seen.has(r.url))return false;seen.add(r.url);return true;});\nreturn [{json:{source:'reddit',niche,data}}];"
       }
     },
     {
@@ -562,7 +548,7 @@
         1460
       ],
       "parameters": {
-        "jsCode": "const niche=($('Split In Batches').first()?.json?.niche || $input.first()?.json?.niche || '');\nconst mr=$('Google Search Main').first().json;\nconst nr=$('Google Search Niche').first().json;\nconst m=r=>({title:r.title||'',url:r.link||'',snippet:r.snippet||''});\nconst organic=(mr?.organic_results||[]).map(m);\nconst relatedSearches=[...(mr?.related_searches||[]).map(s=>s.query),...(nr?.related_searches||[]).map(s=>s.query)].filter(Boolean);\nconst peopleAlsoAsk=(mr?.related_questions||[]).map(q=>q.question).filter(Boolean);\nreturn [{json:{source:'google_search',niche,data:{organic,relatedSearches,peopleAlsoAsk}}}];"
+        "jsCode": "const niche=($('Read Niches').first()?.json?.niche || $input.first()?.json?.niche || '');\nconst mr=$('Google Search Main').first().json;\nconst nr=$('Google Search Niche').first().json;\nconst m=r=>({title:r.title||'',url:r.link||'',snippet:r.snippet||''});\nconst organic=(mr?.organic_results||[]).map(m);\nconst relatedSearches=[...(mr?.related_searches||[]).map(s=>s.query),...(nr?.related_searches||[]).map(s=>s.query)].filter(Boolean);\nconst peopleAlsoAsk=(mr?.related_questions||[]).map(q=>q.question).filter(Boolean);\nreturn [{json:{source:'google_search',niche,data:{organic,relatedSearches,peopleAlsoAsk}}}];"
       }
     },
     {
@@ -667,7 +653,7 @@
         1760
       ],
       "parameters": {
-        "jsCode": "const niche=($('Split In Batches').first()?.json?.niche || $input.first()?.json?.niche || '');\nconst tr=$('Trends Timeseries').first().json;\nconst rr=$('Trends Related Queries').first().json;\nconst timeline=(tr?.interest_over_time?.timeline_data||[]).map(t=>({date:t.date,value:t.values?.[0]?.extracted_value??0}));\nconst avg=arr=>arr.length?arr.reduce((s,v)=>s+v,0)/arr.length:0;\nconst r4=avg(timeline.slice(-4).map(t=>t.value)),p4=avg(timeline.slice(-8,-4).map(t=>t.value));\nconst trendDirection=r4>p4*1.1?'rising':r4<p4*0.9?'falling':'stable';\nconst byMonth={};\ntimeline.forEach(({date,value})=>{const m=date?.split(' ')?.[0]||'';if(!byMonth[m])byMonth[m]=[];byMonth[m].push(value);});\nconst ma=Object.entries(byMonth).map(([m,v])=>({m,a:avg(v)})).sort((a,b)=>b.a-a.a);\nconst rising=(rr?.related_queries?.rising||[]).map(r=>r.query);\nconst top=(rr?.related_queries?.top||[]).map(r=>r.query);\nreturn [{json:{source:'google_trends',niche,data:{timeline,trendDirection,peakMonths:ma.slice(0,3).map(x=>x.m),lowMonths:ma.slice(-3).map(x=>x.m),risingQueries:rising,topQueries:top}}}];"
+        "jsCode": "const niche=($('Read Niches').first()?.json?.niche || $input.first()?.json?.niche || '');\nconst tr=$('Trends Timeseries').first().json;\nconst rr=$('Trends Related Queries').first().json;\nconst timeline=(tr?.interest_over_time?.timeline_data||[]).map(t=>({date:t.date,value:t.values?.[0]?.extracted_value??0}));\nconst avg=arr=>arr.length?arr.reduce((s,v)=>s+v,0)/arr.length:0;\nconst r4=avg(timeline.slice(-4).map(t=>t.value)),p4=avg(timeline.slice(-8,-4).map(t=>t.value));\nconst trendDirection=r4>p4*1.1?'rising':r4<p4*0.9?'falling':'stable';\nconst byMonth={};\ntimeline.forEach(({date,value})=>{const m=date?.split(' ')?.[0]||'';if(!byMonth[m])byMonth[m]=[];byMonth[m].push(value);});\nconst ma=Object.entries(byMonth).map(([m,v])=>({m,a:avg(v)})).sort((a,b)=>b.a-a.a);\nconst rising=(rr?.related_queries?.rising||[]).map(r=>r.query);\nconst top=(rr?.related_queries?.top||[]).map(r=>r.query);\nreturn [{json:{source:'google_trends',niche,data:{timeline,trendDirection,peakMonths:ma.slice(0,3).map(x=>x.m),lowMonths:ma.slice(-3).map(x=>x.m),risingQueries:rising,topQueries:top}}}];"
       }
     },
     {
@@ -783,7 +769,7 @@
         1980
       ],
       "parameters": {
-        "jsCode": "const niche=($('Split In Batches').first()?.json?.niche || $input.first()?.json?.niche || '')||'';\nconst items=$input.all();\nconst data=items.map((item,i)=>{const raw=item.json?.candidates?.[0]?.content?.parts?.[0]?.text||'{}';\nconst clean=raw.replace(/```json|```/g,'').trim();\nconst match=clean.match(/\\{[\\s\\S]*\\}/);\nlet a={};try{a=JSON.parse(match?.[0]||'{}')}catch(_){}\nreturn{imageIndex:i,...a};}).filter(a=>a.style||a.layout);\nreturn [{json:{source:'vision',niche,data}}];"
+        "jsCode": "const niche=($('Read Niches').first()?.json?.niche || $input.first()?.json?.niche || '')||'';\nconst items=$input.all();\nconst data=items.map((item,i)=>{const raw=item.json?.candidates?.[0]?.content?.parts?.[0]?.text||'{}';\nconst clean=raw.replace(/```json|```/g,'').trim();\nconst match=clean.match(/\\{[\\s\\S]*\\}/);\nlet a={};try{a=JSON.parse(match?.[0]||'{}')}catch(_){}\nreturn{imageIndex:i,...a};}).filter(a=>a.style||a.layout);\nreturn [{json:{source:'vision',niche,data}}];"
       }
     },
     {
@@ -896,7 +882,7 @@
         2360
       ],
       "parameters": {
-        "jsCode": "const niche=($('Split In Batches').first()?.json?.niche || $input.first()?.json?.niche || '');\nconst tr=$('Twitter Search').first().json;\nconst vr=$('Twitter Viral').first().json;\nconst snippets=[...(tr?.organic_results||[]),...(vr?.organic_results||[])].map(r=>r.title+' '+(r.snippet||'')).join('\\n');\nreturn [{json:{niche,rawSnippets:snippets}}];"
+        "jsCode": "const niche=($('Read Niches').first()?.json?.niche || $input.first()?.json?.niche || '');\nconst tr=$('Twitter Search').first().json;\nconst vr=$('Twitter Viral').first().json;\nconst snippets=[...(tr?.organic_results||[]),...(vr?.organic_results||[])].map(r=>r.title+' '+(r.snippet||'')).join('\\n');\nreturn [{json:{niche,rawSnippets:snippets}}];"
       }
     },
     {
@@ -970,7 +956,7 @@
         1200
       ],
       "parameters": {
-        "jsCode": "const items = $input.all();\nconst niche = ($('Split In Batches').first()?.json?.niche || items.find(i=>i.json?.niche)?.json?.niche || '');\n\nconst find = (source, def) => {\n  const item = items.find(i => i.json?.source === source);\n  if (!item) return def;\n  return item.json.data ?? def;\n};\n\nreturn [{ json: {\n  niche,\n  etsy:         find('etsy',          []),\n  amazon:       find('amazon',         []),\n  pinterest:    find('pinterest',      {pins:[],trendingKeywords:[]}),\n  reddit:       find('reddit',         []),\n  googleSearch: find('google_search',  {organic:[],relatedSearches:[],peopleAlsoAsk:[]}),\n  googleTrends: find('google_trends',  {timeline:[],trendDirection:'stable',risingQueries:[],topQueries:[]}),\n  vision:       find('vision',         []),\n  twitter:      find('twitter',        {}),\n  collectedAt:  new Date().toISOString()\n} }];"
+        "jsCode": "const items = $input.all();\nconst niche = ($('Read Niches').first()?.json?.niche || items.find(i=>i.json?.niche)?.json?.niche || '');\n\nconst find = (source, def) => {\n  const item = items.find(i => i.json?.source === source);\n  if (!item) return def;\n  return item.json.data ?? def;\n};\n\nreturn [{ json: {\n  niche,\n  etsy:         find('etsy',          []),\n  amazon:       find('amazon',         []),\n  pinterest:    find('pinterest',      {pins:[],trendingKeywords:[]}),\n  reddit:       find('reddit',         []),\n  googleSearch: find('google_search',  {organic:[],relatedSearches:[],peopleAlsoAsk:[]}),\n  googleTrends: find('google_trends',  {timeline:[],trendDirection:'stable',risingQueries:[],topQueries:[]}),\n  vision:       find('vision',         []),\n  twitter:      find('twitter',        {}),\n  collectedAt:  new Date().toISOString()\n} }];"
       }
     },
     {
@@ -1350,17 +1336,6 @@
       }
     },
     {
-      "id": "done",
-      "name": "\u2705 Done",
-      "type": "n8n-nodes-base.noOp",
-      "typeVersion": 1,
-      "position": [
-        7160,
-        500
-      ],
-      "parameters": {}
-    },
-    {
       "id": "skip-error",
       "name": "Skip Error",
       "type": "n8n-nodes-base.noOp",
@@ -1368,6 +1343,17 @@
       "position": [
         1400,
         2600
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "done",
+      "name": "\u2705 Done",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        7200,
+        500
       ],
       "parameters": {}
     }
@@ -1388,7 +1374,72 @@
       "main": [
         [
           {
-            "node": "Split In Batches",
+            "node": "Etsy Shopping",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Etsy Organic",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Amazon Search",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Images Design",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Images Trending",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Reddit Search",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Reddit Community",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Search Main",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Search Niche",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Trends Timeseries",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Trends Related Queries",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Prepare Images",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Twitter Search",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Twitter Viral",
             "type": "main",
             "index": 0
           }
@@ -1727,82 +1778,6 @@
         ]
       ]
     },
-    "Split In Batches": {
-      "main": [
-        [
-          {
-            "node": "Etsy Shopping",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Etsy Organic",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Amazon Search",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Google Images Design",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Google Images Trending",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Reddit Search",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Reddit Community",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Google Search Main",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Google Search Niche",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Trends Timeseries",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Trends Related Queries",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Prepare Images",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Twitter Search",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Twitter Viral",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Parse Etsy": {
       "main": [
         [
@@ -2086,17 +2061,6 @@
         [
           {
             "node": "\u2705 Done",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "\u2705 Done": {
-      "main": [
-        [
-          {
-            "node": "Split In Batches",
             "type": "main",
             "index": 0
           }
