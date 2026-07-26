@@ -2,7 +2,7 @@
   "name": "r0merch \u2014 POD Pipeline (Full)",
   "id": "1790571d-754c-4445-be73-1c370705998b",
   "active": false,
-  "updatedAt": "2026-07-26T15:20:27.000Z",
+  "updatedAt": "2026-07-26T15:46:56.000Z",
   "settings": {
     "executionOrder": "v1"
   },
@@ -1482,7 +1482,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ model: 'llama-3.3-70b-versatile', messages: [{ role: 'user', content: (() => { const d = $('Trend Aggregator').first().json; return 'POD trend analyst. Research for niche: ' + $json.niche + '\\n\\n' + 'Keywords: ' + ($json.keywords||[]).join(', ') + '\\n' + 'Twitter: ' + ($json.twitter?.trendingPhrases||[]).join(', ') + '\\n' + 'Audience: ' + ($json.audience||[]).join(', ') + '\\n\\n' + 'Return ONLY JSON: {\"recurringColors\":[],\"typographyStyles\":[],\"illustrations\":[],\"underservedOpportunities\":[],\"saturatedIdeas\":[],\"emergingTrends\":[],\"audienceSegments\":[],\"seasonality\":{},\"twitterDerivedConcepts\":[],\"topDesignDirections\":[]}'; })() }], max_tokens: 4000, temperature: 0.4 }) }}",
+        "jsonBody": "={{ JSON.stringify({ model: 'llama-3.1-8b-instant', messages: [{ role: 'user', content: (() => { const d = $('Trend Aggregator').first().json; return 'POD trend analyst. Research for niche: ' + $json.niche + '\\n\\n' + 'Keywords: ' + ($json.keywords||[]).join(', ') + '\\n' + 'Twitter: ' + ($json.twitter?.trendingPhrases||[]).join(', ') + '\\n' + 'Audience: ' + ($json.audience||[]).join(', ') + '\\n\\n' + 'Return ONLY JSON: {\"recurringColors\":[],\"typographyStyles\":[],\"illustrations\":[],\"underservedOpportunities\":[],\"saturatedIdeas\":[],\"emergingTrends\":[],\"audienceSegments\":[],\"seasonality\":{},\"twitterDerivedConcepts\":[],\"topDesignDirections\":[]}'; })() }], max_tokens: 2000, temperature: 0.4 }) }}",
         "options": {
           "timeout": 60000
         }
@@ -1558,7 +1558,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ model: 'llama-3.3-70b-versatile', messages: [{ role: 'user', content: (() => { const d = $('Parse Analysis').first().json; return 'Creative director for POD niche: ' + $json.niche + '\\n\\n' + 'Top directions: ' + ($json.topDesignDirections||[]).join(', ') + '\\n' + 'Twitter concepts: ' + ($json.twitterDerivedConcepts||[]).join(', ') + '\\n' + 'Opportunities: ' + ($json.underservedOpportunities||[]).join(', ') + '\\n\\n' + 'Generate EXACTLY 10 t-shirt concepts. Return ONLY a JSON array of 10 objects: [{\"id\":1,\"title\":\"\",\"phrase\":\"\",\"concept\":\"\",\"targetAudience\":\"\",\"sellingAngle\":\"\",\"tone\":\"motivational\",\"imagePrompt\":\"\",\"colors\":[],\"typography\":\"\",\"icons\":[],\"source\":\"twitter\"}]'; })() }], max_tokens: 4000, temperature: 0.4 }) }}",
+        "jsonBody": "={{ JSON.stringify({ model: 'llama-3.1-8b-instant', messages: [{ role: 'user', content: (() => { const d = $('Parse Analysis').first().json; return 'Creative director for POD niche: ' + $json.niche + '\\n\\n' + 'Top directions: ' + ($json.topDesignDirections||[]).join(', ') + '\\n' + 'Twitter concepts: ' + ($json.twitterDerivedConcepts||[]).join(', ') + '\\n' + 'Opportunities: ' + ($json.underservedOpportunities||[]).join(', ') + '\\n\\n' + 'Generate EXACTLY 10 t-shirt concepts. Return ONLY a JSON array of 10 objects: [{\"id\":1,\"title\":\"\",\"phrase\":\"\",\"concept\":\"\",\"targetAudience\":\"\",\"sellingAngle\":\"\",\"tone\":\"motivational\",\"imagePrompt\":\"\",\"colors\":[],\"typography\":\"\",\"icons\":[],\"source\":\"twitter\"}]'; })() }], max_tokens: 2000, temperature: 0.4 }) }}",
         "options": {
           "timeout": 60000
         }
@@ -1634,7 +1634,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ model: 'llama-3.3-70b-versatile', messages: [{ role: 'user', content: (() => { const d = $('Split Designs').first().json; return 'Etsy/Amazon SEO expert for POD t-shirts.\\nNiche: ' + $json.niche + '\\nTitle: ' + $json.title + '\\nPhrase: ' + $json.phrase + '\\nAudience: ' + $json.targetAudience + '\\nTone: ' + $json.tone + '\\n\\n' + 'Return ONLY JSON: {\"etsyTitle\":\"\",\"etsyDescription\":\"\",\"etsyTags\":[],\"amazonTitle\":\"\",\"amazonBulletPoints\":[],\"amazonKeywords\":\"\",\"fileName\":\"\",\"altText\":\"\",\"searchTerms\":[]}'; })() }], max_tokens: 4000, temperature: 0.4 }) }}",
+        "jsonBody": "={{ JSON.stringify({ model: 'llama-3.1-8b-instant', messages: [{ role: 'user', content: (() => { const d = $('Split Designs').first().json; return 'Etsy/Amazon SEO expert for POD t-shirts.\\nNiche: ' + $json.niche + '\\nTitle: ' + $json.title + '\\nPhrase: ' + $json.phrase + '\\nAudience: ' + $json.targetAudience + '\\nTone: ' + $json.tone + '\\n\\n' + 'Return ONLY JSON: {\"etsyTitle\":\"\",\"etsyDescription\":\"\",\"etsyTags\":[],\"amazonTitle\":\"\",\"amazonBulletPoints\":[],\"amazonKeywords\":\"\",\"fileName\":\"\",\"altText\":\"\",\"searchTerms\":[]}'; })() }], max_tokens: 2000, temperature: 0.4 }) }}",
         "options": {
           "timeout": 60000
         }
