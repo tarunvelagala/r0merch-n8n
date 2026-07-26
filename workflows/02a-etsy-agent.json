@@ -1,8 +1,8 @@
 {
-  "updatedAt": "2026-07-25T15:18:33.804Z",
+  "updatedAt": "2026-07-26T03:08:37.000Z",
   "createdAt": "2026-07-25T15:18:33.804Z",
   "id": "25b7d461-1692-4fab-8739-5419bed842c5",
-  "name": "r0merch — Etsy Agent",
+  "name": "r0merch \u2014 Etsy Agent",
   "description": null,
   "active": false,
   "isArchived": false,
@@ -51,7 +51,7 @@
           ]
         },
         "options": {
-          "timeout": 20000
+          "timeout": 30000
         }
       },
       "id": "etsy-shopping-fetch",
@@ -61,7 +61,8 @@
       "position": [
         220,
         150
-      ]
+      ],
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -96,7 +97,7 @@
           ]
         },
         "options": {
-          "timeout": 20000
+          "timeout": 30000
         }
       },
       "id": "etsy-organic-fetch",
@@ -106,11 +107,12 @@
       "position": [
         220,
         450
-      ]
+      ],
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
-        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche;\nconst shoppingRaw = $('SerpAPI Etsy Shopping').first().json;\nconst organicRaw  = $('SerpAPI Etsy Organic').first().json;\n\n// Shopping results — have price, image, rating\nconst shopping = (shoppingRaw?.shopping_results || []).map(r => ({\n  title:    r.title   || '',\n  url:      r.link    || '',\n  price:    r.price   || '',\n  image:    r.thumbnail || '',\n  rating:   r.rating  || 0,\n  reviews:  r.reviews || 0,\n  tags:     [],\n  source:   'google_shopping'\n}));\n\n// Organic results — extract tags from title keywords\nconst organic = (organicRaw?.organic_results || [])\n  .filter(r => r.link?.includes('etsy.com'))\n  .map(r => ({\n    title:    r.title   || '',\n    url:      r.link    || '',\n    price:    '',\n    image:    r.thumbnail || '',\n    rating:   0,\n    reviews:  0,\n    tags:     (r.title || '').toLowerCase().split(/[\\s,|–-]+/).filter(t => t.length > 3),\n    source:   'google_organic'\n  }));\n\nconst data = [...shopping, ...organic].slice(0, 30);\n\nreturn [{ json: { source: 'etsy', niche, data } }];"
+        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche;\nconst shoppingRaw = $('SerpAPI Etsy Shopping').first().json;\nconst organicRaw  = $('SerpAPI Etsy Organic').first().json;\n\n// Shopping results \u2014 have price, image, rating\nconst shopping = (shoppingRaw?.shopping_results || []).map(r => ({\n  title:    r.title   || '',\n  url:      r.link    || '',\n  price:    r.price   || '',\n  image:    r.thumbnail || '',\n  rating:   r.rating  || 0,\n  reviews:  r.reviews || 0,\n  tags:     [],\n  source:   'google_shopping'\n}));\n\n// Organic results \u2014 extract tags from title keywords\nconst organic = (organicRaw?.organic_results || [])\n  .filter(r => r.link?.includes('etsy.com'))\n  .map(r => ({\n    title:    r.title   || '',\n    url:      r.link    || '',\n    price:    '',\n    image:    r.thumbnail || '',\n    rating:   0,\n    reviews:  0,\n    tags:     (r.title || '').toLowerCase().split(/[\\s,|\u2013-]+/).filter(t => t.length > 3),\n    source:   'google_organic'\n  }));\n\nconst data = [...shopping, ...organic].slice(0, 30);\n\nreturn [{ json: { source: 'etsy', niche, data } }];"
       },
       "id": "parse-etsy",
       "name": "Parse Etsy Results",
@@ -147,6 +149,13 @@
             "type": "main",
             "index": 0
           }
+        ],
+        [
+          {
+            "node": "Parse Etsy Results",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
@@ -158,6 +167,13 @@
             "type": "main",
             "index": 1
           }
+        ],
+        [
+          {
+            "node": "Parse Etsy Results",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     }
@@ -168,9 +184,9 @@
   "staticData": null,
   "meta": null,
   "pinData": null,
-  "versionId": "78f06dd0-36aa-41f3-b6af-3f9e06b49de7",
+  "versionId": "b84924fc-0ce3-4ec9-8873-4de76de1702a",
   "activeVersionId": null,
-  "versionCounter": 21,
+  "versionCounter": 26,
   "triggerCount": 0,
   "tags": [],
   "shared": [

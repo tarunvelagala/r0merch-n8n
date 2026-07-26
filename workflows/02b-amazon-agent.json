@@ -1,8 +1,8 @@
 {
-  "updatedAt": "2026-07-25T15:18:34.784Z",
+  "updatedAt": "2026-07-26T03:08:37.000Z",
   "createdAt": "2026-07-25T15:18:34.784Z",
   "id": "5263dc0c-b3cc-4962-b9d0-de12fb260b56",
-  "name": "r0merch — Amazon Agent",
+  "name": "r0merch \u2014 Amazon Agent",
   "description": null,
   "active": false,
   "isArchived": false,
@@ -45,6 +45,9 @@
               "value": "fashion-mens-graphic-tees"
             }
           ]
+        },
+        "options": {
+          "timeout": 30000
         }
       },
       "id": "amazon-fetch",
@@ -54,7 +57,8 @@
       "position": [
         220,
         300
-      ]
+      ],
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -90,6 +94,13 @@
             "type": "main",
             "index": 0
           }
+        ],
+        [
+          {
+            "node": "Parse Amazon Results",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     }
@@ -100,9 +111,9 @@
   "staticData": null,
   "meta": null,
   "pinData": null,
-  "versionId": "c9963eb7-c70c-4d5d-b5ef-8ecc82e51142",
+  "versionId": "b62f24e0-4785-4124-9609-3e05c28e7365",
   "activeVersionId": null,
-  "versionCounter": 21,
+  "versionCounter": 26,
   "triggerCount": 0,
   "tags": [],
   "shared": [

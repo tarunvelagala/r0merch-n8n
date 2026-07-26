@@ -1,8 +1,8 @@
 {
-  "updatedAt": "2026-07-25T15:18:38.613Z",
+  "updatedAt": "2026-07-26T03:08:37.000Z",
   "createdAt": "2026-07-25T15:18:38.613Z",
   "id": "4a5b9883-f228-4502-a93b-ae5197d28d30",
-  "name": "r0merch — Google Trends Agent",
+  "name": "r0merch \u2014 Google Trends Agent",
   "description": null,
   "active": false,
   "isArchived": false,
@@ -51,7 +51,7 @@
           ]
         },
         "options": {
-          "timeout": 20000
+          "timeout": 30000
         }
       },
       "id": "trends-timeseries-fetch",
@@ -61,7 +61,8 @@
       "position": [
         220,
         150
-      ]
+      ],
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -96,7 +97,7 @@
           ]
         },
         "options": {
-          "timeout": 20000
+          "timeout": 30000
         }
       },
       "id": "trends-related-fetch",
@@ -106,7 +107,8 @@
       "position": [
         220,
         450
-      ]
+      ],
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -147,6 +149,13 @@
             "type": "main",
             "index": 0
           }
+        ],
+        [
+          {
+            "node": "Parse Trends",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
@@ -158,6 +167,13 @@
             "type": "main",
             "index": 1
           }
+        ],
+        [
+          {
+            "node": "Parse Trends",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     }
@@ -168,9 +184,9 @@
   "staticData": null,
   "meta": null,
   "pinData": null,
-  "versionId": "c04571c6-ada0-4fef-8742-c5e6f67fe244",
+  "versionId": "cb798c97-9942-481d-a21e-7a65a65b87af",
   "activeVersionId": null,
-  "versionCounter": 21,
+  "versionCounter": 26,
   "triggerCount": 0,
   "tags": [],
   "shared": [

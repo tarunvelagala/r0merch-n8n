@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-07-26T02:57:03.000Z",
+  "updatedAt": "2026-07-26T03:08:37.000Z",
   "createdAt": "2026-07-25T15:18:39.577Z",
   "id": "b7a2e73f-4388-431e-9bb3-737dfd7cf77d",
   "name": "r0merch \u2014 Vision Agent",
@@ -121,7 +121,8 @@
       "position": [
         1100,
         150
-      ]
+      ],
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -202,6 +203,13 @@
     },
     "Gemini Vision Analyze": {
       "main": [
+        [
+          {
+            "node": "Parse Vision Results",
+            "type": "main",
+            "index": 0
+          }
+        ],
         [
           {
             "node": "Parse Vision Results",

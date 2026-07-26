@@ -1,8 +1,8 @@
 {
-  "updatedAt": "2026-07-25T16:19:41.459Z",
+  "updatedAt": "2026-07-26T03:08:37.000Z",
   "createdAt": "2026-07-25T16:19:41.459Z",
   "id": "3d7e9f12-a841-4c56-b234-8f1e2a3b4c5d",
-  "name": "r0merch — Twitter Agent",
+  "name": "r0merch \u2014 Twitter Agent",
   "description": null,
   "active": false,
   "isArchived": false,
@@ -55,7 +55,7 @@
           ]
         },
         "options": {
-          "timeout": 20000
+          "timeout": 30000
         }
       },
       "id": "twitter-fetch",
@@ -65,7 +65,8 @@
       "position": [
         220,
         150
-      ]
+      ],
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -104,7 +105,7 @@
           ]
         },
         "options": {
-          "timeout": 20000
+          "timeout": 30000
         }
       },
       "id": "twitter-viral-fetch",
@@ -114,7 +115,8 @@
       "position": [
         220,
         450
-      ]
+      ],
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -148,7 +150,10 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ model: 'llama-3.1-8b-instant', messages: [{ role: 'user', content: 'You are a trend analyst for print-on-demand merchandise.\\n\\nHere are recent tweets and posts from Twitter/X about the \"' + $json.niche + '\" niche:\\n\\n' + $json.rawSnippets + '\\n\\nExtract trending signals useful for t-shirt design. Return ONLY a raw JSON object, no markdown, no code fences.\\nShape:\\n{\\n  \"trendingPhrases\": [],\\n  \"slang\": [],\\n  \"hashtags\": [],\\n  \"memes\": [],\\n  \"culturalSignals\": [],\\n  \"emotions\": [],\\n  \"keywords\": []\\n}' }], max_tokens: 600, temperature: 0.4 }) }}"
+        "jsonBody": "={{ JSON.stringify({ model: 'llama-3.1-8b-instant', messages: [{ role: 'user', content: 'You are a trend analyst for print-on-demand merchandise.\\n\\nHere are recent tweets and posts from Twitter/X about the \"' + $json.niche + '\" niche:\\n\\n' + $json.rawSnippets + '\\n\\nExtract trending signals useful for t-shirt design. Return ONLY a raw JSON object, no markdown, no code fences.\\nShape:\\n{\\n  \"trendingPhrases\": [],\\n  \"slang\": [],\\n  \"hashtags\": [],\\n  \"memes\": [],\\n  \"culturalSignals\": [],\\n  \"emotions\": [],\\n  \"keywords\": []\\n}' }], max_tokens: 600, temperature: 0.4 }) }}",
+        "options": {
+          "timeout": 30000
+        }
       },
       "id": "groq-analyze",
       "name": "Groq Trend Analyzer",
@@ -157,7 +162,8 @@
       "position": [
         660,
         300
-      ]
+      ],
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -198,6 +204,13 @@
             "type": "main",
             "index": 0
           }
+        ],
+        [
+          {
+            "node": "Collect Tweet Snippets",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
@@ -208,6 +221,13 @@
             "node": "Collect Tweet Snippets",
             "type": "main",
             "index": 1
+          }
+        ],
+        [
+          {
+            "node": "Collect Tweet Snippets",
+            "type": "main",
+            "index": 0
           }
         ]
       ]
@@ -231,6 +251,13 @@
             "type": "main",
             "index": 0
           }
+        ],
+        [
+          {
+            "node": "Parse Twitter Trends",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     }
@@ -241,9 +268,9 @@
   "staticData": null,
   "meta": null,
   "pinData": null,
-  "versionId": "20dd590e-a443-4458-886b-6469f2c96d12",
+  "versionId": "98c4551d-706c-4796-a036-285b01b69c89",
   "activeVersionId": null,
-  "versionCounter": 9,
+  "versionCounter": 14,
   "triggerCount": 0,
   "tags": [],
   "shared": [

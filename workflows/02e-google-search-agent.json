@@ -1,8 +1,8 @@
 {
-  "updatedAt": "2026-07-25T15:18:37.645Z",
+  "updatedAt": "2026-07-26T03:08:37.000Z",
   "createdAt": "2026-07-25T15:18:37.645Z",
   "id": "1fb17f86-9092-4ea6-b5cd-4631ca01134c",
-  "name": "r0merch — Google Search Agent",
+  "name": "r0merch \u2014 Google Search Agent",
   "description": null,
   "active": false,
   "isArchived": false,
@@ -51,7 +51,7 @@
           ]
         },
         "options": {
-          "timeout": 20000
+          "timeout": 30000
         }
       },
       "id": "google-search-fetch",
@@ -61,7 +61,8 @@
       "position": [
         220,
         150
-      ]
+      ],
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -96,7 +97,7 @@
           ]
         },
         "options": {
-          "timeout": 20000
+          "timeout": 30000
         }
       },
       "id": "google-niche-fetch",
@@ -106,7 +107,8 @@
       "position": [
         220,
         450
-      ]
+      ],
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -147,6 +149,13 @@
             "type": "main",
             "index": 0
           }
+        ],
+        [
+          {
+            "node": "Parse Google Results",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
@@ -158,6 +167,13 @@
             "type": "main",
             "index": 1
           }
+        ],
+        [
+          {
+            "node": "Parse Google Results",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     }
@@ -168,9 +184,9 @@
   "staticData": null,
   "meta": null,
   "pinData": null,
-  "versionId": "a345d344-4a6f-4cc9-9169-b2405be8e7ef",
+  "versionId": "67ef7474-764a-4ccf-bc8b-24a0bc2d3162",
   "activeVersionId": null,
-  "versionCounter": 21,
+  "versionCounter": 26,
   "triggerCount": 0,
   "tags": [],
   "shared": [

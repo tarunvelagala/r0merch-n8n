@@ -1,8 +1,8 @@
 {
-  "updatedAt": "2026-07-25T16:05:43.614Z",
+  "updatedAt": "2026-07-26T03:08:37.000Z",
   "createdAt": "2026-07-25T15:18:35.734Z",
   "id": "09597748-4eb1-4b4c-a646-d802f2156694",
-  "name": "r0merch — Pinterest Agent",
+  "name": "r0merch \u2014 Pinterest Agent",
   "description": null,
   "active": false,
   "isArchived": false,
@@ -47,7 +47,7 @@
           ]
         },
         "options": {
-          "timeout": 20000
+          "timeout": 30000
         }
       },
       "id": "serpapi-images",
@@ -57,7 +57,8 @@
       "position": [
         220,
         150
-      ]
+      ],
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -88,7 +89,7 @@
           ]
         },
         "options": {
-          "timeout": 20000
+          "timeout": 30000
         }
       },
       "id": "serpapi-trending",
@@ -98,7 +99,8 @@
       "position": [
         220,
         450
-      ]
+      ],
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -139,6 +141,13 @@
             "type": "main",
             "index": 0
           }
+        ],
+        [
+          {
+            "node": "Parse Pinterest Results",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
@@ -149,6 +158,13 @@
             "node": "Parse Pinterest Results",
             "type": "main",
             "index": 1
+          }
+        ],
+        [
+          {
+            "node": "Parse Pinterest Results",
+            "type": "main",
+            "index": 0
           }
         ]
       ]
@@ -161,9 +177,9 @@
   "staticData": null,
   "meta": null,
   "pinData": {},
-  "versionId": "b8c26945-2564-44ee-98dc-be1ba307a87b",
+  "versionId": "c18dc646-7303-4edd-9488-41d737483ac4",
   "activeVersionId": null,
-  "versionCounter": 53,
+  "versionCounter": 58,
   "triggerCount": 0,
   "tags": [],
   "shared": [
