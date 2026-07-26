@@ -1,8 +1,8 @@
 {
-  "updatedAt": "2026-07-25T15:18:39.577Z",
+  "updatedAt": "2026-07-26T02:57:03.000Z",
   "createdAt": "2026-07-25T15:18:39.577Z",
   "id": "b7a2e73f-4388-431e-9bb3-737dfd7cf77d",
-  "name": "r0merch — Vision Agent",
+  "name": "r0merch \u2014 Vision Agent",
   "description": null,
   "active": false,
   "isArchived": false,
@@ -20,7 +20,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Expects input to carry etsy[] and amazon[] image URLs from Research Agent.\n// Falls back to top Etsy image URLs fetched via SerpAPI image search if not provided.\nconst input = $input.first().json;\nconst niche = input.niche || '';\n\nconst etsyImages   = (input.etsy   || []).map(i => i.image).filter(Boolean);\nconst amazonImages = (input.amazon || []).map(i => i.image).filter(Boolean);\n\nconst imageUrls = [...new Set([...etsyImages, ...amazonImages])].slice(0, 8);\n\nif (imageUrls.length === 0) {\n  return [{ json: { source: 'vision', niche, data: [], skipped: true, reason: 'no_images' } }];\n}\n\nreturn imageUrls.map((url, index) => ({ json: { niche, imageUrl: url, index } }));"
+        "jsCode": "const input = $input.first().json;\nconst niche = input.niche || '';\nconst etsyImages   = (input.etsy   || []).map(i => i.image).filter(Boolean);\nconst amazonImages = (input.amazon || []).map(i => i.image).filter(Boolean);\nconst imageUrls = [...new Set([...etsyImages, ...amazonImages])].slice(0, 8);\n\nif (imageUrls.length === 0) {\n  return [{ json: { source: 'vision', niche, data: [], skipped: true } }];\n}\nreturn imageUrls.map((url, index) => ({ json: { niche, imageUrl: url, index, skipped: false } }));"
       },
       "id": "prepare-images",
       "name": "Prepare Image List",
@@ -28,6 +28,36 @@
       "typeVersion": 2,
       "position": [
         220,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.skipped }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "check-skipped",
+      "name": "Has Images?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        440,
         300
       ]
     },
@@ -48,21 +78,21 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        440,
-        300
+        660,
+        150
       ]
     },
     {
       "parameters": {
-        "jsCode": "const item = $input.first();\nconst ctx  = $('Prepare Image List').first().json;\n\n// Binary data from the HTTP download\nconst binaryKey = Object.keys(item.binary || {})[0] || 'data';\nconst binary = item.binary?.[binaryKey];\n\nif (!binary?.data) {\n  throw new Error(`Failed to download image: ${ctx.imageUrl}`);\n}\n\nconst mimeType  = binary.mimeType || 'image/jpeg';\nconst base64    = binary.data;\n\nreturn [{\n  json: {\n    niche:     ctx.niche,\n    imageUrl:  ctx.imageUrl,\n    index:     ctx.index,\n    base64,\n    mimeType\n  }\n}];"
+        "jsCode": "const item = $input.first();\nconst ctx  = $('Prepare Image List').first().json;\nconst binaryKey = Object.keys(item.binary || {})[0] || 'data';\nconst binary = item.binary?.[binaryKey];\nif (!binary?.data) throw new Error('Failed to download image: ' + ctx.imageUrl);\nreturn [{ json: { niche: ctx.niche, imageUrl: ctx.imageUrl, index: ctx.index, base64: binary.data, mimeType: binary.mimeType || 'image/jpeg' } }];"
       },
       "id": "encode-image",
       "name": "Encode to Base64",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        660,
-        300
+        880,
+        150
       ]
     },
     {
@@ -79,20 +109,23 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({\n  contents: [{\n    parts: [\n      {\n        inline_data: {\n          mime_type: $json.mimeType,\n          data: $json.base64\n        }\n      },\n      {\n        text: 'You are a print-on-demand design analyst. Analyze this t-shirt product image and return ONLY a raw JSON object — no markdown, no code fences.\\n\\nRequired fields:\\n{\\n  \"style\": \"e.g. Vintage / Minimalist / Bold / Retro / Streetwear\",\\n  \"layout\": \"e.g. Centered / Left-aligned / All-over / Top / Chest\",\\n  \"colors\": [\"list of dominant colors as hex or names\"],\\n  \"fonts\": \"typography style description\",\\n  \"icons\": [\"list of graphic elements or illustrations present\"],\\n  \"texture\": \"Clean / Distressed / Grunge / Halftone / Watercolor\",\\n  \"complexity\": \"Low / Medium / High\",\\n  \"visualHierarchy\": \"brief description of layout priority\",\\n  \"mood\": \"e.g. Inspirational / Humorous / Bold / Calm / Edgy\"\\n}'\n      }\n    ]\n  }],\n  generationConfig: { temperature: 0.1, maxOutputTokens: 512 }\n}) }}"
+        "jsonBody": "={{ JSON.stringify({ contents: [{ parts: [{ inline_data: { mime_type: $json.mimeType, data: $json.base64 } }, { text: 'Analyze this t-shirt design image. Return ONLY a raw JSON object, no markdown.\\n{\\n  \"style\": \"\",\\n  \"layout\": \"\",\\n  \"colors\": [],\\n  \"fonts\": \"\",\\n  \"icons\": [],\\n  \"texture\": \"\",\\n  \"complexity\": \"\",\\n  \"visualHierarchy\": \"\",\\n  \"mood\": \"\"\\n}' }] }], generationConfig: { temperature: 0.1, maxOutputTokens: 512 } }) }}",
+        "options": {
+          "timeout": 30000
+        }
       },
       "id": "gemini-vision",
       "name": "Gemini Vision Analyze",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        880,
-        300
+        1100,
+        150
       ]
     },
     {
       "parameters": {
-        "jsCode": "const items = $input.all();\nconst niche = $('Execute Workflow Trigger').first().json.niche;\n\nconst data = items.map((item, i) => {\n  const raw   = item.json?.candidates?.[0]?.content?.parts?.[0]?.text || '{}';\n  const clean = raw.replace(/```json|```/g, '').trim();\n  const match = clean.match(/\\{[\\s\\S]*\\}/);\n  let analysis = {};\n  try { analysis = JSON.parse(match?.[0] || '{}'); } catch (_) {}\n  return { imageIndex: i, ...analysis };\n}).filter(a => a.style || a.layout);\n\nreturn [{ json: { source: 'vision', niche, data } }];"
+        "jsCode": "const items = $input.all();\nconst niche = $('Execute Workflow Trigger').first().json.niche || '';\nconst data = items.map((item, i) => {\n  const raw = item.json?.candidates?.[0]?.content?.parts?.[0]?.text || '{}';\n  const clean = raw.replace(/```json|```/g, '').trim();\n  const match = clean.match(/\\{[\\s\\S]*\\}/);\n  let analysis = {};\n  try { analysis = JSON.parse(match?.[0] || '{}'); } catch (_) {}\n  return { imageIndex: i, ...analysis };\n}).filter(a => a.style || a.layout);\nreturn [{ json: { source: 'vision', niche, data } }];"
       },
       "id": "parse-vision",
       "name": "Parse Vision Results",
@@ -100,7 +133,7 @@
       "typeVersion": 2,
       "position": [
         1100,
-        300
+        450
       ]
     }
   ],
@@ -118,6 +151,24 @@
     },
     "Prepare Image List": {
       "main": [
+        [
+          {
+            "node": "Has Images?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Images?": {
+      "main": [
+        [
+          {
+            "node": "Parse Vision Results",
+            "type": "main",
+            "index": 0
+          }
+        ],
         [
           {
             "node": "Download Image",
@@ -167,9 +218,9 @@
   "staticData": null,
   "meta": null,
   "pinData": null,
-  "versionId": "6882817e-32e7-46f6-b35e-3deb2a84bac2",
+  "versionId": "f4e2037c-4f66-4f6e-9d1e-c98140acd342",
   "activeVersionId": null,
-  "versionCounter": 21,
+  "versionCounter": 26,
   "triggerCount": 0,
   "tags": [],
   "shared": [
