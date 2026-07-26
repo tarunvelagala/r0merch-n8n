@@ -2,7 +2,7 @@
   "name": "r0merch \u2014 POD Pipeline (Full)",
   "id": "1790571d-754c-4445-be73-1c370705998b",
   "active": false,
-  "updatedAt": "2026-07-26T16:25:36.000Z",
+  "updatedAt": "2026-07-26T16:27:41.000Z",
   "settings": {
     "executionOrder": "v1"
   },
@@ -1781,7 +1781,7 @@
       "main": [
         [
           {
-            "node": "Skip Error",
+            "node": "Parse Etsy",
             "type": "main",
             "index": 0
           }
@@ -1835,7 +1835,7 @@
       "main": [
         [
           {
-            "node": "Skip Error",
+            "node": "Parse Google Images",
             "type": "main",
             "index": 0
           }
@@ -1871,7 +1871,7 @@
       "main": [
         [
           {
-            "node": "Skip Error",
+            "node": "Parse Reddit",
             "type": "main",
             "index": 0
           }
@@ -1907,7 +1907,7 @@
       "main": [
         [
           {
-            "node": "Skip Error",
+            "node": "Parse Google Search",
             "type": "main",
             "index": 0
           }
@@ -1943,7 +1943,7 @@
       "main": [
         [
           {
-            "node": "Skip Error",
+            "node": "Parse Google Trends",
             "type": "main",
             "index": 0
           }
@@ -2048,7 +2048,7 @@
       "main": [
         [
           {
-            "node": "Skip Error",
+            "node": "Collect Tweets",
             "type": "main",
             "index": 0
           }
