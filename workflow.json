@@ -2,7 +2,7 @@
   "name": "r0merch \u2014 POD Pipeline (Full)",
   "id": "1790571d-754c-4445-be73-1c370705998b",
   "active": false,
-  "updatedAt": "2026-07-26T16:32:26.000Z",
+  "updatedAt": "2026-07-26T16:35:20.000Z",
   "settings": {
     "executionOrder": "v1"
   },
@@ -666,7 +666,7 @@
         1980
       ],
       "parameters": {
-        "jsCode": "const input = $input.first().json;\nconst niche = input.niche || '';\nconst urls = [...(input.etsy||[]).map(i=>i.image), ...(input.amazon||[]).map(i=>i.image)].filter(Boolean).slice(0,6);\nif (!urls.length) return [{ json: { source: 'vision', niche, data: [], skipped: true } }];\nreturn urls.map((url, index) => ({ json: { niche, imageUrl: url, index, skipped: false } }));"
+        "jsCode": "const niche = ($('Read Niches').first()?.json?.niche || '');\n// Read image URLs from Etsy and Amazon parse nodes\nconst etsyData   = (() => { try { return $('Parse Etsy').first().json?.data || []; } catch(_) { return []; } })();\nconst amazonData = (() => { try { return $('Parse Amazon').first().json?.data || []; } catch(_) { return []; } })();\nconst urls = [...etsyData.map(i=>i.image), ...amazonData.map(i=>i.image)].filter(Boolean).slice(0,6);\nif (!urls.length) return [{ json: { source: 'vision', niche, data: [], skipped: true } }];\nreturn urls.map((url, index) => ({ json: { niche, imageUrl: url, index, skipped: false } }));"
       }
     },
     {
@@ -2145,6 +2145,11 @@
             "node": "Wait 2s (GImages\u2192Reddit)",
             "type": "main",
             "index": 0
+          },
+          {
+            "node": "Prepare Images",
+            "type": "main",
+            "index": 0
           }
         ]
       ]
@@ -2578,11 +2583,6 @@
         [
           {
             "node": "Google Images Design",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Prepare Images",
             "type": "main",
             "index": 0
           }
