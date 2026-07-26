@@ -5,7 +5,8 @@ echo "[r0merch] Importing workflows from /workflows..."
 
 TMPDIR=$(mktemp -d)
 
-for file in /workflows/*.json; do
+# Import root workflow.json (main pipeline) + all workflows/*.json
+for file in /workflow.json /workflows/*.json; do
   [ -f "$file" ] || continue
   base=$(basename "$file")
   tmp="$TMPDIR/$base"

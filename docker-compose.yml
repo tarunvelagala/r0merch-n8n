@@ -9,6 +9,7 @@ services:
       - /Users/C5404787/n8n/data:/home/node/.n8n
       - /Users/C5404787/n8n/files:/home/node/.n8n-files
       - ./workflows:/workflows
+      - ./workflow.json:/workflow.json:ro
       - ./docker-entrypoint.sh:/r0merch-entrypoint.sh:ro
     entrypoint: ["/bin/sh", "/r0merch-entrypoint.sh"]
     env_file:
