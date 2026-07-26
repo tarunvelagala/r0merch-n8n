@@ -2,7 +2,7 @@
   "name": "r0merch \u2014 POD Pipeline (Full)",
   "id": "1790571d-754c-4445-be73-1c370705998b",
   "active": false,
-  "updatedAt": "2026-07-26T16:05:16.000Z",
+  "updatedAt": "2026-07-26T16:08:12.000Z",
   "settings": {
     "executionOrder": "v1"
   },
@@ -188,7 +188,7 @@
         260
       ],
       "parameters": {
-        "jsCode": "const niche=($('Read Niches').first()?.json?.niche || $input.first()?.json?.niche || '');\nconst sr=$('Etsy Shopping').first().json;\nconst or_=$('Etsy Organic').first().json;\nconst shopping=(sr?.shopping_results||[]).map(r=>({title:r.title||'',url:r.link||'',price:r.price||'',image:r.thumbnail||'',rating:r.rating||0,reviews:r.reviews||0,tags:[],source:'google_shopping'}));\nconst organic=(or_?.organic_results||[]).filter(r=>r.link?.includes('etsy.com')).map(r=>({title:r.title||'',url:r.link||'',price:'',image:r.thumbnail||'',rating:0,reviews:0,tags:(r.title||'').toLowerCase().split(/[\\s,|]+/).filter(t=>t.length>3),source:'google_organic'}));\nreturn [{json:{source:'etsy',niche,data:[...shopping,...organic].slice(0,30)}}];"
+        "jsCode": "const niche = ($('Read Niches').first()?.json?.niche || '');\nconst sr = (() => { try { return $('Etsy Shopping').first().json; } catch(_) { return {}; } })();\nconst or_ = (() => { try { return $('Etsy Organic').first().json; } catch(_) { return {}; } })();\nconst shopping = (sr?.shopping_results||[]).map(r=>({title:r.title||'',url:r.link||'',price:r.price||'',image:r.thumbnail||'',rating:r.rating||0,reviews:r.reviews||0,tags:[],source:'google_shopping'}));\nconst organic = (or_?.organic_results||[]).filter(r=>r.link?.includes('etsy.com')).map(r=>({title:r.title||'',url:r.link||'',price:'',image:r.thumbnail||'',rating:0,reviews:0,tags:(r.title||'').toLowerCase().split(/[\\s,|]+/).filter(t=>t.length>3),source:'google_organic'}));\nreturn [{json:{source:'etsy',niche,data:[...shopping,...organic].slice(0,30)}}];"
       }
     },
     {
@@ -355,7 +355,7 @@
         860
       ],
       "parameters": {
-        "jsCode": "const niche=($('Read Niches').first()?.json?.niche || $input.first()?.json?.niche || '');\nconst ir=$('Google Images Design').first().json;\nconst tr=$('Google Images Trending').first().json;\nconst m=r=>({title:r.title||'',url:r.link||r.original||'',image:r.original||r.thumbnail||''});\nconst pins=(ir?.images_results||[]).map(m).slice(0,20);\nconst trending=(tr?.images_results||[]).map(m).slice(0,10);\nconst trendingKeywords=[...(ir?.suggested_searches||[]).map(s=>s.name||s.q||s),...(tr?.suggested_searches||[]).map(s=>s.name||s.q||s)].slice(0,20);\nreturn [{json:{source:'pinterest',niche,data:{pins:[...pins,...trending],trendingKeywords}}}];"
+        "jsCode": "const niche = ($('Read Niches').first()?.json?.niche || '');\nconst ir = (() => { try { return $('Google Images Design').first().json; } catch(_) { return {}; } })();\nconst tr = (() => { try { return $('Google Images Trending').first().json; } catch(_) { return {}; } })();\nconst m = r => ({title:r.title||'',url:r.link||r.original||'',image:r.original||r.thumbnail||''});\nconst pins = (ir?.images_results||[]).map(m).slice(0,20);\nconst trending = (tr?.images_results||[]).map(m).slice(0,10);\nconst trendingKeywords = [...(ir?.suggested_searches||[]).map(s=>s.name||s.q||s),...(tr?.suggested_searches||[]).map(s=>s.name||s.q||s)].slice(0,20);\nreturn [{json:{source:'pinterest',niche,data:{pins:[...pins,...trending],trendingKeywords}}}];"
       }
     },
     {
@@ -478,7 +478,7 @@
         1160
       ],
       "parameters": {
-        "jsCode": "const niche=($('Read Niches').first()?.json?.niche || $input.first()?.json?.niche || '')||'';\nconst sr=$('Reddit Search').first().json;\nconst cr=$('Reddit Community').first().json;\nconst m=r=>({title:r.title||'',url:r.link||'',snippet:r.snippet||'',sub:(r.link||'').match(/reddit\\.com\\/r\\/([^\\/]+)/)?.[1]||''});\nconst seen=new Set();\nconst data=[...(sr?.organic_results||[]).map(m),...(cr?.organic_results||[]).map(m)].filter(r=>{if(!r.title||seen.has(r.url))return false;seen.add(r.url);return true;});\nreturn [{json:{source:'reddit',niche,data}}];"
+        "jsCode": "const niche = ($('Read Niches').first()?.json?.niche || '');\nconst sr = (() => { try { return $('Reddit Search').first().json; } catch(_) { return {}; } })();\nconst cr = (() => { try { return $('Reddit Community').first().json; } catch(_) { return {}; } })();\nconst m = r => ({title:r.title||'',url:r.link||'',snippet:r.snippet||'',sub:(r.link||'').match(/reddit\\.com\\/r\\/([^\\/]+)/)?.[1]||''});\nconst seen = new Set();\nconst data = [...(sr?.organic_results||[]).map(m),...(cr?.organic_results||[]).map(m)].filter(r=>{if(!r.title||seen.has(r.url))return false;seen.add(r.url);return true;});\nreturn [{json:{source:'reddit',niche,data}}];"
       }
     },
     {
@@ -593,7 +593,7 @@
         1460
       ],
       "parameters": {
-        "jsCode": "const niche=($('Read Niches').first()?.json?.niche || $input.first()?.json?.niche || '');\nconst mr=$('Google Search Main').first().json;\nconst nr=$('Google Search Niche').first().json;\nconst m=r=>({title:r.title||'',url:r.link||'',snippet:r.snippet||''});\nconst organic=(mr?.organic_results||[]).map(m);\nconst relatedSearches=[...(mr?.related_searches||[]).map(s=>s.query),...(nr?.related_searches||[]).map(s=>s.query)].filter(Boolean);\nconst peopleAlsoAsk=(mr?.related_questions||[]).map(q=>q.question).filter(Boolean);\nreturn [{json:{source:'google_search',niche,data:{organic,relatedSearches,peopleAlsoAsk}}}];"
+        "jsCode": "const niche = ($('Read Niches').first()?.json?.niche || '');\nconst mr = (() => { try { return $('Google Search Main').first().json; } catch(_) { return {}; } })();\nconst nr = (() => { try { return $('Google Search Niche').first().json; } catch(_) { return {}; } })();\nconst m = r => ({title:r.title||'',url:r.link||'',snippet:r.snippet||''});\nconst organic = (mr?.organic_results||[]).map(m);\nconst relatedSearches = [...(mr?.related_searches||[]).map(s=>s.query),...(nr?.related_searches||[]).map(s=>s.query)].filter(Boolean);\nconst peopleAlsoAsk = (mr?.related_questions||[]).map(q=>q.question).filter(Boolean);\nreturn [{json:{source:'google_search',niche,data:{organic,relatedSearches,peopleAlsoAsk}}}];"
       }
     },
     {
@@ -708,7 +708,7 @@
         1760
       ],
       "parameters": {
-        "jsCode": "const niche=($('Read Niches').first()?.json?.niche || $input.first()?.json?.niche || '');\nconst tr=$('Trends Timeseries').first().json;\nconst rr=$('Trends Related Queries').first().json;\nconst timeline=(tr?.interest_over_time?.timeline_data||[]).map(t=>({date:t.date,value:t.values?.[0]?.extracted_value??0}));\nconst avg=arr=>arr.length?arr.reduce((s,v)=>s+v,0)/arr.length:0;\nconst r4=avg(timeline.slice(-4).map(t=>t.value)),p4=avg(timeline.slice(-8,-4).map(t=>t.value));\nconst trendDirection=r4>p4*1.1?'rising':r4<p4*0.9?'falling':'stable';\nconst byMonth={};\ntimeline.forEach(({date,value})=>{const m=date?.split(' ')?.[0]||'';if(!byMonth[m])byMonth[m]=[];byMonth[m].push(value);});\nconst ma=Object.entries(byMonth).map(([m,v])=>({m,a:avg(v)})).sort((a,b)=>b.a-a.a);\nconst rising=(rr?.related_queries?.rising||[]).map(r=>r.query);\nconst top=(rr?.related_queries?.top||[]).map(r=>r.query);\nreturn [{json:{source:'google_trends',niche,data:{timeline,trendDirection,peakMonths:ma.slice(0,3).map(x=>x.m),lowMonths:ma.slice(-3).map(x=>x.m),risingQueries:rising,topQueries:top}}}];"
+        "jsCode": "const niche = ($('Read Niches').first()?.json?.niche || '');\nconst tr = (() => { try { return $('Trends Timeseries').first().json; } catch(_) { return {}; } })();\nconst rr = (() => { try { return $('Trends Related Queries').first().json; } catch(_) { return {}; } })();\nconst timeline = (tr?.interest_over_time?.timeline_data||[]).map(t=>({date:t.date,value:t.values?.[0]?.extracted_value??0}));\nconst avg = arr => arr.length?arr.reduce((s,v)=>s+v,0)/arr.length:0;\nconst r4=avg(timeline.slice(-4).map(t=>t.value)),p4=avg(timeline.slice(-8,-4).map(t=>t.value));\nconst trendDirection=r4>p4*1.1?'rising':r4<p4*0.9?'falling':'stable';\nconst byMonth={};\ntimeline.forEach(({date,value})=>{const m=date?.split(' ')?.[0]||'';if(!byMonth[m])byMonth[m]=[];byMonth[m].push(value);});\nconst ma=Object.entries(byMonth).map(([m,v])=>({m,a:avg(v)})).sort((a,b)=>b.a-a.a);\nconst rising=(rr?.related_queries?.rising||[]).map(r=>r.query);\nconst top=(rr?.related_queries?.top||[]).map(r=>r.query);\nreturn [{json:{source:'google_trends',niche,data:{timeline,trendDirection,peakMonths:ma.slice(0,3).map(x=>x.m),lowMonths:ma.slice(-3).map(x=>x.m),risingQueries:rising,topQueries:top}}}];"
       }
     },
     {
@@ -947,7 +947,7 @@
         2360
       ],
       "parameters": {
-        "jsCode": "const niche=($('Read Niches').first()?.json?.niche || $input.first()?.json?.niche || '');\nconst tr=$('Twitter Search').first().json;\nconst vr=$('Twitter Viral').first().json;\nconst snippets=[...(tr?.organic_results||[]),...(vr?.organic_results||[])].map(r=>r.title+' '+(r.snippet||'')).join('\\n');\nreturn [{json:{niche,rawSnippets:snippets}}];"
+        "jsCode": "const niche = ($('Read Niches').first()?.json?.niche || '');\nconst tr = (() => { try { return $('Twitter Search').first().json; } catch(_) { return {}; } })();\nconst vr = (() => { try { return $('Twitter Viral').first().json; } catch(_) { return {}; } })();\nconst snippets = [...(tr?.organic_results||[]),...(vr?.organic_results||[])].map(r=>r.title+' '+(r.snippet||'')).join('\\n');\nreturn [{json:{niche,rawSnippets:snippets}}];"
       }
     },
     {
@@ -1845,9 +1845,9 @@
       "main": [
         [
           {
-            "node": "Parse Etsy",
+            "node": "Skip Error",
             "type": "main",
-            "index": 1
+            "index": 0
           }
         ],
         [
@@ -1899,9 +1899,9 @@
       "main": [
         [
           {
-            "node": "Parse Google Images",
+            "node": "Skip Error",
             "type": "main",
-            "index": 1
+            "index": 0
           }
         ],
         [
@@ -1935,9 +1935,9 @@
       "main": [
         [
           {
-            "node": "Parse Reddit",
+            "node": "Skip Error",
             "type": "main",
-            "index": 1
+            "index": 0
           }
         ],
         [
@@ -1971,9 +1971,9 @@
       "main": [
         [
           {
-            "node": "Parse Google Search",
+            "node": "Skip Error",
             "type": "main",
-            "index": 1
+            "index": 0
           }
         ],
         [
@@ -2007,9 +2007,9 @@
       "main": [
         [
           {
-            "node": "Parse Google Trends",
+            "node": "Skip Error",
             "type": "main",
-            "index": 1
+            "index": 0
           }
         ],
         [
@@ -2112,9 +2112,9 @@
       "main": [
         [
           {
-            "node": "Collect Tweets",
+            "node": "Skip Error",
             "type": "main",
-            "index": 1
+            "index": 0
           }
         ],
         [
