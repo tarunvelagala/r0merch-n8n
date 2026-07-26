@@ -1,8 +1,8 @@
 {
-  "updatedAt": "2026-07-25T15:18:32.854Z",
+  "updatedAt": "2026-07-26T02:58:24.000Z",
   "createdAt": "2026-07-25T15:18:32.854Z",
   "id": "f978e116-7fe9-465d-8bb2-c61587fae2b9",
-  "name": "r0merch — Research Agent",
+  "name": "r0merch \u2014 Research Agent",
   "description": null,
   "active": false,
   "isArchived": false,
@@ -15,7 +15,7 @@
       "typeVersion": 1,
       "position": [
         0,
-        400
+        688
       ]
     },
     {
@@ -27,164 +27,111 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        220,
-        400
+        224,
+        688
       ]
     },
     {
       "parameters": {
         "workflowId": "25b7d461-1692-4fab-8739-5419bed842c5",
-        "workflowInputs": {
-          "values": [
-            {
-              "name": "niche",
-              "stringValue": "={{ $json.niche }}"
-            }
-          ]
-        }
+        "options": {}
       },
       "id": "exec-etsy",
       "name": "Etsy Agent",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        440,
-        100
+        448,
+        112
       ]
     },
     {
       "parameters": {
         "workflowId": "5263dc0c-b3cc-4962-b9d0-de12fb260b56",
-        "workflowInputs": {
-          "values": [
-            {
-              "name": "niche",
-              "stringValue": "={{ $json.niche }}"
-            }
-          ]
-        }
+        "options": {}
       },
       "id": "exec-amazon",
       "name": "Amazon Agent",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        440,
-        250
+        448,
+        304
       ]
     },
     {
       "parameters": {
         "workflowId": "09597748-4eb1-4b4c-a646-d802f2156694",
-        "workflowInputs": {
-          "values": [
-            {
-              "name": "niche",
-              "stringValue": "={{ $json.niche }}"
-            }
-          ]
-        }
+        "options": {}
       },
       "id": "exec-pinterest",
       "name": "Pinterest Agent",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        440,
-        400
+        448,
+        496
       ]
     },
     {
       "parameters": {
         "workflowId": "8c4e70a0-cdfa-4f6e-9345-f2895b55ab04",
-        "workflowInputs": {
-          "values": [
-            {
-              "name": "niche",
-              "stringValue": "={{ $json.niche }}"
-            },
-            {
-              "name": "subreddits",
-              "stringValue": "={{ $json.marketing_pages }}"
-            }
-          ]
-        }
+        "options": {}
       },
       "id": "exec-reddit",
       "name": "Reddit Agent",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        440,
-        550
+        448,
+        688
       ]
     },
     {
       "parameters": {
         "workflowId": "1fb17f86-9092-4ea6-b5cd-4631ca01134c",
-        "workflowInputs": {
-          "values": [
-            {
-              "name": "niche",
-              "stringValue": "={{ $json.niche }}"
-            }
-          ]
-        }
+        "options": {}
       },
       "id": "exec-google-search",
       "name": "Google Search Agent",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        440,
-        700
+        448,
+        880
       ]
     },
     {
       "parameters": {
         "workflowId": "4a5b9883-f228-4502-a93b-ae5197d28d30",
-        "workflowInputs": {
-          "values": [
-            {
-              "name": "niche",
-              "stringValue": "={{ $json.niche }}"
-            }
-          ]
-        }
+        "options": {}
       },
       "id": "exec-google-trends",
       "name": "Google Trends Agent",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        440,
-        850
+        448,
+        1072
       ]
     },
     {
       "parameters": {
         "workflowId": "b7a2e73f-4388-431e-9bb3-737dfd7cf77d",
-        "workflowInputs": {
-          "values": [
-            {
-              "name": "niche",
-              "stringValue": "={{ $json.niche }}"
-            }
-          ]
-        }
+        "options": {}
       },
       "id": "exec-vision",
       "name": "Vision Agent",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        440,
-        1000
+        448,
+        1264
       ]
     },
     {
       "parameters": {
-        "mode": "mergeByPosition",
+        "mode": "append",
         "options": {}
       },
       "id": "merge-results",
@@ -192,8 +139,8 @@
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3,
       "position": [
-        700,
-        550
+        672,
+        688
       ]
     },
     {
@@ -205,8 +152,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        920,
-        550
+        896,
+        688
       ]
     }
   ],
@@ -353,14 +300,15 @@
     }
   },
   "settings": {
-    "executionOrder": "v1"
+    "executionOrder": "v1",
+    "binaryMode": "separate"
   },
   "staticData": null,
   "meta": null,
-  "pinData": null,
-  "versionId": "c1fde6dd-16fe-49ba-888e-d659f43f6119",
+  "pinData": {},
+  "versionId": "11320cc7-9da4-49d4-a08c-2374feed011b",
   "activeVersionId": null,
-  "versionCounter": 21,
+  "versionCounter": 27,
   "triggerCount": 0,
   "tags": [],
   "shared": [
