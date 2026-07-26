@@ -1,0 +1,51 @@
+name: Deploy to n8n
+
+on:
+  push:
+    branches: [main, feature/multi-workflow-architecture]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Write .env from GitHub Secrets
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            cd ${{ secrets.DEPLOY_PATH }}
+
+            # Write .env from secrets — never stored in git
+            cat > .env << 'ENVEOF'
+            PINTEREST_ACCESS_TOKEN=${{ secrets.PINTEREST_ACCESS_TOKEN }}
+            GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
+            OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
+            GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}
+            SERPAPI_KEY=${{ secrets.SERPAPI_KEY }}
+            HF_TOKEN=${{ secrets.HF_TOKEN }}
+            REDDIT_ACCESS_TOKEN=${{ secrets.REDDIT_ACCESS_TOKEN }}
+            REDDIT_USERNAME=${{ secrets.REDDIT_USERNAME }}
+            GOOGLE_SHEET_ID=${{ secrets.GOOGLE_SHEET_ID }}
+            NOTION_DATABASE_ID=${{ secrets.NOTION_DATABASE_ID }}
+            AIRTABLE_BASE_ID=${{ secrets.AIRTABLE_BASE_ID }}
+            ETSY_API_KEY=${{ secrets.ETSY_API_KEY }}
+            ETSY_SHOP_ID=${{ secrets.ETSY_SHOP_ID }}
+            ETSY_ACCESS_TOKEN=${{ secrets.ETSY_ACCESS_TOKEN }}
+            ETSY_SHIPPING_PROFILE_ID=${{ secrets.ETSY_SHIPPING_PROFILE_ID }}
+            AMAZON_SELLER_ID=${{ secrets.AMAZON_SELLER_ID }}
+            AMAZON_ACCESS_TOKEN=${{ secrets.AMAZON_ACCESS_TOKEN }}
+            ENVEOF
+
+            # Pull latest workflows
+            git pull origin ${{ github.ref_name }}
+
+            # Restart n8n (imports all workflows on startup)
+            docker compose down && docker compose up -d
+
+            echo "Deploy complete"
