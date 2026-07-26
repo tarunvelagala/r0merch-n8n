@@ -2,7 +2,7 @@
   "name": "r0merch \u2014 POD Pipeline (Full)",
   "id": "1790571d-754c-4445-be73-1c370705998b",
   "active": false,
-  "updatedAt": "2026-07-26T15:18:30.000Z",
+  "updatedAt": "2026-07-26T15:20:27.000Z",
   "settings": {
     "executionOrder": "v1"
   },
@@ -88,7 +88,12 @@
       "parameters": {
         "url": "https://serpapi.com/search.json",
         "options": {
-          "timeout": 30000
+          "timeout": 30000,
+          "retry": {
+            "enabled": true,
+            "maxRetries": 2,
+            "waitBetweenTries": 5000
+          }
         },
         "sendQuery": true,
         "queryParameters": {
@@ -134,7 +139,12 @@
       "parameters": {
         "url": "https://serpapi.com/search.json",
         "options": {
-          "timeout": 30000
+          "timeout": 30000,
+          "retry": {
+            "enabled": true,
+            "maxRetries": 2,
+            "waitBetweenTries": 5000
+          }
         },
         "sendQuery": true,
         "queryParameters": {
@@ -193,7 +203,12 @@
       "parameters": {
         "url": "https://serpapi.com/search.json",
         "options": {
-          "timeout": 30000
+          "timeout": 30000,
+          "retry": {
+            "enabled": true,
+            "maxRetries": 2,
+            "waitBetweenTries": 5000
+          }
         },
         "sendQuery": true,
         "queryParameters": {
@@ -248,7 +263,12 @@
       "parameters": {
         "url": "https://serpapi.com/search.json",
         "options": {
-          "timeout": 30000
+          "timeout": 30000,
+          "retry": {
+            "enabled": true,
+            "maxRetries": 2,
+            "waitBetweenTries": 5000
+          }
         },
         "sendQuery": true,
         "queryParameters": {
@@ -290,7 +310,12 @@
       "parameters": {
         "url": "https://serpapi.com/search.json",
         "options": {
-          "timeout": 30000
+          "timeout": 30000,
+          "retry": {
+            "enabled": true,
+            "maxRetries": 2,
+            "waitBetweenTries": 5000
+          }
         },
         "sendQuery": true,
         "queryParameters": {
@@ -345,7 +370,12 @@
       "parameters": {
         "url": "https://serpapi.com/search.json",
         "options": {
-          "timeout": 30000
+          "timeout": 30000,
+          "retry": {
+            "enabled": true,
+            "maxRetries": 2,
+            "waitBetweenTries": 5000
+          }
         },
         "sendQuery": true,
         "queryParameters": {
@@ -395,7 +425,12 @@
       "parameters": {
         "url": "https://serpapi.com/search.json",
         "options": {
-          "timeout": 30000
+          "timeout": 30000,
+          "retry": {
+            "enabled": true,
+            "maxRetries": 2,
+            "waitBetweenTries": 5000
+          }
         },
         "sendQuery": true,
         "queryParameters": {
@@ -458,7 +493,12 @@
       "parameters": {
         "url": "https://serpapi.com/search.json",
         "options": {
-          "timeout": 30000
+          "timeout": 30000,
+          "retry": {
+            "enabled": true,
+            "maxRetries": 2,
+            "waitBetweenTries": 5000
+          }
         },
         "sendQuery": true,
         "queryParameters": {
@@ -504,7 +544,12 @@
       "parameters": {
         "url": "https://serpapi.com/search.json",
         "options": {
-          "timeout": 30000
+          "timeout": 30000,
+          "retry": {
+            "enabled": true,
+            "maxRetries": 2,
+            "waitBetweenTries": 5000
+          }
         },
         "sendQuery": true,
         "queryParameters": {
@@ -563,7 +608,12 @@
       "parameters": {
         "url": "https://serpapi.com/search.json",
         "options": {
-          "timeout": 30000
+          "timeout": 30000,
+          "retry": {
+            "enabled": true,
+            "maxRetries": 2,
+            "waitBetweenTries": 5000
+          }
         },
         "sendQuery": true,
         "queryParameters": {
@@ -609,7 +659,12 @@
       "parameters": {
         "url": "https://serpapi.com/search.json",
         "options": {
-          "timeout": 30000
+          "timeout": 30000,
+          "retry": {
+            "enabled": true,
+            "maxRetries": 2,
+            "waitBetweenTries": 5000
+          }
         },
         "sendQuery": true,
         "queryParameters": {
@@ -784,7 +839,12 @@
       "parameters": {
         "url": "https://serpapi.com/search.json",
         "options": {
-          "timeout": 30000
+          "timeout": 30000,
+          "retry": {
+            "enabled": true,
+            "maxRetries": 2,
+            "waitBetweenTries": 5000
+          }
         },
         "sendQuery": true,
         "queryParameters": {
@@ -834,7 +894,12 @@
       "parameters": {
         "url": "https://serpapi.com/search.json",
         "options": {
-          "timeout": 30000
+          "timeout": 30000,
+          "retry": {
+            "enabled": true,
+            "maxRetries": 2,
+            "waitBetweenTries": 5000
+          }
         },
         "sendQuery": true,
         "queryParameters": {
@@ -985,7 +1050,7 @@
         500
       ],
       "parameters": {
-        "jsCode": "const r=$input.first().json;\nconst{niche,etsy,amazon,pinterest,reddit,googleSearch,googleTrends,vision,twitter}=r;\nconst freq=arr=>{const m={};arr.filter(Boolean).forEach(v=>{m[v]=(m[v]||0)+1;});return Object.entries(m).sort((a,b)=>b[1]-a[1]).map(([k])=>k);};\nconst n=s=>(s||'').toLowerCase().trim();\nconst tw=twitter||{};\nconst allTags=[...(etsy||[]).flatMap(i=>i.tags||[]),...(pinterest?.trendingKeywords||[])].map(n).filter(Boolean);\nconst rq=googleTrends?.risingQueries||[],tq=googleTrends?.topQueries||[],rs=googleSearch?.relatedSearches||[],paa=googleSearch?.peopleAlsoAsk||[];\nconst allColors=(vision||[]).flatMap(i=>i.colors||[]).map(n);\nconst redditPosts=(reddit||[]).filter(p=>p.score>50);\nconst audience=freq([...freq(redditPosts.map(p=>p.flair).filter(Boolean)).slice(0,5),...(tw.emotions||[]).map(n)]).slice(0,8);\nconst season=googleTrends?.trendDirection?{peakMonths:googleTrends.peakMonths||[],lowMonths:googleTrends.lowMonths||[],trendDirection:googleTrends.trendDirection}:{trendDirection:'stable'};\nreturn [{json:{niche,colors:freq(allColors).slice(0,10),fonts:freq((vision||[]).map(i=>i.fonts).filter(Boolean)).slice(0,5),icons:freq((vision||[]).flatMap(i=>i.icons||[]).map(n)).slice(0,15),styles:freq((vision||[]).map(i=>i.style).filter(Boolean)).slice(0,5),moods:freq((vision||[]).map(i=>i.mood).filter(Boolean)).slice(0,5),keywords:freq([...allTags,...rq,...tq,...rs,...(tw.trendingPhrases||[]).map(n),...(tw.slang||[]).map(n)]).slice(0,40),quotes:[...(etsy||[]).map(i=>i.title),...(amazon||[]).map(i=>i.title)].filter(Boolean).slice(0,20),audience,seasonality:season,competition:{etsyCount:(etsy||[]).length,amazonCount:(amazon||[]).length},twitter:{trendingPhrases:(tw.trendingPhrases||[]).slice(0,15),slang:(tw.slang||[]).slice(0,10),hashtags:(tw.hashtags||[]).slice(0,10),memes:(tw.memes||[]).slice(0,10)},peopleAlsoAsk:paa.slice(0,10),aggregatedAt:new Date().toISOString()}}];"
+        "jsCode": "const r=$input.first().json;\nconst{niche,etsy,amazon,pinterest,reddit,googleSearch,googleTrends,vision,twitter}=r;\nconst freq=arr=>{const m={};arr.filter(Boolean).forEach(v=>{m[v]=(m[v]||0)+1;});return Object.entries(m).sort((a,b)=>b[1]-a[1]).map(([k])=>k);};\nconst n=s=>(s||'').toLowerCase().trim();\nconst tw=twitter||{};\nconst allTags=[...(etsy||[]).flatMap(i=>i.tags||[]),...(pinterest?.trendingKeywords||[])].map(n).filter(Boolean);\nconst rq=googleTrends?.risingQueries||[],tq=googleTrends?.topQueries||[],rs=googleSearch?.relatedSearches||[],paa=googleSearch?.peopleAlsoAsk||[];\nconst allColors=(vision||[]).flatMap(i=>i.colors||[]).map(n);\nconst redditPosts=(reddit||[]).filter(p=>p.score>50);\nconst audience=freq([...freq(redditPosts.map(p=>p.flair).filter(Boolean)).slice(0,5),...(tw.emotions||[]).map(n)]).slice(0,8);\nconst season=googleTrends?.trendDirection?{peakMonths:googleTrends.peakMonths||[],lowMonths:googleTrends.lowMonths||[],trendDirection:googleTrends.trendDirection}:{trendDirection:'stable'};\n// Strip any error fields that leaked in\ndelete r.error;\nreturn [{json:{niche,colors:freq(allColors).slice(0,10),fonts:freq((vision||[]).map(i=>i.fonts).filter(Boolean)).slice(0,5),icons:freq((vision||[]).flatMap(i=>i.icons||[]).map(n)).slice(0,15),styles:freq((vision||[]).map(i=>i.style).filter(Boolean)).slice(0,5),moods:freq((vision||[]).map(i=>i.mood).filter(Boolean)).slice(0,5),keywords:freq([...allTags,...rq,...tq,...rs,...(tw.trendingPhrases||[]).map(n),...(tw.slang||[]).map(n)]).slice(0,40),quotes:[...(etsy||[]).map(i=>i.title),...(amazon||[]).map(i=>i.title)].filter(Boolean).slice(0,20),audience,seasonality:season,competition:{etsyCount:(etsy||[]).length,amazonCount:(amazon||[]).length},twitter:{trendingPhrases:(tw.trendingPhrases||[]).slice(0,15),slang:(tw.slang||[]).slice(0,10),hashtags:(tw.hashtags||[]).slice(0,10),memes:(tw.memes||[]).slice(0,10)},peopleAlsoAsk:paa.slice(0,10),aggregatedAt:new Date().toISOString()}}];"
       }
     },
     {
@@ -1613,66 +1678,6 @@
             "node": "Etsy Organic",
             "type": "main",
             "index": 0
-          },
-          {
-            "node": "Amazon Search",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Google Images Design",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Google Images Trending",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Reddit Search",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Reddit Community",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Google Search Main",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Google Search Niche",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Trends Timeseries",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Trends Related Queries",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Prepare Images",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Twitter Search",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Twitter Viral",
-            "type": "main",
-            "index": 0
           }
         ]
       ]
@@ -2016,6 +2021,11 @@
             "node": "Merge All Research",
             "type": "main",
             "index": 0
+          },
+          {
+            "node": "Amazon Search",
+            "type": "main",
+            "index": 0
           }
         ]
       ]
@@ -2025,6 +2035,21 @@
         [
           {
             "node": "Merge All Research",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Images Design",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Images Trending",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Prepare Images",
             "type": "main",
             "index": 0
           }
@@ -2038,6 +2063,16 @@
             "node": "Merge All Research",
             "type": "main",
             "index": 0
+          },
+          {
+            "node": "Reddit Search",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Reddit Community",
+            "type": "main",
+            "index": 0
           }
         ]
       ]
@@ -2049,6 +2084,16 @@
             "node": "Merge All Research",
             "type": "main",
             "index": 0
+          },
+          {
+            "node": "Trends Timeseries",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Trends Related Queries",
+            "type": "main",
+            "index": 0
           }
         ]
       ]
@@ -2058,6 +2103,16 @@
         [
           {
             "node": "Merge All Research",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Twitter Search",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Twitter Viral",
             "type": "main",
             "index": 0
           }
@@ -2080,6 +2135,16 @@
         [
           {
             "node": "Merge All Research",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Search Main",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Search Niche",
             "type": "main",
             "index": 0
           }
