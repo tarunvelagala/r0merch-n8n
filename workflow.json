@@ -2,7 +2,7 @@
   "name": "r0merch \u2014 POD Pipeline (Full)",
   "id": "1790571d-754c-4445-be73-1c370705998b",
   "active": false,
-  "updatedAt": "2026-07-26T16:11:29.000Z",
+  "updatedAt": "2026-07-26T16:13:33.000Z",
   "settings": {
     "executionOrder": "v1"
   },
@@ -1396,7 +1396,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        3760,
+        4000,
         680
       ],
       "parameters": {
@@ -1417,7 +1417,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ model: \"llama-3.1-8b-instant\", messages: [{ role: \"user\", content: \"POD trend analyst for \\\"\" + $json.niche + \"\\\" niche.\\nKeywords: \" + ($json.keywords||[]).slice(0,15).join(\", \") + \"\\nTwitter: \" + ($json.twitter?.trendingPhrases||[]).slice(0,5).join(\", \") + \"\\nReturn ONLY JSON: {\\\"underservedOpportunities\\\":[\\\"3 specific angles\\\"],\\\"saturatedIdeas\\\":[\\\"2 to avoid\\\"],\\\"emergingTrends\\\":[\\\"3 trends\\\"],\\\"audienceSegments\\\":[\\\"3 personas\\\"],\\\"twitterDerivedConcepts\\\":[\\\"3 shirt concepts from twitter\\\"],\\\"topDesignDirections\\\":[\\\"5 actionable directions\\\"],\\\"recurringColors\\\":[],\\\"typographyStyles\\\":[],\\\"illustrations\\\":[],\\\"seasonality\\\":{}}\" }], max_tokens: 800, temperature: 0.4 }) }}",
+        "jsonBody": "={{ $json.groqBody }}",
         "options": {
           "timeout": 30000
         }
@@ -1429,7 +1429,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        4020,
+        4260,
         680
       ],
       "parameters": {
@@ -1472,7 +1472,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        4600,
+        4840,
         680
       ],
       "parameters": {
@@ -1493,7 +1493,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ model: \"llama-3.1-8b-instant\", messages: [{ role: \"user\", content: \"POD creative director for \\\"\" + $json.niche + \"\\\" niche.\\nDirections: \" + ($json.topDesignDirections||[]).slice(0,3).join(\", \") + \"\\nOpportunities: \" + ($json.underservedOpportunities||[]).slice(0,2).join(\", \") + \"\\nGenerate 10 t-shirt concepts. Return ONLY JSON array of 10: [{id:1,title:\\\"\\\",phrase:\\\"\\\",concept:\\\"\\\",targetAudience:\\\"\\\",sellingAngle:\\\"\\\",tone:\\\"bold\\\",imagePrompt:\\\"minimal flat vector t-shirt design of [describe]\\\",colors:[],typography:\\\"\\\",icons:[],source:\\\"opportunity\\\"}]\" }], max_tokens: 1500, temperature: 0.7 }) }}",
+        "jsonBody": "={{ $json.groqBody }}",
         "options": {
           "timeout": 30000
         }
@@ -1505,7 +1505,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        4860,
+        5100,
         680
       ],
       "parameters": {
@@ -1548,7 +1548,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        6640,
+        6880,
         680
       ],
       "parameters": {
@@ -1569,7 +1569,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ model: \"llama-3.1-8b-instant\", messages: [{ role: \"user\", content: \"Etsy/Amazon SEO for: \\\"\" + ($json.phrase||$json.title||\"\") + \"\\\" (\" + $json.niche + \" niche, \" + $json.tone + \" tone, audience: \" + $json.targetAudience + \")\\nReturn ONLY JSON: {\\\"etsyTitle\\\":\\\"\\\",\\\"etsyDescription\\\":\\\"\\\",\\\"etsyTags\\\":[\\\"13 tags\\\"],\\\"amazonTitle\\\":\\\"\\\",\\\"amazonBulletPoints\\\":[\\\"5\\\"],\\\"amazonKeywords\\\":\\\"\\\",\\\"fileName\\\":\\\"\\\",\\\"altText\\\":\\\"\\\",\\\"searchTerms\\\":[\\\"5\\\"]}\" }], max_tokens: 600, temperature: 0.3 }) }}",
+        "jsonBody": "={{ $json.groqBody }}",
         "options": {
           "timeout": 30000
         }
@@ -1581,7 +1581,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        6900,
+        7140,
         680
       ],
       "parameters": {
@@ -1712,6 +1712,45 @@
       "parameters": {
         "unit": "seconds",
         "amount": 2
+      }
+    },
+    {
+      "id": "build-groq-analyst",
+      "name": "Build Groq Analyst Body",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3760,
+        680
+      ],
+      "parameters": {
+        "jsCode": "const d = $('Trend Aggregator').first().json;\nconst body = JSON.stringify({\n  model: 'llama-3.1-8b-instant',\n  messages: [{ role: 'user', content:\n    'POD trend analyst for ' + (d.niche||'') + ' niche.\\n' +\n    'Keywords: ' + (d.keywords||[]).slice(0,15).join(', ') + '\\n' +\n    'Twitter phrases: ' + ((d.twitter||{}).trendingPhrases||[]).slice(0,5).join(', ') + '\\n' +\n    'Return ONLY JSON with these keys: underservedOpportunities (array of 3), saturatedIdeas (array of 2), emergingTrends (array of 3), audienceSegments (array of 3), twitterDerivedConcepts (array of 3), topDesignDirections (array of 5), recurringColors (array), typographyStyles (array), illustrations (array), seasonality (object)'\n  }],\n  max_tokens: 800,\n  temperature: 0.4\n});\nreturn [{ json: { ...d, groqBody: body } }];"
+      }
+    },
+    {
+      "id": "build-groq-concepts",
+      "name": "Build Groq Concepts Body",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4600,
+        680
+      ],
+      "parameters": {
+        "jsCode": "const d = $('Parse Analysis').first().json;\nconst body = JSON.stringify({\n  model: 'llama-3.1-8b-instant',\n  messages: [{ role: 'user', content:\n    'POD creative director for ' + (d.niche||'') + ' niche.\\n' +\n    'Directions: ' + (d.topDesignDirections||[]).slice(0,3).join(', ') + '\\n' +\n    'Opportunities: ' + (d.underservedOpportunities||[]).slice(0,2).join(', ') + '\\n' +\n    'Generate 10 t-shirt concepts. Return ONLY a JSON array of 10 objects, each with: id, title, phrase, concept, targetAudience, sellingAngle, tone, imagePrompt, colors, typography, icons, source'\n  }],\n  max_tokens: 1500,\n  temperature: 0.7\n});\nreturn [{ json: { ...d, groqBody: body } }];"
+      }
+    },
+    {
+      "id": "build-groq-seo",
+      "name": "Build Groq SEO Body",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        6640,
+        680
+      ],
+      "parameters": {
+        "jsCode": "const d = $('Split Designs').first().json;\nconst body = JSON.stringify({\n  model: 'llama-3.1-8b-instant',\n  messages: [{ role: 'user', content:\n    'Etsy/Amazon SEO for: ' + (d.phrase||d.title||'') + ' (' + (d.niche||'') + ' niche, ' + (d.tone||'') + ' tone, audience: ' + (d.targetAudience||'') + ')\\n' +\n    'Return ONLY JSON with: etsyTitle (max 140 chars), etsyDescription (150 words), etsyTags (13 tags array), amazonTitle (max 200 chars), amazonBulletPoints (5 bullets array), amazonKeywords (250 chars), fileName (slug), altText (125 chars), searchTerms (5 phrases array)'\n  }],\n  max_tokens: 600,\n  temperature: 0.3\n});\nreturn [{ json: { ...d, groqBody: body } }];"
       }
     }
   ],
@@ -2539,7 +2578,7 @@
       "main": [
         [
           {
-            "node": "Groq Trend Analyst",
+            "node": "Build Groq Analyst Body",
             "type": "main",
             "index": 0
           }
@@ -2550,7 +2589,7 @@
       "main": [
         [
           {
-            "node": "Groq Generate Concepts",
+            "node": "Build Groq Concepts Body",
             "type": "main",
             "index": 0
           }
@@ -2561,7 +2600,7 @@
       "main": [
         [
           {
-            "node": "Groq SEO",
+            "node": "Build Groq SEO Body",
             "type": "main",
             "index": 0
           }
@@ -2676,6 +2715,39 @@
         [
           {
             "node": "Vision Download",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Groq Analyst Body": {
+      "main": [
+        [
+          {
+            "node": "Groq Trend Analyst",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Groq Concepts Body": {
+      "main": [
+        [
+          {
+            "node": "Groq Generate Concepts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Groq SEO Body": {
+      "main": [
+        [
+          {
+            "node": "Groq SEO",
             "type": "main",
             "index": 0
           }
