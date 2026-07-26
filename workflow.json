@@ -2,7 +2,7 @@
   "name": "r0merch \u2014 POD Pipeline (Full)",
   "id": "1790571d-754c-4445-be73-1c370705998b",
   "active": false,
-  "updatedAt": "2026-07-26T15:15:19.000Z",
+  "updatedAt": "2026-07-26T15:18:30.000Z",
   "settings": {
     "executionOrder": "v1"
   },
@@ -1015,7 +1015,8 @@
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify({ contents: [{ parts: [{ text: \"POD trend analyst. Research for \\\"\" + $json.niche + \"\\\":\\n\\nColors: \" + ($json.colors||[]).join(\", \") + \"\\nKeywords: \" + ($json.keywords||[]).join(\", \") + \"\\nTwitter phrases: \" + ($json.twitter?.trendingPhrases||[]).join(\", \") + \"\\nTwitter slang: \" + ($json.twitter?.slang||[]).join(\", \") + \"\\nTwitter memes: \" + ($json.twitter?.memes||[]).join(\", \") + \"\\nAudience: \" + ($json.audience||[]).join(\", \") + \"\\nSeasonality: \" + ($json.seasonality?.trendDirection||\"stable\") + \"\\nCompetition: etsy=\" + ($json.competition?.etsyCount||0) + \" amazon=\" + ($json.competition?.amazonCount||0) + \"\\n\\nReturn ONLY JSON:\\n{\\n  \\\"recurringColors\\\": [],\\n  \\\"typographyStyles\\\": [],\\n  \\\"illustrations\\\": [],\\n  \\\"underservedOpportunities\\\": [],\\n  \\\"saturatedIdeas\\\": [],\\n  \\\"emergingTrends\\\": [],\\n  \\\"audienceSegments\\\": [],\\n  \\\"seasonality\\\": {},\\n  \\\"twitterDerivedConcepts\\\": [],\\n  \\\"topDesignDirections\\\": []\\n}\" }] }], generationConfig: { temperature: 0.4, maxOutputTokens: 2048 } }) }}"
-      }
+      },
+      "onError": "continueErrorOutput"
     },
     {
       "id": "parse-analyst",
@@ -1073,7 +1074,8 @@
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify({ contents: [{ parts: [{ text: \"Creative director for POD brand. Niche: \\\"\" + $json.niche + \"\\\"\\n\\nTop directions: \" + ($json.topDesignDirections||[]).join(\", \") + \"\\nTwitter concepts: \" + ($json.twitterDerivedConcepts||[]).join(\", \") + \"\\nEmerging: \" + ($json.emergingTrends||[]).join(\", \") + \"\\nOpportunities: \" + ($json.underservedOpportunities||[]).join(\", \") + \"\\n\\nGenerate EXACTLY 10 t-shirt concepts. Diversity: 3 Twitter-inspired, 3 opportunity, 2 seasonal, 2 evergreen. Mix tones.\\n\\nReturn ONLY a JSON array of 10:\\n[{\\n  \\\"id\\\": 1, \\\"title\\\": \\\"\\\", \\\"phrase\\\": \\\"\\\", \\\"concept\\\": \\\"\\\",\\n  \\\"targetAudience\\\": \\\"\\\", \\\"sellingAngle\\\": \\\"\\\",\\n  \\\"tone\\\": \\\"motivational|ironic|raw|minimalist|bold\\\",\\n  \\\"imagePrompt\\\": \\\"detailed AI image gen prompt\\\",\\n  \\\"colors\\\": [], \\\"typography\\\": \\\"\\\", \\\"icons\\\": [],\\n  \\\"source\\\": \\\"twitter|opportunity|seasonal|evergreen\\\"\\n}]\" }] }], generationConfig: { temperature: 0.85, maxOutputTokens: 4000 } }) }}"
-      }
+      },
+      "onError": "continueErrorOutput"
     },
     {
       "id": "parse-concepts",
@@ -1259,7 +1261,8 @@
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify({ contents: [{ parts: [{ text: \"Etsy/Amazon SEO expert for POD t-shirts.\\nNiche: \" + $json.niche + \"\\nTitle: \" + $json.title + \"\\nPhrase: \" + $json.phrase + \"\\nAudience: \" + $json.targetAudience + \"\\nAngle: \" + $json.sellingAngle + \"\\nTone: \" + $json.tone + \"\\n\\nReturn ONLY JSON:\\n{\\n  \\\"etsyTitle\\\": \\\"max 140 chars\\\",\\n  \\\"etsyDescription\\\": \\\"150 words\\\",\\n  \\\"etsyTags\\\": [\\\"13 tags max 20 chars\\\"],\\n  \\\"amazonTitle\\\": \\\"max 200 chars\\\",\\n  \\\"amazonBulletPoints\\\": [\\\"5 bullets\\\"],\\n  \\\"amazonKeywords\\\": \\\"250 chars\\\",\\n  \\\"fileName\\\": \\\"slug\\\",\\n  \\\"altText\\\": \\\"125 chars\\\",\\n  \\\"searchTerms\\\": [\\\"10 buyer phrases\\\"]\\n}\" }] }], generationConfig: { temperature: 0.3, maxOutputTokens: 2000 } }) }}"
-      }
+      },
+      "onError": "continueErrorOutput"
     },
     {
       "id": "parse-seo",
@@ -1356,6 +1359,234 @@
         500
       ],
       "parameters": {}
+    },
+    {
+      "id": "if-analyst",
+      "name": "Analyst OK?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        3260,
+        500
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.candidates?.[0]?.content?.parts?.[0]?.text ? true : false }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "groq-analyst",
+      "name": "Groq Trend Analyst",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3520,
+        680
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + $env.GROQ_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'llama-3.3-70b-versatile', messages: [{ role: 'user', content: (() => { const d = $('Trend Aggregator').first().json; return 'POD trend analyst. Research for niche: ' + $json.niche + '\\n\\n' + 'Keywords: ' + ($json.keywords||[]).join(', ') + '\\n' + 'Twitter: ' + ($json.twitter?.trendingPhrases||[]).join(', ') + '\\n' + 'Audience: ' + ($json.audience||[]).join(', ') + '\\n\\n' + 'Return ONLY JSON: {\"recurringColors\":[],\"typographyStyles\":[],\"illustrations\":[],\"underservedOpportunities\":[],\"saturatedIdeas\":[],\"emergingTrends\":[],\"audienceSegments\":[],\"seasonality\":{},\"twitterDerivedConcepts\":[],\"topDesignDirections\":[]}'; })() }], max_tokens: 4000, temperature: 0.4 }) }}",
+        "options": {
+          "timeout": 60000
+        }
+      }
+    },
+    {
+      "id": "groq-analyst-parse",
+      "name": "Groq Trend Analyst Parse",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3780,
+        680
+      ],
+      "parameters": {
+        "jsCode": "const raw = $input.first().json?.choices?.[0]?.message?.content || '{}';\nconst clean = raw.replace(/```json|```/g,'').trim();\nconst match = clean.match(/[\\[{][\\s\\S]*[\\]}]/);\nlet parsed = null;\ntry { parsed = JSON.parse(match?.[0] || '{}'); } catch(_) { parsed = {}; }\n// Re-wrap as Gemini-style response so Parse Analysis/Concepts/SEO works\nreturn [{ json: { candidates: [{ content: { parts: [{ text: JSON.stringify(parsed) }] } }] } }];"
+      }
+    },
+    {
+      "id": "if-concepts",
+      "name": "Concepts OK?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        4100,
+        500
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.candidates?.[0]?.content?.parts?.[0]?.text ? true : false }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "groq-concepts",
+      "name": "Groq Generate Concepts",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        4360,
+        680
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + $env.GROQ_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'llama-3.3-70b-versatile', messages: [{ role: 'user', content: (() => { const d = $('Parse Analysis').first().json; return 'Creative director for POD niche: ' + $json.niche + '\\n\\n' + 'Top directions: ' + ($json.topDesignDirections||[]).join(', ') + '\\n' + 'Twitter concepts: ' + ($json.twitterDerivedConcepts||[]).join(', ') + '\\n' + 'Opportunities: ' + ($json.underservedOpportunities||[]).join(', ') + '\\n\\n' + 'Generate EXACTLY 10 t-shirt concepts. Return ONLY a JSON array of 10 objects: [{\"id\":1,\"title\":\"\",\"phrase\":\"\",\"concept\":\"\",\"targetAudience\":\"\",\"sellingAngle\":\"\",\"tone\":\"motivational\",\"imagePrompt\":\"\",\"colors\":[],\"typography\":\"\",\"icons\":[],\"source\":\"twitter\"}]'; })() }], max_tokens: 4000, temperature: 0.4 }) }}",
+        "options": {
+          "timeout": 60000
+        }
+      }
+    },
+    {
+      "id": "groq-concepts-parse",
+      "name": "Groq Generate Concepts Parse",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4620,
+        680
+      ],
+      "parameters": {
+        "jsCode": "const raw = $input.first().json?.choices?.[0]?.message?.content || '{}';\nconst clean = raw.replace(/```json|```/g,'').trim();\nconst match = clean.match(/[\\[{][\\s\\S]*[\\]}]/);\nlet parsed = null;\ntry { parsed = JSON.parse(match?.[0] || '{}'); } catch(_) { parsed = {}; }\n// Re-wrap as Gemini-style response so Parse Analysis/Concepts/SEO works\nreturn [{ json: { candidates: [{ content: { parts: [{ text: JSON.stringify(parsed) }] } }] } }];"
+      }
+    },
+    {
+      "id": "if-seo",
+      "name": "SEO OK?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        6140,
+        500
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.candidates?.[0]?.content?.parts?.[0]?.text ? true : false }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "groq-seo",
+      "name": "Groq SEO",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        6400,
+        680
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + $env.GROQ_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'llama-3.3-70b-versatile', messages: [{ role: 'user', content: (() => { const d = $('Split Designs').first().json; return 'Etsy/Amazon SEO expert for POD t-shirts.\\nNiche: ' + $json.niche + '\\nTitle: ' + $json.title + '\\nPhrase: ' + $json.phrase + '\\nAudience: ' + $json.targetAudience + '\\nTone: ' + $json.tone + '\\n\\n' + 'Return ONLY JSON: {\"etsyTitle\":\"\",\"etsyDescription\":\"\",\"etsyTags\":[],\"amazonTitle\":\"\",\"amazonBulletPoints\":[],\"amazonKeywords\":\"\",\"fileName\":\"\",\"altText\":\"\",\"searchTerms\":[]}'; })() }], max_tokens: 4000, temperature: 0.4 }) }}",
+        "options": {
+          "timeout": 60000
+        }
+      }
+    },
+    {
+      "id": "groq-seo-parse",
+      "name": "Groq SEO Parse",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        6660,
+        680
+      ],
+      "parameters": {
+        "jsCode": "const raw = $input.first().json?.choices?.[0]?.message?.content || '{}';\nconst clean = raw.replace(/```json|```/g,'').trim();\nconst match = clean.match(/[\\[{][\\s\\S]*[\\]}]/);\nlet parsed = null;\ntry { parsed = JSON.parse(match?.[0] || '{}'); } catch(_) { parsed = {}; }\n// Re-wrap as Gemini-style response so Parse Analysis/Concepts/SEO works\nreturn [{ json: { candidates: [{ content: { parts: [{ text: JSON.stringify(parsed) }] } }] } }];"
+      }
     }
   ],
   "connections": {
@@ -1903,7 +2134,14 @@
       "main": [
         [
           {
-            "node": "Parse Analysis",
+            "node": "Analyst OK?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Groq Trend Analyst",
             "type": "main",
             "index": 0
           }
@@ -1925,7 +2163,14 @@
       "main": [
         [
           {
-            "node": "Parse 10 Concepts",
+            "node": "Concepts OK?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Groq Generate Concepts",
             "type": "main",
             "index": 0
           }
@@ -2027,7 +2272,14 @@
       "main": [
         [
           {
-            "node": "Parse SEO",
+            "node": "SEO OK?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Groq SEO",
             "type": "main",
             "index": 0
           }
@@ -2061,6 +2313,126 @@
         [
           {
             "node": "\u2705 Done",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyst OK?": {
+      "main": [
+        [
+          {
+            "node": "Parse Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Groq Trend Analyst",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Trend Analyst": {
+      "main": [
+        [
+          {
+            "node": "Groq Trend Analyst Parse",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Trend Analyst Parse": {
+      "main": [
+        [
+          {
+            "node": "Parse Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Concepts OK?": {
+      "main": [
+        [
+          {
+            "node": "Parse 10 Concepts",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Groq Generate Concepts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Generate Concepts": {
+      "main": [
+        [
+          {
+            "node": "Groq Generate Concepts Parse",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Generate Concepts Parse": {
+      "main": [
+        [
+          {
+            "node": "Parse 10 Concepts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SEO OK?": {
+      "main": [
+        [
+          {
+            "node": "Parse SEO",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Groq SEO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq SEO": {
+      "main": [
+        [
+          {
+            "node": "Groq SEO Parse",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq SEO Parse": {
+      "main": [
+        [
+          {
+            "node": "Parse SEO",
             "type": "main",
             "index": 0
           }
