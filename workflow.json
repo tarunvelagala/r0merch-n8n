@@ -2,7 +2,7 @@
   "name": "r0merch \u2014 POD Pipeline (Full)",
   "id": "1790571d-754c-4445-be73-1c370705998b",
   "active": false,
-  "updatedAt": "2026-07-26T15:49:29.000Z",
+  "updatedAt": "2026-07-26T15:51:06.000Z",
   "settings": {
     "executionOrder": "v1"
   },
@@ -1021,7 +1021,7 @@
         1200
       ],
       "parameters": {
-        "jsCode": "const items = $input.all();\nconst niche = ($('Read Niches').first()?.json?.niche || items.find(i=>i.json?.niche)?.json?.niche || '');\n\nconst find = (source, def) => {\n  const item = items.find(i => i.json?.source === source);\n  if (!item) return def;\n  return item.json.data ?? def;\n};\n\nreturn [{ json: {\n  niche,\n  etsy:         find('etsy',          []),\n  amazon:       find('amazon',         []),\n  pinterest:    find('pinterest',      {pins:[],trendingKeywords:[]}),\n  reddit:       find('reddit',         []),\n  googleSearch: find('google_search',  {organic:[],relatedSearches:[],peopleAlsoAsk:[]}),\n  googleTrends: find('google_trends',  {timeline:[],trendDirection:'stable',risingQueries:[],topQueries:[]}),\n  vision:       find('vision',         []),\n  twitter:      find('twitter',        {}),\n  collectedAt:  new Date().toISOString()\n} }];"
+        "jsCode": "const r = $input.first().json;\ndelete r?.error;\nconst items = $input.all();\nconst niche = ($('Read Niches').first()?.json?.niche || items.find(i=>i.json?.niche)?.json?.niche || '');\n\nconst find = (source, def) => {\n  const item = items.find(i => i.json?.source === source);\n  if (!item) return def;\n  return item.json.data ?? def;\n};\n\nreturn [{ json: {\n  niche,\n  etsy:         find('etsy',          []),\n  amazon:       find('amazon',         []),\n  pinterest:    find('pinterest',      {pins:[],trendingKeywords:[]}),\n  reddit:       find('reddit',         []),\n  googleSearch: find('google_search',  {organic:[],relatedSearches:[],peopleAlsoAsk:[]}),\n  googleTrends: find('google_trends',  {timeline:[],trendDirection:'stable',risingQueries:[],topQueries:[]}),\n  vision:       find('vision',         []),\n  twitter:      find('twitter',        {}),\n  collectedAt:  new Date().toISOString()\n} }];"
       }
     },
     {
@@ -1709,6 +1709,90 @@
         "unit": "seconds",
         "amount": 10
       }
+    },
+    {
+      "id": "w1",
+      "name": "Wait 2s (Etsy\u2192Amazon)",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        950,
+        260
+      ],
+      "parameters": {
+        "unit": "seconds",
+        "amount": 2
+      }
+    },
+    {
+      "id": "w2",
+      "name": "Wait 2s (Amazon\u2192GImages)",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        950,
+        480
+      ],
+      "parameters": {
+        "unit": "seconds",
+        "amount": 2
+      }
+    },
+    {
+      "id": "w3",
+      "name": "Wait 2s (GImages\u2192Reddit)",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        950,
+        860
+      ],
+      "parameters": {
+        "unit": "seconds",
+        "amount": 2
+      }
+    },
+    {
+      "id": "w4",
+      "name": "Wait 2s (Vision\u2192GSearch)",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1330,
+        1980
+      ],
+      "parameters": {
+        "unit": "seconds",
+        "amount": 2
+      }
+    },
+    {
+      "id": "w5",
+      "name": "Wait 2s (Reddit\u2192Trends)",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        950,
+        1160
+      ],
+      "parameters": {
+        "unit": "seconds",
+        "amount": 2
+      }
+    },
+    {
+      "id": "w6",
+      "name": "Wait 2s (GSearch\u2192Twitter)",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        950,
+        1460
+      ],
+      "parameters": {
+        "unit": "seconds",
+        "amount": 2
+      }
     }
   ],
   "connections": {
@@ -2080,7 +2164,7 @@
             "index": 0
           },
           {
-            "node": "Amazon Search",
+            "node": "Wait 2s (Etsy\u2192Amazon)",
             "type": "main",
             "index": 0
           }
@@ -2096,17 +2180,7 @@
             "index": 0
           },
           {
-            "node": "Google Images Design",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Google Images Trending",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Prepare Images",
+            "node": "Wait 2s (Amazon\u2192GImages)",
             "type": "main",
             "index": 0
           }
@@ -2122,12 +2196,7 @@
             "index": 0
           },
           {
-            "node": "Reddit Search",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Reddit Community",
+            "node": "Wait 2s (GImages\u2192Reddit)",
             "type": "main",
             "index": 0
           }
@@ -2143,12 +2212,7 @@
             "index": 0
           },
           {
-            "node": "Trends Timeseries",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Trends Related Queries",
+            "node": "Wait 2s (Reddit\u2192Trends)",
             "type": "main",
             "index": 0
           }
@@ -2164,12 +2228,7 @@
             "index": 0
           },
           {
-            "node": "Twitter Search",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Twitter Viral",
+            "node": "Wait 2s (GSearch\u2192Twitter)",
             "type": "main",
             "index": 0
           }
@@ -2196,12 +2255,7 @@
             "index": 0
           },
           {
-            "node": "Google Search Main",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Google Search Niche",
+            "node": "Wait 2s (Vision\u2192GSearch)",
             "type": "main",
             "index": 0
           }
@@ -2588,6 +2642,102 @@
         [
           {
             "node": "Groq SEO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 2s (Etsy\u2192Amazon)": {
+      "main": [
+        [
+          {
+            "node": "Amazon Search",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 2s (Amazon\u2192GImages)": {
+      "main": [
+        [
+          {
+            "node": "Google Images Design",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Images Trending",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Prepare Images",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 2s (GImages\u2192Reddit)": {
+      "main": [
+        [
+          {
+            "node": "Reddit Search",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Reddit Community",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 2s (Vision\u2192GSearch)": {
+      "main": [
+        [
+          {
+            "node": "Google Search Main",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Search Niche",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 2s (Reddit\u2192Trends)": {
+      "main": [
+        [
+          {
+            "node": "Trends Timeseries",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Trends Related Queries",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 2s (GSearch\u2192Twitter)": {
+      "main": [
+        [
+          {
+            "node": "Twitter Search",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Twitter Viral",
             "type": "main",
             "index": 0
           }
