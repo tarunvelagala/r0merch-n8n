@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-07-26T03:04:02.000Z",
+  "updatedAt": "2026-07-26T03:06:11.000Z",
   "createdAt": "2026-07-25T15:18:32.854Z",
   "id": "f978e116-7fe9-465d-8bb2-c61587fae2b9",
   "name": "r0merch \u2014 Research Agent",
@@ -20,7 +20,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const { niche, marketing_pages } = $input.first().json;\nif (!niche) throw new Error('Input must include a niche field');\nreturn [{ json: { niche, marketing_pages: marketing_pages || '' } }];"
+        "jsCode": "const input = $input.first().json;\n// n8n passes Execute Workflow inputs either as direct fields or nested\nconst niche = input.niche || input.body?.niche || '';\nconst marketing_pages = input.marketing_pages || input.body?.marketing_pages || '';\nreturn [{ json: { niche, marketing_pages } }];"
       },
       "id": "unpack-input",
       "name": "Unpack Input",
