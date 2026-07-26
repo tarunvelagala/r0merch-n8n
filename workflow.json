@@ -2,7 +2,7 @@
   "name": "r0merch \u2014 POD Pipeline (Full)",
   "id": "1790571d-754c-4445-be73-1c370705998b",
   "active": false,
-  "updatedAt": "2026-07-26T16:19:22.000Z",
+  "updatedAt": "2026-07-26T16:23:24.000Z",
   "settings": {
     "executionOrder": "v1"
   },
@@ -933,20 +933,6 @@
       }
     },
     {
-      "id": "merge-all",
-      "name": "Merge All Research",
-      "type": "n8n-nodes-base.merge",
-      "typeVersion": 3,
-      "position": [
-        2100,
-        1200
-      ],
-      "parameters": {
-        "mode": "append",
-        "options": {}
-      }
-    },
-    {
       "id": "combine-research",
       "name": "Combine Research",
       "type": "n8n-nodes-base.code",
@@ -956,7 +942,7 @@
         1200
       ],
       "parameters": {
-        "jsCode": "const r = $input.first().json;\ndelete r?.error;\nconst items = $input.all();\nconst niche = ($('Read Niches').first()?.json?.niche || items.find(i=>i.json?.niche)?.json?.niche || '');\n\nconst find = (source, def) => {\n  const item = items.find(i => i.json?.source === source);\n  if (!item) return def;\n  return item.json.data ?? def;\n};\n\nreturn [{ json: {\n  niche,\n  etsy:         find('etsy',          []),\n  amazon:       find('amazon',         []),\n  pinterest:    find('pinterest',      {pins:[],trendingKeywords:[]}),\n  reddit:       find('reddit',         []),\n  googleSearch: find('google_search',  {organic:[],relatedSearches:[],peopleAlsoAsk:[]}),\n  googleTrends: find('google_trends',  {timeline:[],trendDirection:'stable',risingQueries:[],topQueries:[]}),\n  vision:       find('vision',         []),\n  twitter:      find('twitter',        {}),\n  collectedAt:  new Date().toISOString()\n} }];"
+        "jsCode": "const safe = (name, def) => {\n  try {\n    const items = $(name).all();\n    const found = items.find(i => i.json?.source);\n    if (found) return found.json.data ?? def;\n    // Try first item\n    const first = items[0]?.json;\n    if (first?.data !== undefined) return first.data;\n    return def;\n  } catch(_) { return def; }\n};\n\nconst niche = (() => {\n  try { return $('Read Niches').first()?.json?.niche || ''; } catch(_) { return ''; }\n})();\n\nreturn [{ json: {\n  niche,\n  etsy:         safe('Parse Etsy',          []),\n  amazon:       safe('Parse Amazon',         []),\n  pinterest:    safe('Parse Google Images',  {pins:[],trendingKeywords:[]}),\n  reddit:       safe('Parse Reddit',         []),\n  googleSearch: safe('Parse Google Search',  {organic:[],relatedSearches:[],peopleAlsoAsk:[]}),\n  googleTrends: safe('Parse Google Trends',  {timeline:[],trendDirection:'stable',risingQueries:[],topQueries:[]}),\n  vision:       safe('Parse Vision',         []),\n  twitter:      safe('Parse Twitter',        {}),\n  collectedAt:  new Date().toISOString()\n} }];"
       }
     },
     {
@@ -2109,11 +2095,6 @@
       "main": [
         [
           {
-            "node": "Merge All Research",
-            "type": "main",
-            "index": 0
-          },
-          {
             "node": "Wait 2s (Etsy\u2192Amazon)",
             "type": "main",
             "index": 0
@@ -2124,11 +2105,6 @@
     "Parse Amazon": {
       "main": [
         [
-          {
-            "node": "Merge All Research",
-            "type": "main",
-            "index": 0
-          },
           {
             "node": "Wait 2s (Amazon\u2192GImages)",
             "type": "main",
@@ -2141,11 +2117,6 @@
       "main": [
         [
           {
-            "node": "Merge All Research",
-            "type": "main",
-            "index": 0
-          },
-          {
             "node": "Wait 2s (GImages\u2192Reddit)",
             "type": "main",
             "index": 0
@@ -2156,11 +2127,6 @@
     "Parse Reddit": {
       "main": [
         [
-          {
-            "node": "Merge All Research",
-            "type": "main",
-            "index": 0
-          },
           {
             "node": "Wait (Reddit\u2192GSearch)",
             "type": "main",
@@ -2173,11 +2139,6 @@
       "main": [
         [
           {
-            "node": "Merge All Research",
-            "type": "main",
-            "index": 0
-          },
-          {
             "node": "Wait (GSearch\u2192Trends)",
             "type": "main",
             "index": 0
@@ -2189,11 +2150,6 @@
       "main": [
         [
           {
-            "node": "Merge All Research",
-            "type": "main",
-            "index": 0
-          },
-          {
             "node": "Wait (Trends\u2192Twitter)",
             "type": "main",
             "index": 0
@@ -2203,27 +2159,10 @@
     },
     "Parse Vision": {
       "main": [
-        [
-          {
-            "node": "Merge All Research",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        []
       ]
     },
     "Parse Twitter": {
-      "main": [
-        [
-          {
-            "node": "Merge All Research",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Merge All Research": {
       "main": [
         [
           {
