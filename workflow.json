@@ -2,7 +2,7 @@
   "name": "r0merch \u2014 POD Pipeline (Full)",
   "id": "1790571d-754c-4445-be73-1c370705998b",
   "active": false,
-  "updatedAt": "2026-07-26T15:46:56.000Z",
+  "updatedAt": "2026-07-26T15:49:29.000Z",
   "settings": {
     "executionOrder": "v1"
   },
@@ -1461,7 +1461,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        3520,
+        3760,
         680
       ],
       "parameters": {
@@ -1482,9 +1482,14 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ model: 'llama-3.1-8b-instant', messages: [{ role: 'user', content: (() => { const d = $('Trend Aggregator').first().json; return 'POD trend analyst. Research for niche: ' + $json.niche + '\\n\\n' + 'Keywords: ' + ($json.keywords||[]).join(', ') + '\\n' + 'Twitter: ' + ($json.twitter?.trendingPhrases||[]).join(', ') + '\\n' + 'Audience: ' + ($json.audience||[]).join(', ') + '\\n\\n' + 'Return ONLY JSON: {\"recurringColors\":[],\"typographyStyles\":[],\"illustrations\":[],\"underservedOpportunities\":[],\"saturatedIdeas\":[],\"emergingTrends\":[],\"audienceSegments\":[],\"seasonality\":{},\"twitterDerivedConcepts\":[],\"topDesignDirections\":[]}'; })() }], max_tokens: 2000, temperature: 0.4 }) }}",
+        "jsonBody": "={{ JSON.stringify({ model: \"llama-3.1-8b-instant\", messages: [{ role: \"user\", content: \"POD trend analyst for \\\"\" + $json.niche + \"\\\" niche.\\nKeywords: \" + ($json.keywords||[]).slice(0,15).join(\", \") + \"\\nTwitter: \" + ($json.twitter?.trendingPhrases||[]).slice(0,5).join(\", \") + \"\\nReturn ONLY JSON: {\\\"underservedOpportunities\\\":[\\\"3 specific angles\\\"],\\\"saturatedIdeas\\\":[\\\"2 to avoid\\\"],\\\"emergingTrends\\\":[\\\"3 trends\\\"],\\\"audienceSegments\\\":[\\\"3 personas\\\"],\\\"twitterDerivedConcepts\\\":[\\\"3 shirt concepts from twitter\\\"],\\\"topDesignDirections\\\":[\\\"5 actionable directions\\\"],\\\"recurringColors\\\":[],\\\"typographyStyles\\\":[],\\\"illustrations\\\":[],\\\"seasonality\\\":{}}\" }], max_tokens: 800, temperature: 0.4 }) }}",
         "options": {
-          "timeout": 60000
+          "timeout": 30000,
+          "retry": {
+            "enabled": true,
+            "maxRetries": 3,
+            "waitBetweenTries": 8000
+          }
         }
       }
     },
@@ -1494,7 +1499,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        3780,
+        4020,
         680
       ],
       "parameters": {
@@ -1537,7 +1542,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        4360,
+        4600,
         680
       ],
       "parameters": {
@@ -1558,9 +1563,14 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ model: 'llama-3.1-8b-instant', messages: [{ role: 'user', content: (() => { const d = $('Parse Analysis').first().json; return 'Creative director for POD niche: ' + $json.niche + '\\n\\n' + 'Top directions: ' + ($json.topDesignDirections||[]).join(', ') + '\\n' + 'Twitter concepts: ' + ($json.twitterDerivedConcepts||[]).join(', ') + '\\n' + 'Opportunities: ' + ($json.underservedOpportunities||[]).join(', ') + '\\n\\n' + 'Generate EXACTLY 10 t-shirt concepts. Return ONLY a JSON array of 10 objects: [{\"id\":1,\"title\":\"\",\"phrase\":\"\",\"concept\":\"\",\"targetAudience\":\"\",\"sellingAngle\":\"\",\"tone\":\"motivational\",\"imagePrompt\":\"\",\"colors\":[],\"typography\":\"\",\"icons\":[],\"source\":\"twitter\"}]'; })() }], max_tokens: 2000, temperature: 0.4 }) }}",
+        "jsonBody": "={{ JSON.stringify({ model: \"llama-3.1-8b-instant\", messages: [{ role: \"user\", content: \"POD creative director for \\\"\" + $json.niche + \"\\\" niche.\\nDirections: \" + ($json.topDesignDirections||[]).slice(0,3).join(\", \") + \"\\nOpportunities: \" + ($json.underservedOpportunities||[]).slice(0,2).join(\", \") + \"\\nGenerate 10 t-shirt concepts. Return ONLY JSON array of 10: [{id:1,title:\\\"\\\",phrase:\\\"\\\",concept:\\\"\\\",targetAudience:\\\"\\\",sellingAngle:\\\"\\\",tone:\\\"bold\\\",imagePrompt:\\\"minimal flat vector t-shirt design of [describe]\\\",colors:[],typography:\\\"\\\",icons:[],source:\\\"opportunity\\\"}]\" }], max_tokens: 1500, temperature: 0.7 }) }}",
         "options": {
-          "timeout": 60000
+          "timeout": 30000,
+          "retry": {
+            "enabled": true,
+            "maxRetries": 3,
+            "waitBetweenTries": 8000
+          }
         }
       }
     },
@@ -1570,7 +1580,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        4620,
+        4860,
         680
       ],
       "parameters": {
@@ -1613,7 +1623,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        6400,
+        6640,
         680
       ],
       "parameters": {
@@ -1634,9 +1644,14 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ model: 'llama-3.1-8b-instant', messages: [{ role: 'user', content: (() => { const d = $('Split Designs').first().json; return 'Etsy/Amazon SEO expert for POD t-shirts.\\nNiche: ' + $json.niche + '\\nTitle: ' + $json.title + '\\nPhrase: ' + $json.phrase + '\\nAudience: ' + $json.targetAudience + '\\nTone: ' + $json.tone + '\\n\\n' + 'Return ONLY JSON: {\"etsyTitle\":\"\",\"etsyDescription\":\"\",\"etsyTags\":[],\"amazonTitle\":\"\",\"amazonBulletPoints\":[],\"amazonKeywords\":\"\",\"fileName\":\"\",\"altText\":\"\",\"searchTerms\":[]}'; })() }], max_tokens: 2000, temperature: 0.4 }) }}",
+        "jsonBody": "={{ JSON.stringify({ model: \"llama-3.1-8b-instant\", messages: [{ role: \"user\", content: \"Etsy/Amazon SEO for: \\\"\" + ($json.phrase||$json.title||\"\") + \"\\\" (\" + $json.niche + \" niche, \" + $json.tone + \" tone, audience: \" + $json.targetAudience + \")\\nReturn ONLY JSON: {\\\"etsyTitle\\\":\\\"\\\",\\\"etsyDescription\\\":\\\"\\\",\\\"etsyTags\\\":[\\\"13 tags\\\"],\\\"amazonTitle\\\":\\\"\\\",\\\"amazonBulletPoints\\\":[\\\"5\\\"],\\\"amazonKeywords\\\":\\\"\\\",\\\"fileName\\\":\\\"\\\",\\\"altText\\\":\\\"\\\",\\\"searchTerms\\\":[\\\"5\\\"]}\" }], max_tokens: 600, temperature: 0.3 }) }}",
         "options": {
-          "timeout": 60000
+          "timeout": 30000,
+          "retry": {
+            "enabled": true,
+            "maxRetries": 3,
+            "waitBetweenTries": 8000
+          }
         }
       }
     },
@@ -1646,11 +1661,53 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        6660,
+        6900,
         680
       ],
       "parameters": {
         "jsCode": "const raw = $input.first().json?.choices?.[0]?.message?.content || '{}';\nconst clean = raw.replace(/```json|```/g,'').trim();\nconst match = clean.match(/[\\[{][\\s\\S]*[\\]}]/);\nlet parsed = null;\ntry { parsed = JSON.parse(match?.[0] || '{}'); } catch(_) { parsed = {}; }\n// Re-wrap as Gemini-style response so Parse Analysis/Concepts/SEO works\nreturn [{ json: { candidates: [{ content: { parts: [{ text: JSON.stringify(parsed) }] } }] } }];"
+      }
+    },
+    {
+      "id": "groq-analyst-wait",
+      "name": "Wait before Groq Analyst",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        3520,
+        680
+      ],
+      "parameters": {
+        "unit": "seconds",
+        "amount": 10
+      }
+    },
+    {
+      "id": "groq-concepts-wait",
+      "name": "Wait before Groq Concepts",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        4360,
+        680
+      ],
+      "parameters": {
+        "unit": "seconds",
+        "amount": 10
+      }
+    },
+    {
+      "id": "groq-seo-wait",
+      "name": "Wait before Groq SEO",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        6400,
+        680
+      ],
+      "parameters": {
+        "unit": "seconds",
+        "amount": 10
       }
     }
   ],
@@ -2395,7 +2452,7 @@
         ],
         [
           {
-            "node": "Groq Trend Analyst",
+            "node": "Wait before Groq Analyst",
             "type": "main",
             "index": 0
           }
@@ -2435,7 +2492,7 @@
         ],
         [
           {
-            "node": "Groq Generate Concepts",
+            "node": "Wait before Groq Concepts",
             "type": "main",
             "index": 0
           }
@@ -2475,7 +2532,7 @@
         ],
         [
           {
-            "node": "Groq SEO",
+            "node": "Wait before Groq SEO",
             "type": "main",
             "index": 0
           }
@@ -2498,6 +2555,39 @@
         [
           {
             "node": "Parse SEO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait before Groq Analyst": {
+      "main": [
+        [
+          {
+            "node": "Groq Trend Analyst",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait before Groq Concepts": {
+      "main": [
+        [
+          {
+            "node": "Groq Generate Concepts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait before Groq SEO": {
+      "main": [
+        [
+          {
+            "node": "Groq SEO",
             "type": "main",
             "index": 0
           }
