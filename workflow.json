@@ -50,7 +50,7 @@
     },
     {
       "parameters": {
-        "workflowId": "={{ $vars.RESEARCH_AGENT_WORKFLOW_ID }}",
+        "workflowId": "f978e116-7fe9-465d-8bb2-c61587fae2b9",
         "workflowInputs": {
           "values": [
             {
@@ -75,7 +75,7 @@
     },
     {
       "parameters": {
-        "workflowId": "={{ $vars.TREND_AGGREGATOR_WORKFLOW_ID }}",
+        "workflowId": "bfa7568e-33a0-4ab6-8494-667e213eea00",
         "workflowInputs": {
           "values": [
             {
@@ -96,7 +96,7 @@
     },
     {
       "parameters": {
-        "workflowId": "={{ $vars.GEMINI_ANALYST_WORKFLOW_ID }}",
+        "workflowId": "56d91c94-825f-4b48-90eb-08625926ef3e",
         "workflowInputs": {
           "values": [
             {
@@ -117,7 +117,7 @@
     },
     {
       "parameters": {
-        "workflowId": "={{ $vars.PROMPT_GENERATOR_WORKFLOW_ID }}",
+        "workflowId": "6673d7e3-9b47-450e-81c9-b470e83e7230",
         "workflowInputs": {
           "values": [
             {
@@ -138,7 +138,7 @@
     },
     {
       "parameters": {
-        "workflowId": "={{ $vars.IMAGE_GENERATOR_WORKFLOW_ID }}",
+        "workflowId": "a7e13a5f-b228-40c9-b37a-c91545985814",
         "workflowInputs": {
           "values": [
             {
@@ -159,7 +159,7 @@
     },
     {
       "parameters": {
-        "workflowId": "={{ $vars.SEO_GENERATOR_WORKFLOW_ID }}",
+        "workflowId": "70f2fdb2-215a-4dd5-968b-aceac3989e2f",
         "workflowInputs": {
           "values": [
             {
@@ -180,7 +180,7 @@
     },
     {
       "parameters": {
-        "workflowId": "={{ $vars.DATABASE_WORKFLOW_ID }}",
+        "workflowId": "5be92a45-a579-44e8-bf9c-7443d99080c5",
         "workflowInputs": {
           "values": [
             {
@@ -201,7 +201,7 @@
     },
     {
       "parameters": {
-        "workflowId": "={{ $vars.PUBLISHER_WORKFLOW_ID }}",
+        "workflowId": "8770f81f-e7ce-469e-a60b-410df33f951f",
         "workflowInputs": {
           "values": [
             {

@@ -2,7 +2,7 @@
   "updatedAt": "2026-07-25T15:18:32.854Z",
   "createdAt": "2026-07-25T15:18:32.854Z",
   "id": "f978e116-7fe9-465d-8bb2-c61587fae2b9",
-  "name": "r0merch — Research Agent",
+  "name": "r0merch \u2014 Research Agent",
   "description": null,
   "active": false,
   "isArchived": false,
@@ -33,7 +33,7 @@
     },
     {
       "parameters": {
-        "workflowId": "={{ $vars.ETSY_AGENT_WORKFLOW_ID }}",
+        "workflowId": "25b7d461-1692-4fab-8739-5419bed842c5",
         "workflowInputs": {
           "values": [
             {
@@ -54,7 +54,7 @@
     },
     {
       "parameters": {
-        "workflowId": "={{ $vars.AMAZON_AGENT_WORKFLOW_ID }}",
+        "workflowId": "5263dc0c-b3cc-4962-b9d0-de12fb260b56",
         "workflowInputs": {
           "values": [
             {
@@ -75,7 +75,7 @@
     },
     {
       "parameters": {
-        "workflowId": "={{ $vars.PINTEREST_AGENT_WORKFLOW_ID }}",
+        "workflowId": "09597748-4eb1-4b4c-a646-d802f2156694",
         "workflowInputs": {
           "values": [
             {
@@ -96,7 +96,7 @@
     },
     {
       "parameters": {
-        "workflowId": "={{ $vars.REDDIT_AGENT_WORKFLOW_ID }}",
+        "workflowId": "8c4e70a0-cdfa-4f6e-9345-f2895b55ab04",
         "workflowInputs": {
           "values": [
             {
@@ -121,7 +121,7 @@
     },
     {
       "parameters": {
-        "workflowId": "={{ $vars.GOOGLE_SEARCH_WORKFLOW_ID }}",
+        "workflowId": "1fb17f86-9092-4ea6-b5cd-4631ca01134c",
         "workflowInputs": {
           "values": [
             {
@@ -142,7 +142,7 @@
     },
     {
       "parameters": {
-        "workflowId": "={{ $vars.GOOGLE_TRENDS_WORKFLOW_ID }}",
+        "workflowId": "4a5b9883-f228-4502-a93b-ae5197d28d30",
         "workflowInputs": {
           "values": [
             {
@@ -163,7 +163,7 @@
     },
     {
       "parameters": {
-        "workflowId": "={{ $vars.VISION_AGENT_WORKFLOW_ID }}",
+        "workflowId": "b7a2e73f-4388-431e-9bb3-737dfd7cf77d",
         "workflowInputs": {
           "values": [
             {
@@ -358,9 +358,9 @@
   "staticData": null,
   "meta": null,
   "pinData": null,
-  "versionId": "6a617696-c0bb-4264-9f80-ed2e6b37db16",
+  "versionId": "0b5cbee2-6d41-4e1d-8d55-0d46c8ad06c5",
   "activeVersionId": null,
-  "versionCounter": 19,
+  "versionCounter": 20,
   "triggerCount": 0,
   "tags": [],
   "shared": [
