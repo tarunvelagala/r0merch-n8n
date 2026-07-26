@@ -2,7 +2,7 @@
   "name": "r0merch \u2014 POD Pipeline (Full)",
   "id": "1790571d-754c-4445-be73-1c370705998b",
   "active": false,
-  "updatedAt": "2026-07-26T16:16:49.000Z",
+  "updatedAt": "2026-07-26T16:19:22.000Z",
   "settings": {
     "executionOrder": "v1"
   },
@@ -99,7 +99,7 @@
             },
             {
               "name": "q",
-              "value": "={{ $json.niche + ' t-shirt site:etsy.com' }}"
+              "value": "={{ ($json.niche || 'general') + ' t-shirt site:etsy.com' }}"
             },
             {
               "name": "api_key",
@@ -145,7 +145,7 @@
             },
             {
               "name": "q",
-              "value": "={{ 'site:etsy.com ' + $json.niche + ' t-shirt bestseller' }}"
+              "value": "={{ 'site:etsy.com ' + ($json.niche || 'general') + ' t-shirt bestseller' }}"
             },
             {
               "name": "api_key",
@@ -204,7 +204,7 @@
             },
             {
               "name": "k",
-              "value": "={{ $json.niche + ' t-shirt' }}"
+              "value": "={{ ($json.niche || 'general') + ' t-shirt' }}"
             },
             {
               "name": "amazon_domain",
@@ -259,7 +259,7 @@
             },
             {
               "name": "q",
-              "value": "={{ $json.niche + ' t-shirt design' }}"
+              "value": "={{ ($json.niche || 'general') + ' t-shirt design' }}"
             },
             {
               "name": "api_key",
@@ -301,7 +301,7 @@
             },
             {
               "name": "q",
-              "value": "={{ $json.niche + ' t-shirt trending' }}"
+              "value": "={{ ($json.niche || 'general') + ' t-shirt trending' }}"
             },
             {
               "name": "api_key",
@@ -356,7 +356,7 @@
             },
             {
               "name": "q",
-              "value": "={{ 'site:reddit.com ' + ($json.niche||'') + ' t-shirt' }}"
+              "value": "={{ 'site:reddit.com ' + (($json.niche || 'general')||'') + ' t-shirt' }}"
             },
             {
               "name": "api_key",
@@ -406,7 +406,7 @@
             },
             {
               "name": "q",
-              "value": "={{ 'site:reddit.com ' + ($json.niche||'') + ' merch design community' }}"
+              "value": "={{ 'site:reddit.com ' + (($json.niche || 'general')||'') + ' merch design community' }}"
             },
             {
               "name": "api_key",
@@ -469,7 +469,7 @@
             },
             {
               "name": "q",
-              "value": "={{ $json.niche + ' t-shirt best selling 2025' }}"
+              "value": "={{ ($json.niche || 'general') + ' t-shirt best selling 2025' }}"
             },
             {
               "name": "api_key",
@@ -515,7 +515,7 @@
             },
             {
               "name": "q",
-              "value": "={{ $json.niche + ' t-shirt print on demand niche ideas' }}"
+              "value": "={{ ($json.niche || 'general') + ' t-shirt print on demand niche ideas' }}"
             },
             {
               "name": "api_key",
@@ -574,7 +574,7 @@
             },
             {
               "name": "q",
-              "value": "={{ ($json.niche || $('Parse Google Search').first()?.json?.niche || '') + ' t-shirt' }}"
+              "value": "={{ $json.searchQuery }}"
             },
             {
               "name": "api_key",
@@ -620,7 +620,7 @@
             },
             {
               "name": "q",
-              "value": "={{ ($json.niche || $('Parse Google Search').first()?.json?.niche || '') + ' t-shirt' }}"
+              "value": "={{ $json.searchQuery }}"
             },
             {
               "name": "api_key",
@@ -795,7 +795,7 @@
             },
             {
               "name": "q",
-              "value": "={{ 'site:x.com OR site:twitter.com ' + ($json.niche || $('Parse Google Trends').first()?.json?.niche || '') + ' t-shirt' }}"
+              "value": "={{ 'site:x.com OR site:twitter.com ' + ($json.niche || 'general') + ' t-shirt' }}"
             },
             {
               "name": "api_key",
@@ -845,7 +845,7 @@
             },
             {
               "name": "q",
-              "value": "={{ 'site:x.com OR site:twitter.com ' + ($json.niche || $('Parse Google Trends').first()?.json?.niche || '') + ' trending viral meme' }}"
+              "value": "={{ 'site:x.com OR site:twitter.com ' + ($json.niche || 'general') + ' trending viral' }}"
             },
             {
               "name": "api_key",
@@ -1676,7 +1676,7 @@
         1980
       ],
       "parameters": {
-        "jsCode": "// Pass through \u2014 SerpAPI handles its own rate limiting\nreturn $input.all().map(i => ({ json: i.json }));"
+        "jsCode": "const item = $input.first().json;\nconst niche = item.niche || '';\nreturn [{ json: { ...item, niche: niche || 'general' } }];"
       }
     },
     {
@@ -1702,7 +1702,7 @@
         1460
       ],
       "parameters": {
-        "jsCode": "// Pass through \u2014 SerpAPI handles its own rate limiting\nreturn $input.all().map(i => ({ json: i.json }));"
+        "jsCode": "const item = $input.first().json;\nconst niche = item.niche || '';\nconst q = (niche + ' t-shirt').trim();\nreturn [{ json: { ...item, searchQuery: q || 't-shirt', niche: niche || 'general' } }];"
       }
     },
     {
