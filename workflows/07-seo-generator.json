@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-07-27T03:35:44.000Z",
+  "updatedAt": "2099-01-01T00:00:00.000Z",
   "createdAt": "2026-07-25T15:18:44.396Z",
   "id": "70f2fdb2-215a-4dd5-968b-aceac3989e2f",
   "name": "r0merch \u2014 SEO Generator",
@@ -20,10 +20,10 @@
     },
     {
       "parameters": {
-        "jsCode": "const raw = $input.first().json;\nlet parsed;\ntry {\n  parsed = typeof raw.designs === 'string' ? JSON.parse(raw.designs) : raw;\n} catch (_) { parsed = raw; }\n\nconst designs = parsed.designs || (Array.isArray(parsed) ? parsed : [parsed]);\nreturn designs.map(d => ({ json: d }));"
+        "jsCode": "// Single design per execution \u2014 just pass it through\nconst raw = $input.first().json;\nconst design = raw.concept || raw;\nconst niche = raw.niche || design.niche || '';\nreturn [{ json: { niche, ...design } }];"
       },
       "id": "split-designs",
-      "name": "Split Designs",
+      "name": "Unpack Design",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
@@ -33,22 +33,27 @@
     },
     {
       "parameters": {
-        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
-        "sendQuery": true,
-        "queryParameters": {
+        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "sendBody": true,
+        "specifyBody": "json",
+        "headerParameters": {
           "parameters": [
             {
-              "name": "key",
-              "value": "={{ $env.GEMINI_API_KEY }}"
+              "name": "Authorization",
+              "value": "={{ \"Bearer \" + $env.GROQ_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
             }
           ]
         },
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({\n  contents: [{\n    parts: [{\n      text: (() => {\n        const d = $json;\n        return `You are an expert Etsy and Amazon SEO strategist for print-on-demand t-shirts.\n\nDesign Details:\n- Niche: ${d.niche}\n- Title: ${d.title}\n- Phrase on shirt: ${d.phrase}\n- Concept: ${d.concept || \"\"}\n- Target Audience: ${d.targetAudience}\n- Selling Angle: ${d.sellingAngle}\n- Tone: ${d.tone}\n- Source: ${d.source || \"\"}\n- Colors: ${(d.colors || []).join(\", \")}\n- Icons: ${(d.icons || []).join(\", \")}\n\nGenerate complete SEO metadata optimised for maximum discoverability.\nReturn ONLY a raw JSON object. No markdown, no code fences.\n\nShape:\n{\n  \"etsyTitle\": \"max 140 chars \u2014 lead with strongest keyword\",\n  \"etsyDescription\": \"150-200 word description with natural keyword integration, include size/material info placeholder\",\n  \"etsyTags\": [\"exactly 13 tags\", \"each max 20 chars\", \"mix long-tail and short\"],\n  \"amazonTitle\": \"max 200 chars \u2014 Brand + Keywords + Product Type\",\n  \"amazonBulletPoints\": [\"exactly 5 bullets\", \"start each with benefit\", \"include keywords naturally\"],\n  \"amazonKeywords\": \"backend keywords space-separated max 250 chars\",\n  \"fileName\": \"url-safe-slug-no-spaces\",\n  \"altText\": \"descriptive alt text for accessibility and SEO max 125 chars\",\n  \"searchTerms\": [\"10 buyer-intent search phrases people use to find this design\"]\n}`;\n      })()\n    }]\n  }],\n  generationConfig: { temperature: 0.3, maxOutputTokens: 2000 }\n}) }}"
+        "sendHeaders": true,
+        "method": "POST",
+        "jsonBody": "={{ {\n  model: \"llama-3.3-70b-versatile\",\n  messages: [{\n    role: \"user\",\n    content: \"You are an Etsy and Amazon SEO expert for POD t-shirts.\\n\\nDesign:\\n- Niche: \" + $json.niche + \"\\n- Title: \" + $json.title + \"\\n- Phrase: \" + $json.phrase + \"\\n- Audience: \" + $json.targetAudience + \"\\n- Angle: \" + $json.sellingAngle + \"\\n- Tone: \" + $json.tone + \"\\n- Colors: \" + ($json.colors || []).join(\", \") + \"\\n- Icons: \" + ($json.icons || []).join(\", \") + \"\\n\\nReturn ONLY a raw JSON object, no markdown:\\n{\\\"etsyTitle\\\":\\\"\\\",\\\"etsyDescription\\\":\\\"\\\",\\\"etsyTags\\\":[],\\\"amazonTitle\\\":\\\"\\\",\\\"amazonBulletPoints\\\":[],\\\"amazonKeywords\\\":\\\"\\\",\\\"fileName\\\":\\\"\\\",\\\"altText\\\":\\\"\\\",\\\"searchTerms\\\":[]}\"\n  }],\n  temperature: 0.3,\n  max_tokens: 2000\n} }}"
       },
       "id": "gemini-seo",
-      "name": "Gemini SEO Generation",
+      "name": "Groq SEO Generation",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
@@ -58,7 +63,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const ctx = $('Split Designs').first().json;\nconst raw = $input.first().json?.candidates?.[0]?.content?.parts?.[0]?.text || '{}';\nconst clean = raw.replace(/```json|```/g, '').trim();\nconst match = clean.match(/\\{[\\s\\S]*\\}/);\nlet seo = {};\ntry { seo = JSON.parse(match?.[0] || '{}'); } catch (_) {}\n\nreturn [{\n  json: {\n    ...ctx,\n    etsyTitle:          seo.etsyTitle          || '',\n    etsyDescription:    seo.etsyDescription    || '',\n    etsyTags:           seo.etsyTags           || [],\n    amazonTitle:        seo.amazonTitle        || '',\n    amazonBulletPoints: seo.amazonBulletPoints || [],\n    amazonKeywords:     seo.amazonKeywords     || '',\n    seoFileName:        seo.fileName           || '',\n    altText:            seo.altText            || '',\n    searchTerms:        seo.searchTerms        || []\n  }\n}];"
+        "jsCode": "const ctx = $('Split Designs').first().json;\nconst raw = $input.first().json?.choices?.[0]?.message?.content || '{}';\nconst clean = raw.replace(/```json|```/g, '').trim();\nconst match = clean.match(/\\{[\\s\\S]*\\}/);\nlet seo = {};\ntry { seo = JSON.parse(match?.[0] || '{}'); } catch (_) {}\n\nreturn [{\n  json: {\n    ...ctx,\n    etsyTitle:          seo.etsyTitle          || '',\n    etsyDescription:    seo.etsyDescription    || '',\n    etsyTags:           seo.etsyTags           || [],\n    amazonTitle:        seo.amazonTitle        || '',\n    amazonBulletPoints: seo.amazonBulletPoints || [],\n    amazonKeywords:     seo.amazonKeywords     || '',\n    seoFileName:        seo.fileName           || '',\n    altText:            seo.altText            || '',\n    searchTerms:        seo.searchTerms        || []\n  }\n}];"
       },
       "id": "parse-seo",
       "name": "Parse SEO Metadata",
@@ -88,7 +93,7 @@
       "main": [
         [
           {
-            "node": "Split Designs",
+            "node": "Unpack Design",
             "type": "main",
             "index": 0
           }
@@ -99,14 +104,14 @@
       "main": [
         [
           {
-            "node": "Gemini SEO Generation",
+            "node": "Groq SEO Generation",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Gemini SEO Generation": {
+    "Groq SEO Generation": {
       "main": [
         [
           {
@@ -127,17 +132,30 @@
           }
         ]
       ]
+    },
+    "Unpack Design": {
+      "main": [
+        [
+          {
+            "node": "Gemini SEO Generation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
-    "executionOrder": "v1"
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
   },
   "staticData": null,
   "meta": null,
   "pinData": null,
-  "versionId": "0e97dadd-33cd-439c-baa7-52cc32e1f35a",
-  "activeVersionId": null,
-  "versionCounter": 26,
+  "versionId": "30cd5365-70a7-4b55-8cb2-c097ecd2c0da",
+  "activeVersionId": "30cd5365-70a7-4b55-8cb2-c097ecd2c0da",
+  "versionCounter": 47,
   "triggerCount": 0,
   "tags": [],
   "shared": [

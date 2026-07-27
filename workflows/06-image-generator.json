@@ -20,10 +20,10 @@
     },
     {
       "parameters": {
-        "jsCode": "const raw = $input.first().json;\nlet parsed;\ntry {\n  parsed = typeof raw.concepts === 'string' ? JSON.parse(raw.concepts) : raw;\n} catch (_) { parsed = raw; }\nconst concepts = parsed.concepts || [];\nconst niche    = parsed.niche || '';\nreturn concepts.map(c => ({ json: { niche, ...c } }));"
+        "jsCode": "const raw = $input.all()[0]?.json || {};\nconst concept = raw.concept || raw;\nconst niche = raw.niche || concept.niche || '';\nreturn [{ json: { niche, ...concept } }];"
       },
       "id": "split-concepts",
-      "name": "Split Into Concepts",
+      "name": "Unpack Concept",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
@@ -33,7 +33,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// $('Normalise Image') has the resolved image URL and provider\nconst norm = $('Normalise Image').first().json;\n// $('Split Into Concepts') in this execution context IS the current concept\nconst item = $('Split Into Concepts').first().json;\nconst hasBg = !!($input.first().binary?.data);\n\nconst niche    = item.niche    || 'unknown';\nconst id       = item.id       || Date.now();\nconst ts       = new Date().toISOString().replace(/[:.]/g, '-');\nconst fileName = `design_${niche}_${id}_${ts}.png`;\n\nreturn [{\n  json: {\n    niche,\n    conceptId:       id,\n    title:           item.title          || '',\n    phrase:          item.phrase         || '',\n    tone:            item.tone           || '',\n    source:          item.source         || '',\n    targetAudience:  item.targetAudience || '',\n    sellingAngle:    item.sellingAngle   || '',\n    imagePrompt:     item.imagePrompt    || '',\n    imageUrl:        norm.resolvedImageUrl || '',\n    provider:        norm.provider        || 'unknown',\n    fileName,\n    generatedAt:     new Date().toISOString(),\n    pod: {\n      printWidth:     '12 inches',\n      printHeight:    '14 inches',\n      dpi:            300,\n      colorMode:      'RGB',\n      printPlacement: 'front-center chest',\n      garmentTypes:   ['t-shirt', 'hoodie', 'sweatshirt'],\n      podPlatforms:   ['Printful', 'Printify', 'Gelato']\n    }\n  },\n  binary: hasBg ? { transparentPng: $input.first().binary.data } : {}\n}];"
+        "jsCode": "// $('Normalise Image') has the resolved image URL and provider\nconst norm = $('Normalise Image').first().json;\n// $('Unpack Concept') in this execution context IS the current concept\nconst item = $('Unpack Concept').first().json;\nconst hasBg = !!($input.first().binary?.data);\n\nconst niche    = item.niche    || 'unknown';\nconst id       = item.id       || Date.now();\nconst ts       = new Date().toISOString().replace(/[:.]/g, '-');\nconst fileName = `design_${niche}_${id}_${ts}.png`;\n\nreturn [{\n  json: {\n    niche,\n    conceptId:       id,\n    title:           item.title          || '',\n    phrase:          item.phrase         || '',\n    tone:            item.tone           || '',\n    source:          item.source         || '',\n    targetAudience:  item.targetAudience || '',\n    sellingAngle:    item.sellingAngle   || '',\n    imagePrompt:     item.imagePrompt    || '',\n    imageUrl:        norm.resolvedImageUrl || '',\n    provider:        norm.provider        || 'unknown',\n    fileName,\n    generatedAt:     new Date().toISOString(),\n    pod: {\n      printWidth:     '12 inches',\n      printHeight:    '14 inches',\n      dpi:            300,\n      colorMode:      'RGB',\n      printPlacement: 'front-center chest',\n      garmentTypes:   ['t-shirt', 'hoodie', 'sweatshirt'],\n      podPlatforms:   ['Printful', 'Printify', 'Gelato']\n    }\n  },\n  binary: hasBg ? { transparentPng: $input.first().binary.data } : {}\n}];"
       },
       "id": "prepare-record",
       "name": "Prepare PNG Record",
@@ -173,7 +173,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const raw = $input.first().json?.data ?? $input.first().json ?? '';\nconst text = typeof raw === 'string' ? raw : JSON.stringify(raw);\nconst ctx = $('Split Into Concepts').first().json;\n\n// Detect quota/error\nconst isError = text.includes('event: error') || text.includes('quota exceeded') || text.includes('\"error\"');\nif (isError) {\n  return [{ json: { ...ctx, ideogramImageUrl: '', ideogramCaption: '', usesFallback: true } }];\n}\n\n// Parse success\nconst match = text.match(/data: (\\[.*\\])/s);\nlet imageUrl = '', caption = '';\ntry {\n  const parsed = JSON.parse(match?.[1] || '[]');\n  imageUrl = parsed?.[0]?.url || '';\n  caption  = JSON.stringify(parsed?.[2] || {});\n} catch(_) {}\n\nreturn [{ json: { ...ctx, ideogramImageUrl: imageUrl, ideogramCaption: caption, usesFallback: !imageUrl } }];"
+        "jsCode": "const raw = $input.first().json?.data ?? $input.first().json ?? '';\nconst text = typeof raw === 'string' ? raw : JSON.stringify(raw);\nconst ctx = $('Unpack Concept').first().json;\n\n// Detect quota/error\nconst isError = text.includes('event: error') || text.includes('quota exceeded') || text.includes('\"error\"');\nif (isError) {\n  return [{ json: { ...ctx, ideogramImageUrl: '', ideogramCaption: '', usesFallback: true } }];\n}\n\n// Parse success\nconst match = text.match(/data: (\\[.*\\])/s);\nlet imageUrl = '', caption = '';\ntry {\n  const parsed = JSON.parse(match?.[1] || '[]');\n  imageUrl = parsed?.[0]?.url || '';\n  caption  = JSON.stringify(parsed?.[2] || {});\n} catch(_) {}\n\nreturn [{ json: { ...ctx, ideogramImageUrl: imageUrl, ideogramCaption: caption, usesFallback: !imageUrl } }];"
       },
       "id": "parse-ideogram",
       "name": "Parse Ideogram Result",
@@ -274,7 +274,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const ctx = $('Split Into Concepts').first().json;\nconst ideogram = $('Parse Ideogram Result').first().json;\n\n// Check which path we came from\nconst fromPollinations = !!$input.first().binary?.data;\nlet imageUrl = '';\nlet provider = 'ideogram';\n\nif (fromPollinations) {\n  // Pollinations path \u2014 build URL\n  const podSuffix = ', isolated on pure white background, bold flat vector illustration, screen print style, 3-5 spot colors max, no gradients, no shadows, no textures, high contrast, print-ready t-shirt graphic, centered composition, professional POD design';\n  imageUrl = 'https://image.pollinations.ai/prompt/' + encodeURIComponent((ctx.imagePrompt || '') + podSuffix) + '?width=1024&height=1024&nologo=true&model=flux&enhance=true';\n  provider = 'pollinations-fallback';\n} else {\n  imageUrl = ideogram.ideogramImageUrl || '';\n  provider = 'ideogram';\n}\n\nreturn [{ json: { ...ctx, resolvedImageUrl: imageUrl, ideogramCaption: ideogram.ideogramCaption || '', provider }, binary: $input.first().binary || {} }];"
+        "jsCode": "const ctx = $('Unpack Concept').first().json;\nconst ideogram = $('Parse Ideogram Result').first().json;\n\n// Check which path we came from\nconst fromPollinations = !!$input.first().binary?.data;\nlet imageUrl = '';\nlet provider = 'ideogram';\n\nif (fromPollinations) {\n  // Pollinations path \u2014 build URL\n  const podSuffix = ', isolated on pure white background, bold flat vector illustration, screen print style, 3-5 spot colors max, no gradients, no shadows, no textures, high contrast, print-ready t-shirt graphic, centered composition, professional POD design';\n  imageUrl = 'https://image.pollinations.ai/prompt/' + encodeURIComponent((ctx.imagePrompt || '') + podSuffix) + '?width=1024&height=1024&nologo=true&model=flux&enhance=true';\n  provider = 'pollinations-fallback';\n} else {\n  imageUrl = ideogram.ideogramImageUrl || '';\n  provider = 'ideogram';\n}\n\nreturn [{ json: { ...ctx, resolvedImageUrl: imageUrl, ideogramCaption: ideogram.ideogramCaption || '', provider }, binary: $input.first().binary || {} }];"
       },
       "id": "normalise-image",
       "name": "Normalise Image",
@@ -291,7 +291,7 @@
       "main": [
         [
           {
-            "node": "Split Into Concepts",
+            "node": "Unpack Concept",
             "type": "main",
             "index": 0
           }

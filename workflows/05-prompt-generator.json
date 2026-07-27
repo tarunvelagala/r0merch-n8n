@@ -71,10 +71,10 @@
     },
     {
       "parameters": {
-        "jsCode": "const raw = $input.first().json?.choices?.[0]?.message?.content || '[]';\nconst clean = raw.replace(/```json|```/g, '').trim();\nconst match = clean.match(/\\[[\\s\\S]*\\]/);\nlet concepts = [];\ntry { concepts = JSON.parse(match?.[0] || '[]'); } catch (_) {}\n\nconst input = $('Execute Workflow Trigger').first().json;\nconst report = input.trendAnalysis ? JSON.parse(input.trendAnalysis) : input;\nconst niche = report.niche || '';\n\nreturn [{ json: { niche, concepts } }];"
+        "jsCode": "const raw = $input.first().json?.choices?.[0]?.message?.content || '[]';\nconst clean = raw.replace(/```json|```/g, '').trim();\nconst match = clean.match(/\\[[\\s\\S]*\\]/);\nlet concepts = [];\ntry { concepts = JSON.parse(match?.[0] || '[]'); } catch (_) {}\n\nconst input = $('Execute Workflow Trigger').first().json;\nconst report = input.trendAnalysis ? JSON.parse(input.trendAnalysis) : input;\nconst niche = report.niche || '';\n\n// Score each concept \u2014 prefer opportunity/underserved, then twitter, then seasonal\nconst scores = { opportunity: 3, underserved: 3, twitter: 2, seasonal: 1, evergreen: 1 };\nconst scored = concepts.map(c => ({ ...c, _score: scores[c.source] || 1 }));\nconst best = scored.sort((a, b) => b._score - a._score)[0] || concepts[0];\ndelete best?._score;\n\n// Return single best concept (not an array) \u2014 one image per niche\nreturn [{ json: { niche, concept: best, concepts } }];"
       },
       "id": "parse-concepts",
-      "name": "Parse 10 Concepts",
+      "name": "Pick Best Concept",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
@@ -110,7 +110,7 @@
       "main": [
         [
           {
-            "node": "Parse 10 Concepts",
+            "node": "Pick Best Concept",
             "type": "main",
             "index": 0
           }

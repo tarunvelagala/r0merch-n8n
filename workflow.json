@@ -117,10 +117,6 @@
             {
               "name": "trendAnalysis",
               "stringValue": "={{ JSON.stringify($('Gemini Trend Analyst').first().json) }}"
-            },
-            {
-              "name": "keywords",
-              "stringValue": "={{ JSON.stringify($json.keywords || []) }}"
             }
           ]
         }
@@ -140,8 +136,12 @@
         "workflowInputs": {
           "values": [
             {
-              "name": "concepts",
-              "stringValue": "={{ JSON.stringify($json) }}"
+              "name": "concept",
+              "stringValue": "={{ JSON.stringify($json.concept) }}"
+            },
+            {
+              "name": "niche",
+              "stringValue": "={{ $json.niche }}"
             }
           ]
         }
