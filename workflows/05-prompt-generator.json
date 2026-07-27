@@ -110,6 +110,19 @@
         "amount": 12,
         "unit": "seconds"
       }
+    },
+    {
+      "id": "prepare-concept-input",
+      "name": "Prepare Concept Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        460,
+        300
+      ],
+      "parameters": {
+        "jsCode": "// Merge keyword from Keyword Generator with trendAnalysis from trigger\nconst triggerInput = $('Execute Workflow Trigger').first().json;\nconst keywordOutput = $('Keyword Generator').first()?.json || {};\nreturn [{ json: {\n  niche:         keywordOutput.niche    || triggerInput.niche    || '',\n  keyword:       keywordOutput.keyword  || '',\n  keywords:      keywordOutput.keywords || [],\n  trendAnalysis: triggerInput.trendAnalysis || JSON.stringify(triggerInput)\n} }];"
+      }
     }
   ],
   "connections": {
@@ -150,7 +163,7 @@
       "main": [
         [
           {
-            "node": "Cooldown Concepts",
+            "node": "Prepare Concept Input",
             "type": "main",
             "index": 0
           }
@@ -162,6 +175,17 @@
         [
           {
             "node": "Groq Generate Concepts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Concept Input": {
+      "main": [
+        [
+          {
+            "node": "Cooldown Concepts",
             "type": "main",
             "index": 0
           }
