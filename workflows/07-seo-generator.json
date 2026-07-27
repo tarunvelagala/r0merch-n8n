@@ -137,7 +137,7 @@
       "main": [
         [
           {
-            "node": "Gemini SEO Generation",
+            "node": "Groq SEO Generation",
             "type": "main",
             "index": 0
           }
