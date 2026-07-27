@@ -372,6 +372,20 @@
       "parameters": {
         "jsCode": "const storeItems = $('Store Niche Context').all();\nreturn $input.all().map((item, i) => {\n  const niche = storeItems[i]?.json?.niche || storeItems[0]?.json?.niche || '';\n  const raw = item.json?.choices?.[0]?.message?.content || '';\n  const design_style = raw.trim() || 'bold two-word phrases, minimalist graphic, clean urban typography';\n  return { json: { niche, design_style, marketing_pages: 'r/' + niche.replace(/[^a-zA-Z0-9]/g,'') } };\n});"
       }
+    },
+    {
+      "id": "wait-between-niches",
+      "name": "Wait Between Niches",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2912,
+        128
+      ],
+      "parameters": {
+        "amount": 30,
+        "unit": "seconds"
+      }
     }
   ],
   "pinData": {},
@@ -468,7 +482,7 @@
       "main": [
         [
           {
-            "node": "Loop Over Items",
+            "node": "Wait Between Niches",
             "type": "main",
             "index": 0
           }
@@ -578,6 +592,17 @@
         [
           {
             "node": "Research Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait Between Niches": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
             "type": "main",
             "index": 0
           }
