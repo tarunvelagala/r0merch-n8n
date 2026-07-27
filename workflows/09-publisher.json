@@ -1,10 +1,10 @@
 {
-  "updatedAt": "2026-07-25T15:18:46.337Z",
+  "updatedAt": "2026-07-27T03:35:44.000Z",
   "createdAt": "2026-07-25T15:18:46.337Z",
   "id": "8770f81f-e7ce-469e-a60b-410df33f951f",
-  "name": "r0merch — Publisher (Optional)",
+  "name": "r0merch \u2014 Publisher (Optional)",
   "description": null,
-  "active": false,
+  "active": true,
   "isArchived": false,
   "nodes": [
     {

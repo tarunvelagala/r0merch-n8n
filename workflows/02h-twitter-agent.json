@@ -1,10 +1,10 @@
 {
-  "updatedAt": "2026-07-26T03:08:37.000Z",
+  "updatedAt": "2026-07-27T03:35:44.000Z",
   "createdAt": "2026-07-25T16:19:41.459Z",
   "id": "3d7e9f12-a841-4c56-b234-8f1e2a3b4c5d",
   "name": "r0merch \u2014 Twitter Agent",
   "description": null,
-  "active": false,
+  "active": true,
   "isArchived": false,
   "nodes": [
     {

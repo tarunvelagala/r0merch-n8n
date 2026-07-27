@@ -1,10 +1,10 @@
 {
-  "updatedAt": "2026-07-25T15:18:40.546Z",
+  "updatedAt": "2026-07-27T03:35:44.000Z",
   "createdAt": "2026-07-25T15:18:40.546Z",
   "id": "bfa7568e-33a0-4ab6-8494-667e213eea00",
-  "name": "r0merch — Trend Aggregator",
+  "name": "r0merch \u2014 Trend Aggregator",
   "description": null,
-  "active": false,
+  "active": true,
   "isArchived": false,
   "nodes": [
     {

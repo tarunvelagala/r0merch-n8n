@@ -1,10 +1,10 @@
 {
-  "updatedAt": "2026-07-26T03:08:37.000Z",
+  "updatedAt": "2026-07-27T03:35:44.000Z",
   "createdAt": "2026-07-25T15:18:37.645Z",
   "id": "1fb17f86-9092-4ea6-b5cd-4631ca01134c",
   "name": "r0merch \u2014 Google Search Agent",
   "description": null,
-  "active": false,
+  "active": true,
   "isArchived": false,
   "nodes": [
     {

@@ -1,10 +1,10 @@
 {
-  "updatedAt": "2026-07-26T03:08:37.000Z",
+  "updatedAt": "2026-07-27T03:35:44.000Z",
   "createdAt": "2026-07-25T15:18:35.734Z",
   "id": "09597748-4eb1-4b4c-a646-d802f2156694",
   "name": "r0merch \u2014 Pinterest Agent",
   "description": null,
-  "active": false,
+  "active": true,
   "isArchived": false,
   "nodes": [
     {

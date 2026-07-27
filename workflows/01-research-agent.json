@@ -1,10 +1,10 @@
 {
-  "updatedAt": "2026-07-26T03:06:11.000Z",
+  "updatedAt": "2026-07-27T03:35:44.000Z",
   "createdAt": "2026-07-25T15:18:32.854Z",
   "id": "f978e116-7fe9-465d-8bb2-c61587fae2b9",
   "name": "r0merch \u2014 Research Agent",
   "description": null,
-  "active": false,
+  "active": true,
   "isArchived": false,
   "nodes": [
     {

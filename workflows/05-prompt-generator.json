@@ -1,10 +1,10 @@
 {
-  "updatedAt": "2026-07-25T15:18:42.488Z",
+  "updatedAt": "2026-07-27T03:35:44.000Z",
   "createdAt": "2026-07-25T15:18:42.488Z",
   "id": "6673d7e3-9b47-450e-81c9-b470e83e7230",
-  "name": "r0merch — Prompt Generator",
+  "name": "r0merch \u2014 Prompt Generator",
   "description": null,
-  "active": false,
+  "active": true,
   "isArchived": false,
   "nodes": [
     {

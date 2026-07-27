@@ -1,10 +1,10 @@
 {
-  "updatedAt": "2026-07-26T03:08:37.000Z",
+  "updatedAt": "2026-07-27T03:35:44.000Z",
   "createdAt": "2026-07-25T15:18:36.697Z",
   "id": "8c4e70a0-cdfa-4f6e-9345-f2895b55ab04",
   "name": "r0merch \u2014 Reddit Agent",
   "description": null,
-  "active": false,
+  "active": true,
   "isArchived": false,
   "nodes": [
     {

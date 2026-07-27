@@ -1,10 +1,10 @@
 {
-  "updatedAt": "2026-07-26T03:08:37.000Z",
+  "updatedAt": "2026-07-27T03:35:44.000Z",
   "createdAt": "2026-07-25T15:18:38.613Z",
   "id": "4a5b9883-f228-4502-a93b-ae5197d28d30",
   "name": "r0merch \u2014 Google Trends Agent",
   "description": null,
-  "active": false,
+  "active": true,
   "isArchived": false,
   "nodes": [
     {
