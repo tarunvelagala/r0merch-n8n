@@ -243,7 +243,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Niche comes from Store Niche Context which preserved it from Read Niches\nconst niche = $('Store Niche Context').first().json.niche || '';\nconst raw = $input.first().json?.choices?.[0]?.message?.content || '';\nconst design_style = raw.trim() || 'bold two-word phrases, minimalist graphic, clean urban typography';\nreturn [{ json: {\n  niche,\n  design_style,\n  marketing_pages: 'r/' + niche.replace(/[^a-zA-Z0-9]/g, '')\n} }];"
+        "jsCode": "// Each item flowing through has niche from Analyze Design Style's input\n// $json here is the Groq response \u2014 need niche from the previous context\n// Use $input.item to get the current execution item index\nconst allStoreItems = $('Store Niche Context').all();\nconst currentIndex = $itemIndex;\nconst storeItem = allStoreItems[currentIndex] || allStoreItems[0];\nconst niche = storeItem?.json?.niche || '';\n\nconst raw = $input.item.json?.choices?.[0]?.message?.content || '';\nconst design_style = raw.trim() || 'bold two-word phrases, minimalist graphic, clean urban typography';\nreturn { json: {\n  niche,\n  design_style,\n  marketing_pages: 'r/' + niche.replace(/[^a-zA-Z0-9]/g, '')\n} };"
       },
       "id": "parse-niche-style",
       "name": "Parse Niche Style",
