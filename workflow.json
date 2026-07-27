@@ -36,20 +36,6 @@
     },
     {
       "parameters": {
-        "batchSize": 1,
-        "options": {}
-      },
-      "id": "split-batches",
-      "name": "Split In Batches",
-      "type": "n8n-nodes-base.splitInBatches",
-      "typeVersion": 3,
-      "position": [
-        440,
-        300
-      ]
-    },
-    {
-      "parameters": {
         "workflowId": "f978e116-7fe9-465d-8bb2-c61587fae2b9",
         "workflowInputs": {
           "values": [
@@ -239,17 +225,6 @@
       "main": [
         [
           {
-            "node": "Split In Batches",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Split In Batches": {
-      "main": [
-        [
-          {
             "node": "Research Agent",
             "type": "main",
             "index": 0
@@ -347,5 +322,6 @@
     "orchestrator",
     "r0merch"
   ],
-  "id": "1790571d-754c-4445-be73-1c370705998b"
+  "id": "1790571d-754c-4445-be73-1c370705998b",
+  "updatedAt": "2026-07-27T03:33:01.000Z"
 }
