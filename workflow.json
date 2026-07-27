@@ -54,6 +54,9 @@
               "stringValue": "={{ $json.marketing_pages }}"
             }
           ]
+        },
+        "options": {
+          "waitForSubWorkflow": true
         }
       },
       "id": "exec-research",
@@ -79,6 +82,9 @@
               "stringValue": "={{ $json.niche }}"
             }
           ]
+        },
+        "options": {
+          "waitForSubWorkflow": true
         }
       },
       "id": "exec-trend-agg",
@@ -104,6 +110,9 @@
               "stringValue": "={{ $json.niche }}"
             }
           ]
+        },
+        "options": {
+          "waitForSubWorkflow": true
         }
       },
       "id": "exec-gemini-analyst",
@@ -129,6 +138,9 @@
               "stringValue": "={{ $json.niche }}"
             }
           ]
+        },
+        "options": {
+          "waitForSubWorkflow": true
         }
       },
       "id": "exec-prompt-gen",
@@ -154,6 +166,9 @@
               "stringValue": "={{ $json.niche }}"
             }
           ]
+        },
+        "options": {
+          "waitForSubWorkflow": true
         }
       },
       "id": "exec-image-gen",
@@ -179,6 +194,9 @@
               "stringValue": "={{ $json.niche }}"
             }
           ]
+        },
+        "options": {
+          "waitForSubWorkflow": true
         }
       },
       "id": "exec-seo-gen",
@@ -204,6 +222,9 @@
               "stringValue": "={{ $json.niche }}"
             }
           ]
+        },
+        "options": {
+          "waitForSubWorkflow": true
         }
       },
       "id": "exec-database",
@@ -245,6 +266,9 @@
               "stringValue": "={{ $json.niche }}"
             }
           ]
+        },
+        "options": {
+          "waitForSubWorkflow": true
         }
       },
       "id": "exec-keyword-gen",
