@@ -1,0 +1,68 @@
+{
+  "name": "r0merch — Keyword Generator",
+  "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "active": true,
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "trigger-input",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [0, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.all()[0]?.json || {};\nconst category = input.category || input.niche || 'streetwear';\nreturn [{ json: { category } }];"
+      },
+      "id": "unpack",
+      "name": "Unpack Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [220, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "={{ 'Bearer ' + $env.GROQ_API_KEY }}" },
+            { "name": "Content-Type",  "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'llama-3.1-8b-instant', messages: [{ role: 'user', content: 'You are a T-shirt design AI assistant for the brand r0merch.\\n\\nTask: Generate 5–10 short, print-ready keywords for a T-shirt or merchandise design based on the given category.\\n\\nRules:\\n1. Only 1–2 words per keyword. No sentences.\\n2. Keywords must fit the category aesthetic vibe.\\n3. Keep them visually appealing, suitable for bold typography, simple graphics, or accessories (mugs, hats, stickers).\\n4. Avoid sensitive, political, or offensive topics.\\n5. Include subtle branding hints where possible (like \"r0\" for r0merch), without making it explicit in all keywords.\\n6. Return the result as a JSON array, like: [\"KEYWORD1\", \"KEYWORD2\", \"KEYWORD3\"]\\n\\nCategory: ' + $json.category + '\\n\\nExamples:\\n- Gorpcore → [\"TOPOGRAPHY\", \"ALTITUDE\", \"VERTEX\", \"RIDGELINE\", \"WAYPOINT\"]\\n- Brutalism → [\"CONCRETE\", \"RAW\", \"STRUCTURE\", \"VOID\", \"BLOCK\"]\\n- Eco-Activism → [\"RECLAIM\", \"TRACE\", \"RENEW\", \"ROOTED\", \"SUSTAIN\"]\\n- Digital Glitch → [\"ERROR\", \"NULL\", \"SIGNAL\", \"GLITCH\", \"404\"]\\n\\nBrand info: r0merch is modern, minimalist, playful, and urban. Keywords should match this personality.\\n\\nYour output must be ONLY a JSON array — nothing else.' }], max_tokens: 200, temperature: 0.7 }) }}"
+      },
+      "id": "groq-keywords",
+      "name": "Groq Keyword Generator",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [440, 300],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const category = $('Unpack Input').first().json.category;\nconst raw = $input.first().json?.choices?.[0]?.message?.content || '[]';\nconst clean = raw.replace(/```json|```/g, '').trim();\nconst match = clean.match(/\\[[\\s\\S]*\\]/);\nlet keywords = [];\ntry { keywords = JSON.parse(match?.[0] || '[]'); } catch(_) {}\nreturn [{ json: { category, keywords } }];"
+      },
+      "id": "parse-keywords",
+      "name": "Parse Keywords",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [660, 300]
+    }
+  ],
+  "connections": {
+    "Execute Workflow Trigger": { "main": [[{ "node": "Unpack Input",          "type": "main", "index": 0 }]] },
+    "Unpack Input":              { "main": [[{ "node": "Groq Keyword Generator","type": "main", "index": 0 }]] },
+    "Groq Keyword Generator":    { "main": [
+      [{ "node": "Parse Keywords", "type": "main", "index": 0 }],
+      [{ "node": "Parse Keywords", "type": "main", "index": 0 }]
+    ]},
+    "Groq Keyword Generator error": { "main": [[{ "node": "Parse Keywords", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" },
+  "tags": ["pod", "keywords", "r0merch"]
+}
