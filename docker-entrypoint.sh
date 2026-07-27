@@ -24,6 +24,21 @@ done
 
 rm -rf "$TMPDIR"
 
+# Activate all r0merch workflows in DB after import
+node -e "
+const sqlite3 = require('/usr/local/lib/node_modules/n8n/node_modules/.pnpm/sqlite3@5.1.7/node_modules/sqlite3/lib/sqlite3.js');
+const db = new sqlite3.Database('/home/node/.n8n/database.sqlite');
+db.run(\"UPDATE workflow_entity SET active = 1 WHERE name LIKE 'r0merch%'\", function(err) {
+  if (err) console.error('[r0merch] Activation error:', err.message);
+  else console.log('[r0merch] Activated ' + this.changes + ' workflows.');
+  // Also publish: set activeVersionId = versionId so workflows are published not draft
+  db.run(\"UPDATE workflow_entity SET activeVersionId = versionId WHERE name LIKE 'r0merch%' AND activeVersionId IS NULL\", function(err2) {
+    if (!err2) console.log('[r0merch] Published ' + this.changes + ' draft workflows.');
+    db.close();
+  });
+});
+" 2>/dev/null || echo "[r0merch] WARN: could not activate workflows via DB"
+
 # Remove any non-canonical files left by previous --separate exports
 for f in /workflows/*.json; do
   base=$(basename "$f")
