@@ -33,25 +33,21 @@
     },
     {
       "parameters": {
-        "url": "https://www.googleapis.com/customsearch/v1",
+        "url": "https://serpapi.com/search.json",
         "sendQuery": true,
         "queryParameters": {
           "parameters": [
             {
-              "name": "key",
-              "value": "={{ $env.GOOGLE_API_KEY }}"
-            },
-            {
-              "name": "cx",
-              "value": "={{ $env.GOOGLE_CSE_ID }}"
+              "name": "engine",
+              "value": "google"
             },
             {
               "name": "q",
-              "value": "={{ ($json.niche || 'fitness') + ' sticker trending design cute funny aesthetic' }}"
+              "value": "={{ ($('Unpack Input').first().json.niche || 'fitness') + ' sticker trending design cute funny' }}"
             },
             {
-              "name": "num",
-              "value": "10"
+              "name": "api_key",
+              "value": "={{ $env.SERPAPI_KEY }}"
             },
             {
               "name": "gl",
@@ -60,6 +56,10 @@
             {
               "name": "hl",
               "value": "en"
+            },
+            {
+              "name": "num",
+              "value": "20"
             }
           ]
         },
@@ -207,36 +207,6 @@
       }
     },
     {
-      "id": "check-cse-02i-sticker-trends-agent",
-      "name": "CSE Has Results?",
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2,
-      "position": [
-        700,
-        150
-      ],
-      "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict"
-          },
-          "conditions": [
-            {
-              "leftValue": "={{ (() => { const j = $json; const items = j.items || j.organic_results || j.shopping_results || j.interest_over_time?.timeline_data || []; return items.length > 0 && !j.error; })() }}",
-              "rightValue": true,
-              "operator": {
-                "type": "boolean",
-                "operation": "true"
-              }
-            }
-          ],
-          "combinator": "and"
-        }
-      }
-    },
-    {
       "id": "serp-fallback-02i-sticker-trends-agent",
       "name": "SerpAPI Fallback",
       "type": "n8n-nodes-base.httpRequest",
@@ -257,7 +227,7 @@
             },
             {
               "name": "q",
-              "value": "={{ ($('Unpack Input').first().json.niche || 'fitness') + ' sticker trending design cute funny aesthetic' }}"
+              "value": "={{ ($('Unpack Input').first().json.niche || 'fitness') + ' sticker trending design cute funny' }}"
             },
             {
               "name": "api_key",
@@ -280,19 +250,6 @@
         "options": {
           "timeout": 25000
         }
-      }
-    },
-    {
-      "id": "merge-cse-serp-02i-sticker-trends-agent",
-      "name": "Merge CSE/SerpAPI",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        1220,
-        150
-      ],
-      "parameters": {
-        "jsCode": "// Accept data from either CSE success path or SerpAPI fallback\nconst item = $input.first()?.json || {};\n\n// Normalize SerpAPI formats to CSE 'items' format\nconst normalized = { ...item };\nif (!normalized.items) {\n  if (normalized.organic_results?.length) {\n    normalized.items = normalized.organic_results.map(r => ({\n      title: r.title, link: r.link, snippet: r.snippet,\n      displayLink: r.source || new URL(r.link || 'https://x.com').hostname\n    }));\n  } else if (normalized.shopping_results?.length) {\n    normalized.items = normalized.shopping_results.map(r => ({\n      title: r.title, link: r.link, snippet: r.snippet || ''\n    }));\n  } else if (normalized.interest_over_time) {\n    // Google Trends \u2014 keep as-is\n    normalized.items = [];\n  } else {\n    normalized.items = [];\n  }\n}\nreturn [{ json: normalized }];"
       }
     }
   ],
@@ -381,7 +338,7 @@
       "main": [
         [
           {
-            "node": "CSE Has Results?",
+            "node": "Parse Sticker Signals",
             "type": "main",
             "index": 0
           }
@@ -417,7 +374,7 @@
       "main": [
         [
           {
-            "node": "Merge CSE/SerpAPI",
+            "node": "Parse Sticker Signals",
             "type": "main",
             "index": 0
           }
