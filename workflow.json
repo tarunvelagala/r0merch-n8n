@@ -4,15 +4,15 @@
     {
       "id": "read-niches-file",
       "name": "Read Niches File",
-      "type": "n8n-nodes-base.readWriteFile",
+      "type": "n8n-nodes-base.readBinaryFile",
       "typeVersion": 1,
       "position": [
         0,
         300
       ],
       "parameters": {
-        "operation": "read",
-        "filePath": "/niches.csv"
+        "fileSelector": "/niches.csv",
+        "options": {}
       }
     },
     {
