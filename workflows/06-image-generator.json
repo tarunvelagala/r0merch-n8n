@@ -20,7 +20,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const raw = $input.all()[0]?.json || {};\n// concept may arrive as JSON string or object\nlet concept = raw.concept || raw;\nif (typeof concept === 'string') {\n  try { concept = JSON.parse(concept); } catch(_) {}\n}\nconst niche = raw.niche || concept.niche || '';\nreturn [{ json: { niche, ...concept } }];"
+        "jsCode": "const raw = $input.all()[0]?.json || {};\n// niche comes as direct field OR inside concept object\nlet concept = raw.concept || raw;\nif (typeof concept === 'string') {\n  try { concept = JSON.parse(concept); } catch(_) {}\n}\nconst niche = raw.niche || concept.niche || '';\n// Ensure niche propagates into concept\nreturn [{ json: { niche, ...concept, niche } }];"
       },
       "id": "split-concepts",
       "name": "Unpack Concept",

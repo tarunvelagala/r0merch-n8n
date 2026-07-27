@@ -96,6 +96,10 @@
             {
               "name": "trendReport",
               "stringValue": "={{ JSON.stringify($json) }}"
+            },
+            {
+              "name": "niche",
+              "stringValue": "={{ $json.niche }}"
             }
           ]
         }
@@ -117,6 +121,10 @@
             {
               "name": "trendAnalysis",
               "stringValue": "={{ JSON.stringify($('Gemini Trend Analyst').first().json) }}"
+            },
+            {
+              "name": "niche",
+              "stringValue": "={{ $('Gemini Trend Analyst').first().json.niche || $json.niche }}"
             }
           ]
         }
@@ -163,6 +171,10 @@
             {
               "name": "designs",
               "stringValue": "={{ JSON.stringify($json) }}"
+            },
+            {
+              "name": "niche",
+              "stringValue": "={{ $json.niche }}"
             }
           ]
         }
