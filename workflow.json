@@ -1,5 +1,4 @@
 {
-  "id": "1790571d-754c-4445-be73-1c370705998b",
   "name": "r0merch \u2014 Main Orchestrator",
   "nodes": [
     {
@@ -12,7 +11,7 @@
       "typeVersion": 2,
       "position": [
         224,
-        304
+        128
       ]
     },
     {
@@ -32,13 +31,28 @@
       "typeVersion": 1.2,
       "position": [
         0,
-        304
+        128
       ]
     },
     {
       "parameters": {
         "workflowId": "f978e116-7fe9-465d-8bb2-c61587fae2b9",
-        "options": {}
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "niche",
+              "stringValue": "={{ $json.niche }}"
+            },
+            {
+              "name": "design_style",
+              "stringValue": "={{ $json.design_style }}"
+            },
+            {
+              "name": "marketing_pages",
+              "stringValue": "={{ $json.marketing_pages }}"
+            }
+          ]
+        }
       },
       "id": "exec-research",
       "name": "Research Agent",
@@ -46,13 +60,20 @@
       "typeVersion": 1,
       "position": [
         1344,
-        304
+        128
       ]
     },
     {
       "parameters": {
         "workflowId": "bfa7568e-33a0-4ab6-8494-667e213eea00",
-        "options": {}
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "researchData",
+              "stringValue": "={{ JSON.stringify($json) }}"
+            }
+          ]
+        }
       },
       "id": "exec-trend-agg",
       "name": "Trend Aggregator",
@@ -60,13 +81,24 @@
       "typeVersion": 1,
       "position": [
         1568,
-        304
+        128
       ]
     },
     {
       "parameters": {
         "workflowId": "56d91c94-825f-4b48-90eb-08625926ef3e",
-        "options": {}
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "trendReport",
+              "stringValue": "={{ JSON.stringify($json) }}"
+            },
+            {
+              "name": "niche",
+              "stringValue": "={{ $json.niche }}"
+            }
+          ]
+        }
       },
       "id": "exec-gemini-analyst",
       "name": "Gemini Trend Analyst",
@@ -74,13 +106,24 @@
       "typeVersion": 1,
       "position": [
         1792,
-        304
+        128
       ]
     },
     {
       "parameters": {
         "workflowId": "6673d7e3-9b47-450e-81c9-b470e83e7230",
-        "options": {}
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "trendAnalysis",
+              "stringValue": "={{ JSON.stringify($('Gemini Trend Analyst').first().json) }}"
+            },
+            {
+              "name": "niche",
+              "stringValue": "={{ $('Gemini Trend Analyst').first().json.niche || $json.niche }}"
+            }
+          ]
+        }
       },
       "id": "exec-prompt-gen",
       "name": "Generate Image Prompts",
@@ -88,13 +131,24 @@
       "typeVersion": 1,
       "position": [
         2240,
-        304
+        128
       ]
     },
     {
       "parameters": {
         "workflowId": "a7e13a5f-b228-40c9-b37a-c91545985814",
-        "options": {}
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "concept",
+              "stringValue": "={{ JSON.stringify($json.concept) }}"
+            },
+            {
+              "name": "niche",
+              "stringValue": "={{ $json.niche }}"
+            }
+          ]
+        }
       },
       "id": "exec-image-gen",
       "name": "Generate PNG Designs",
@@ -102,13 +156,24 @@
       "typeVersion": 1,
       "position": [
         2464,
-        304
+        128
       ]
     },
     {
       "parameters": {
         "workflowId": "70f2fdb2-215a-4dd5-968b-aceac3989e2f",
-        "options": {}
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "designs",
+              "stringValue": "={{ JSON.stringify($json) }}"
+            },
+            {
+              "name": "niche",
+              "stringValue": "={{ $json.niche }}"
+            }
+          ]
+        }
       },
       "id": "exec-seo-gen",
       "name": "Generate SEO Metadata",
@@ -116,13 +181,20 @@
       "typeVersion": 1,
       "position": [
         2688,
-        304
+        128
       ]
     },
     {
       "parameters": {
         "workflowId": "5be92a45-a579-44e8-bf9c-7443d99080c5",
-        "options": {}
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "records",
+              "stringValue": "={{ JSON.stringify($json) }}"
+            }
+          ]
+        }
       },
       "id": "exec-database",
       "name": "Save to Database",
@@ -130,7 +202,7 @@
       "typeVersion": 1,
       "position": [
         2912,
-        304
+        200
       ]
     },
     {
@@ -143,8 +215,8 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        3136,
-        304
+        672,
+        -64
       ],
       "disabled": true,
       "notes": "Optional \u2014 enable when ready to publish"
@@ -152,7 +224,14 @@
     {
       "parameters": {
         "workflowId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-        "options": {}
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "category",
+              "stringValue": "={{ $json.niche }}"
+            }
+          ]
+        }
       },
       "id": "exec-keyword-gen",
       "name": "Generate Keywords",
@@ -160,7 +239,7 @@
       "typeVersion": 1,
       "position": [
         2016,
-        304
+        128
       ]
     },
     {
@@ -204,8 +283,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        448,
-        304
+        672,
+        128
       ],
       "onError": "continueErrorOutput"
     },
@@ -228,7 +307,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({\n  model: 'llama-3.1-8b-instant',\n  messages: [{\n    role: 'user',\n    content: 'You are a POD design strategist. Based on these REAL bestselling t-shirt titles for the \"'\n           + $json.niche\n           + '\" niche:\\n\\n'\n           + ($json.serpResults?.shopping_results || []).slice(0,8).map(r => '- ' + r.title).join('\\n')\n           + '\\n\\nDescribe the dominant design style in ONE sentence (max 20 words).'\n           + ' Focus on: phrase patterns, tone, typography, graphics.'\n           + ' Return ONLY the style description, nothing else.'\n  }],\n  max_tokens: 60,\n  temperature: 0.3\n}) }}",
+        "jsonBody": "={{ JSON.stringify({\n  model: 'llama-3.1-8b-instant',\n  messages: [{\n    role: 'user',\n    content: 'You are a POD design strategist. Based on these REAL bestselling t-shirt titles for the \"'\n           + $json.niche\n           + '\" niche:\\n\\n'\n           + ($json.serpResults?.shopping_results || []).slice(0,8).map(r => '- ' + r.title).join('\\n')\n           + '\\n\\nDescribe the dominant design style in ONE sentence (max 20 words).'\n           + ' Return ONLY the style description, nothing else.'\n  }],\n  max_tokens: 60,\n  temperature: 0.3\n}) }}",
         "options": {}
       },
       "id": "analyze-style",
@@ -236,23 +315,37 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        1116,
-        304
+        1120,
+        128
       ],
       "onError": "continueErrorOutput"
     },
     {
       "parameters": {
+        "amount": 10
+      },
+      "id": "wait-analyze-style",
+      "name": "Cooldown Analyze",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        896,
+        128
+      ],
+      "webhookId": "53f60b60-33fa-4e87-9f63-ce683fa5f0d5"
+    },
+    {
+      "parameters": {
         "options": {}
       },
-      "type": "n8n-nodes-base.splitOut",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
       "position": [
-        608,
-        544
+        448,
+        128
       ],
-      "id": "f12efe98-d0a0-49b3-b7dc-793fab6c41a3",
-      "name": "Split Out"
+      "id": "bd8e3264-9199-4497-915b-1c68dbebba94",
+      "name": "Loop Over Items"
     },
     {
       "id": "store-niche",
@@ -260,11 +353,11 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        660,
-        300
+        784,
+        128
       ],
       "parameters": {
-        "jsCode": "// Process ALL items \u2014 one output per niche\nreturn $input.all().map(item => {\n  const niche = item.json?.niche || '';\n  const serpResults = item.json;\n  return { json: { niche, serpResults } };\n});"
+        "jsCode": "return $input.all().map(item => ({\n  json: { niche: item.json?.niche || '', serpResults: item.json }\n}));"
       }
     },
     {
@@ -273,28 +366,15 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1156,
-        304
+        1232,
+        128
       ],
       "parameters": {
-        "jsCode": "// Match each Groq response back to its niche using Store Niche Context\nconst storeItems = $('Store Niche Context').all();\nreturn $input.all().map((item, i) => {\n  const niche = storeItems[i]?.json?.niche || storeItems[0]?.json?.niche || '';\n  const raw = item.json?.choices?.[0]?.message?.content || '';\n  const design_style = raw.trim() || 'bold two-word phrases, minimalist graphic, clean urban typography';\n  return { json: { niche, design_style, marketing_pages: 'r/' + niche.replace(/[^a-zA-Z0-9]/g,'') } };\n});"
-      }
-    },
-    {
-      "id": "wait-analyze-style",
-      "name": "Cooldown Analyze",
-      "type": "n8n-nodes-base.wait",
-      "typeVersion": 1.1,
-      "position": [
-        896,
-        304
-      ],
-      "parameters": {
-        "amount": 10,
-        "unit": "seconds"
+        "jsCode": "const storeItems = $('Store Niche Context').all();\nreturn $input.all().map((item, i) => {\n  const niche = storeItems[i]?.json?.niche || storeItems[0]?.json?.niche || '';\n  const raw = item.json?.choices?.[0]?.message?.content || '';\n  const design_style = raw.trim() || 'bold two-word phrases, minimalist graphic, clean urban typography';\n  return { json: { niche, design_style, marketing_pages: 'r/' + niche.replace(/[^a-zA-Z0-9]/g,'') } };\n});"
       }
     }
   ],
+  "pinData": {},
   "connections": {
     "Schedule Trigger": {
       "main": [
@@ -311,7 +391,7 @@
       "main": [
         [
           {
-            "node": "Research Design Style",
+            "node": "Loop Over Items",
             "type": "main",
             "index": 0
           }
@@ -388,7 +468,7 @@
       "main": [
         [
           {
-            "node": "Publish to Etsy / Amazon",
+            "node": "Loop Over Items",
             "type": "main",
             "index": 0
           }
@@ -453,6 +533,35 @@
         ]
       ]
     },
+    "Cooldown Analyze": {
+      "main": [
+        [
+          {
+            "node": "Analyze Design Style",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Publish to Etsy / Amazon",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Research Design Style",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
     "Store Niche Context": {
       "main": [
         [
@@ -474,30 +583,17 @@
           }
         ]
       ]
-    },
-    "Cooldown Analyze": {
-      "main": [
-        [
-          {
-            "node": "Analyze Design Style",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
     }
   },
-  "updatedAt": "2099-01-01T00:00:00.000Z",
   "active": true,
   "settings": {
-    "executionOrder": "v1"
+    "executionOrder": "v1",
+    "binaryMode": "separate"
   },
-  "tags": [
-    "pod",
-    "orchestrator",
-    "r0merch"
-  ],
+  "versionId": "8ec355b3-77a4-4191-879b-49f44d6c7b4e",
   "meta": {
-    "instanceId": ""
-  }
+    "instanceId": "a85daf90edc465569c741f3fec78f624a74daab07286d5b528191d81eec738ab"
+  },
+  "id": "1790571d-754c-4445-be73-1c370705998b",
+  "tags": []
 }

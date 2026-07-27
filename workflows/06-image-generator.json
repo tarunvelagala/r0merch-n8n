@@ -2,7 +2,7 @@
   "updatedAt": "2099-01-01T00:00:00.000Z",
   "createdAt": "2026-07-25T15:18:43.428Z",
   "id": "a7e13a5f-b228-40c9-b37a-c91545985814",
-  "name": "r0merch \u2014 Image Generator",
+  "name": "r0merch — Image Generator",
   "description": null,
   "active": true,
   "isArchived": false,
@@ -46,7 +46,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Collect fires once per concept \u2014 pass individual items through\n// SEO Generator's Split Designs handles both single items and arrays\nconst item = $input.first().json;\nreturn [{ json: item }];"
+        "jsCode": "// Collect fires once per concept — pass individual items through\n// SEO Generator's Split Designs handles both single items and arrays\nconst item = $input.first().json;\nreturn [{ json: item }];"
       },
       "id": "collect-designs",
       "name": "Collect All Designs",
@@ -126,7 +126,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ { data: [$json.imagePrompt + \", isolated on pure white background, bold flat vector illustration, screen print style, 3-5 spot colors max, no gradients, no shadows, no textures, high contrast, print-ready t-shirt graphic, centered composition, professional POD design\", \"Quality \u00b7 48 steps\", \"Ideogram (remote)\", 1024, 1024, $json.id || 42, false] } }}"
+        "jsonBody": "={{ { data: [$json.imagePrompt + \", isolated on pure white background, bold flat vector illustration, screen print style, 3-5 spot colors max, no gradients, no shadows, no textures, high contrast, print-ready t-shirt graphic, centered composition, professional POD design\", \"Quality · 48 steps\", \"Ideogram (remote)\", 1024, 1024, $json.id || 42, false] } }}"
       },
       "id": "ideogram-submit",
       "name": "Ideogram Submit",
@@ -274,7 +274,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const ctx = $('Unpack Concept').first().json;\nconst ideogram = $('Parse Ideogram Result').first().json;\n\n// Check which path we came from\nconst fromPollinations = !!$input.first().binary?.data;\nlet imageUrl = '';\nlet provider = 'ideogram';\n\nif (fromPollinations) {\n  // Pollinations path \u2014 build URL\n  const podSuffix = ', isolated on pure white background, bold flat vector illustration, screen print style, 3-5 spot colors max, no gradients, no shadows, no textures, high contrast, print-ready t-shirt graphic, centered composition, professional POD design';\n  imageUrl = 'https://image.pollinations.ai/prompt/' + encodeURIComponent((ctx.imagePrompt || '') + podSuffix) + '?width=1024&height=1024&nologo=true&model=flux&enhance=true';\n  provider = 'pollinations-fallback';\n} else {\n  imageUrl = ideogram.ideogramImageUrl || '';\n  provider = 'ideogram';\n}\n\nreturn [{ json: { ...ctx, resolvedImageUrl: imageUrl, ideogramCaption: ideogram.ideogramCaption || '', provider }, binary: $input.first().binary || {} }];"
+        "jsCode": "const ctx = $('Unpack Concept').first().json;\nconst ideogram = $('Parse Ideogram Result').first().json;\n\n// Check which path we came from\nconst fromPollinations = !!$input.first().binary?.data;\nlet imageUrl = '';\nlet provider = 'ideogram';\n\nif (fromPollinations) {\n  // Pollinations path — build URL\n  const podSuffix = ', isolated on pure white background, bold flat vector illustration, screen print style, 3-5 spot colors max, no gradients, no shadows, no textures, high contrast, print-ready t-shirt graphic, centered composition, professional POD design';\n  imageUrl = 'https://image.pollinations.ai/prompt/' + encodeURIComponent((ctx.imagePrompt || '') + podSuffix) + '?width=1024&height=1024&nologo=true&model=flux&enhance=true';\n  provider = 'pollinations-fallback';\n} else {\n  imageUrl = ideogram.ideogramImageUrl || '';\n  provider = 'ideogram';\n}\n\nreturn [{ json: { ...ctx, resolvedImageUrl: imageUrl, ideogramCaption: ideogram.ideogramCaption || '', provider }, binary: $input.first().binary || {} }];"
       },
       "id": "normalise-image",
       "name": "Normalise Image",
@@ -435,9 +435,9 @@
   "staticData": null,
   "meta": null,
   "pinData": null,
-  "versionId": "d2ae3e45-416c-426c-8b76-a8c0a3ed1bce",
-  "activeVersionId": "d2ae3e45-416c-426c-8b76-a8c0a3ed1bce",
-  "versionCounter": 63,
+  "versionId": "5526920d-a871-4cbe-b40a-1294209a50b7",
+  "activeVersionId": "5526920d-a871-4cbe-b40a-1294209a50b7",
+  "versionCounter": 66,
   "triggerCount": 0,
   "tags": [],
   "shared": [
