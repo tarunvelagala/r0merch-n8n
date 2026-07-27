@@ -50,7 +50,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const raw = $input.first().json?.choices?.[0]?.message?.content || '{}';\nconst match = raw.match(/\\{[\\s\\S]*\\}/);\nlet analysis = {};\ntry { analysis = JSON.parse(match?.[0] || '{}'); } catch (_) {}\n\nconst niche = (() => {\n  try { return JSON.parse($('Execute Workflow Trigger').first().json.trendReport || '{}').niche; } catch(_) { return ''; }\n})();\n\nreturn [{ json: { niche, ...analysis } }];"
+        "jsCode": "const raw = $input.first().json?.choices?.[0]?.message?.content || '{}';\nconst clean = raw.replace(/```json|```/g, '').trim();\nconst match = clean.match(/\\{[\\s\\S]*\\}/);\nlet a = {};\ntry { a = JSON.parse(match?.[0] || '{}'); } catch(_) {}\n\nconst input = $('Execute Workflow Trigger').first().json;\nlet niche = '';\ntry {\n  const report = input.trendReport ? JSON.parse(input.trendReport) : input;\n  niche = report.niche || '';\n} catch(_) { niche = input.niche || ''; }\n\nreturn [{ json: { niche, ...a } }];"
       },
       "id": "parse-analysis",
       "name": "Parse Trend Analysis",

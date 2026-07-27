@@ -1,7 +1,11 @@
 {
-  "name": "r0merch — Sticker Trends Agent",
+  "updatedAt": "2026-07-27T12:04:02.912Z",
+  "createdAt": "2026-07-27T12:04:02.912Z",
   "id": "b2c3d4e5-f6a7-8901-bcde-f23456789012",
+  "name": "r0merch — Sticker Trends Agent",
+  "description": null,
   "active": true,
+  "isArchived": false,
   "nodes": [
     {
       "parameters": {},
@@ -9,7 +13,10 @@
       "name": "Execute Workflow Trigger",
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1,
-      "position": [0, 300]
+      "position": [
+        0,
+        300
+      ]
     },
     {
       "parameters": {
@@ -19,7 +26,10 @@
       "name": "Unpack Input",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [220, 300]
+      "position": [
+        220,
+        300
+      ]
     },
     {
       "parameters": {
@@ -27,21 +37,44 @@
         "sendQuery": true,
         "queryParameters": {
           "parameters": [
-            { "name": "engine",  "value": "google_shopping" },
-            { "name": "q",       "value": "={{ $json.niche + ' sticker trending design' }}" },
-            { "name": "api_key", "value": "={{ $env.SERPAPI_KEY }}" },
-            { "name": "gl",      "value": "us" },
-            { "name": "hl",      "value": "en" },
-            { "name": "num",     "value": "20" }
+            {
+              "name": "engine",
+              "value": "google_shopping"
+            },
+            {
+              "name": "q",
+              "value": "={{ $json.niche + ' sticker trending design' }}"
+            },
+            {
+              "name": "api_key",
+              "value": "={{ $env.SERPAPI_KEY }}"
+            },
+            {
+              "name": "gl",
+              "value": "us"
+            },
+            {
+              "name": "hl",
+              "value": "en"
+            },
+            {
+              "name": "num",
+              "value": "20"
+            }
           ]
         },
-        "options": { "timeout": 25000 }
+        "options": {
+          "timeout": 25000
+        }
       },
       "id": "shopping-stickers",
       "name": "Google Shopping Stickers",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [440, 150],
+      "position": [
+        440,
+        150
+      ],
       "onError": "continueErrorOutput"
     },
     {
@@ -50,21 +83,44 @@
         "sendQuery": true,
         "queryParameters": {
           "parameters": [
-            { "name": "engine",  "value": "google" },
-            { "name": "q",       "value": "={{ 'site:redbubble.com/shop sticker ' + $json.niche + ' trending' }}" },
-            { "name": "api_key", "value": "={{ $env.SERPAPI_KEY }}" },
-            { "name": "num",     "value": "15" },
-            { "name": "gl",      "value": "us" },
-            { "name": "hl",      "value": "en" }
+            {
+              "name": "engine",
+              "value": "google"
+            },
+            {
+              "name": "q",
+              "value": "={{ 'site:redbubble.com/shop sticker ' + $json.niche + ' trending' }}"
+            },
+            {
+              "name": "api_key",
+              "value": "={{ $env.SERPAPI_KEY }}"
+            },
+            {
+              "name": "num",
+              "value": "15"
+            },
+            {
+              "name": "gl",
+              "value": "us"
+            },
+            {
+              "name": "hl",
+              "value": "en"
+            }
           ]
         },
-        "options": { "timeout": 25000 }
+        "options": {
+          "timeout": 25000
+        }
       },
       "id": "redbubble-stickers",
       "name": "Redbubble Stickers",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [440, 450],
+      "position": [
+        440,
+        450
+      ],
       "onError": "continueErrorOutput"
     },
     {
@@ -75,7 +131,10 @@
       "name": "Parse Sticker Signals",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [700, 300]
+      "position": [
+        700,
+        300
+      ]
     },
     {
       "parameters": {
@@ -84,8 +143,14 @@
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "Authorization", "value": "={{ 'Bearer ' + $env.GROQ_API_KEY }}" },
-            { "name": "Content-Type",  "value": "application/json" }
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + $env.GROQ_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
           ]
         },
         "sendBody": true,
@@ -96,7 +161,10 @@
       "name": "Groq Sticker Concepts",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [940, 300],
+      "position": [
+        940,
+        300
+      ],
       "onError": "continueErrorOutput"
     },
     {
@@ -107,29 +175,138 @@
       "name": "Merge Sticker Output",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1180, 300]
+      "position": [
+        1180,
+        300
+      ]
     }
   ],
   "connections": {
-    "Execute Workflow Trigger":  { "main": [[{ "node": "Unpack Input",            "type": "main", "index": 0 }]] },
-    "Unpack Input": { "main": [[
-      { "node": "Google Shopping Stickers", "type": "main", "index": 0 },
-      { "node": "Redbubble Stickers",       "type": "main", "index": 0 }
-    ]]},
-    "Google Shopping Stickers": { "main": [
-      [{ "node": "Parse Sticker Signals", "type": "main", "index": 0 }],
-      [{ "node": "Parse Sticker Signals", "type": "main", "index": 0 }]
-    ]},
-    "Redbubble Stickers": { "main": [
-      [{ "node": "Parse Sticker Signals", "type": "main", "index": 1 }],
-      [{ "node": "Parse Sticker Signals", "type": "main", "index": 0 }]
-    ]},
-    "Parse Sticker Signals":    { "main": [[{ "node": "Groq Sticker Concepts",   "type": "main", "index": 0 }]] },
-    "Groq Sticker Concepts":    { "main": [
-      [{ "node": "Merge Sticker Output",  "type": "main", "index": 0 }],
-      [{ "node": "Merge Sticker Output",  "type": "main", "index": 0 }]
-    ]}
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Unpack Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Unpack Input": {
+      "main": [
+        [
+          {
+            "node": "Google Shopping Stickers",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Redbubble Stickers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Shopping Stickers": {
+      "main": [
+        [
+          {
+            "node": "Parse Sticker Signals",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Parse Sticker Signals",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redbubble Stickers": {
+      "main": [
+        [
+          {
+            "node": "Parse Sticker Signals",
+            "type": "main",
+            "index": 1
+          }
+        ],
+        [
+          {
+            "node": "Parse Sticker Signals",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Sticker Signals": {
+      "main": [
+        [
+          {
+            "node": "Groq Sticker Concepts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Sticker Concepts": {
+      "main": [
+        [
+          {
+            "node": "Merge Sticker Output",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Merge Sticker Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
   },
-  "settings": { "executionOrder": "v1" },
-  "tags": ["pod", "research", "stickers", "r0merch"]
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": null,
+  "versionId": "2a944941-1735-47b8-8021-6d84867c7685",
+  "activeVersionId": "2a944941-1735-47b8-8021-6d84867c7685",
+  "versionCounter": 4,
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-07-27T12:04:02.913Z",
+      "createdAt": "2026-07-27T12:04:02.913Z",
+      "role": "workflow:owner",
+      "workflowId": "b2c3d4e5-f6a7-8901-bcde-f23456789012",
+      "projectId": "A5qWeG5doYXJG0tr",
+      "project": {
+        "updatedAt": "2026-03-29T08:57:26.442Z",
+        "createdAt": "2026-03-29T08:55:38.920Z",
+        "id": "A5qWeG5doYXJG0tr",
+        "name": "Tarun Velagala <tarunvelagala80@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "7a3b5da8-30cb-4aea-98f3-9838086695e3"
+      }
+    }
+  ],
+  "versionMetadata": {
+    "name": null,
+    "description": null
+  }
 }
