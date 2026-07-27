@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-07-27T03:35:44.000Z",
+  "updatedAt": "2099-01-01T00:00:00.000Z",
   "createdAt": "2026-07-25T15:18:43.428Z",
   "id": "a7e13a5f-b228-40c9-b37a-c91545985814",
   "name": "r0merch \u2014 Image Generator",
@@ -33,50 +33,155 @@
     },
     {
       "parameters": {
+        "jsCode": "// $('Normalise Image') has the resolved image URL and provider\nconst norm = $('Normalise Image').first().json;\n// $('Split Into Concepts') in this execution context IS the current concept\nconst item = $('Split Into Concepts').first().json;\nconst hasBg = !!($input.first().binary?.data);\n\nconst niche    = item.niche    || 'unknown';\nconst id       = item.id       || Date.now();\nconst ts       = new Date().toISOString().replace(/[:.]/g, '-');\nconst fileName = `design_${niche}_${id}_${ts}.png`;\n\nreturn [{\n  json: {\n    niche,\n    conceptId:       id,\n    title:           item.title          || '',\n    phrase:          item.phrase         || '',\n    tone:            item.tone           || '',\n    source:          item.source         || '',\n    targetAudience:  item.targetAudience || '',\n    sellingAngle:    item.sellingAngle   || '',\n    imagePrompt:     item.imagePrompt    || '',\n    imageUrl:        norm.resolvedImageUrl || '',\n    provider:        norm.provider        || 'unknown',\n    fileName,\n    generatedAt:     new Date().toISOString(),\n    pod: {\n      printWidth:     '12 inches',\n      printHeight:    '14 inches',\n      dpi:            300,\n      colorMode:      'RGB',\n      printPlacement: 'front-center chest',\n      garmentTypes:   ['t-shirt', 'hoodie', 'sweatshirt'],\n      podPlatforms:   ['Printful', 'Printify', 'Gelato']\n    }\n  },\n  binary: hasBg ? { transparentPng: $input.first().binary.data } : {}\n}];"
+      },
+      "id": "prepare-record",
+      "name": "Prepare PNG Record",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2420,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Collect fires once per concept \u2014 pass individual items through\n// SEO Generator's Split Designs handles both single items and arrays\nconst item = $input.first().json;\nreturn [{ json: item }];"
+      },
+      "id": "collect-designs",
+      "name": "Collect All Designs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2640,
+        300
+      ]
+    },
+    {
+      "parameters": {
         "method": "POST",
-        "url": "https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict",
-        "sendQuery": true,
-        "queryParameters": {
+        "url": "https://api.remove.bg/v1.0/removebg",
+        "sendHeaders": true,
+        "headerParameters": {
           "parameters": [
             {
-              "name": "key",
-              "value": "={{ $env.GEMINI_API_KEY }}"
+              "name": "X-Api-Key",
+              "value": "={{ $env.REMOVE_BG_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "image_url",
+              "value": "={{ $json.resolvedImageUrl }}"
+            },
+            {
+              "name": "size",
+              "value": "auto"
+            },
+            {
+              "name": "format",
+              "value": "png"
+            },
+            {
+              "name": "type",
+              "value": "product"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "id": "remove-bg",
+      "name": "Remove Background",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2200,
+        300
+      ],
+      "disabled": false,
+      "notes": "Enable when REMOVE_BG_API_KEY is set in .env (50 free calls/month at remove.bg)"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://ideogram-ai-ideogram4.hf.space/gradio_api/call/generate",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
             }
           ]
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({\n  instances: [{\n    prompt: $json.imagePrompt + '. T-shirt graphic design, transparent background, clean bold vector art, print-ready, high contrast, no photorealism, flat illustration.'\n  }],\n  parameters: {\n    sampleCount: 1,\n    aspectRatio: \"1:1\",\n    safetyFilterLevel: \"block_few\",\n    personGeneration: \"allow_adult\"\n  }\n}) }}",
-        "options": {
-          "timeout": 60000,
-          "response": {
-            "response": {
-              "responseFormat": "json"
-            }
-          }
-        }
+        "jsonBody": "={{ { data: [$json.imagePrompt + \", isolated on pure white background, bold flat vector illustration, screen print style, 3-5 spot colors max, no gradients, no shadows, no textures, high contrast, print-ready t-shirt graphic, centered composition, professional POD design\", \"Quality \u00b7 48 steps\", \"Ideogram (remote)\", 1024, 1024, $json.id || 42, false] } }}"
       },
-      "id": "gemini-imagen",
-      "name": "Gemini Imagen 3",
+      "id": "ideogram-submit",
+      "name": "Ideogram Submit",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
         440,
-        150
-      ],
-      "onError": "continueErrorOutput"
+        300
+      ]
     },
     {
       "parameters": {
-        "jsCode": "const geminiResult = $input.first();\nconst ctx = $('Split Into Concepts').first().json;\n// Gemini Imagen returns base64 in predictions[0].bytesBase64Encoded\nconst b64 = geminiResult.json?.predictions?.[0]?.bytesBase64Encoded;\nif (b64) {\n  return [{ json: { ...ctx, imageBase64: b64, imageUrl: '', provider: 'gemini', success: true } }];\n}\n// Failed \u2014 pass to Ideogram fallback\nreturn [{ json: { ...ctx, imageBase64: '', imageUrl: '', provider: '', success: false } }];"
+        "amount": 30,
+        "unit": "seconds"
       },
-      "id": "check-gemini",
-      "name": "Check Gemini Result",
+      "id": "wait-ideogram",
+      "name": "Wait for Ideogram",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        660,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ \"https://ideogram-ai-ideogram4.hf.space/gradio_api/call/generate/\" + $json.event_id }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "text"
+            }
+          }
+        }
+      },
+      "id": "ideogram-poll",
+      "name": "Ideogram Poll",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        880,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json?.data ?? $input.first().json ?? '';\nconst text = typeof raw === 'string' ? raw : JSON.stringify(raw);\nconst ctx = $('Split Into Concepts').first().json;\n\n// Detect quota/error\nconst isError = text.includes('event: error') || text.includes('quota exceeded') || text.includes('\"error\"');\nif (isError) {\n  return [{ json: { ...ctx, ideogramImageUrl: '', ideogramCaption: '', usesFallback: true } }];\n}\n\n// Parse success\nconst match = text.match(/data: (\\[.*\\])/s);\nlet imageUrl = '', caption = '';\ntry {\n  const parsed = JSON.parse(match?.[1] || '[]');\n  imageUrl = parsed?.[0]?.url || '';\n  caption  = JSON.stringify(parsed?.[2] || {});\n} catch(_) {}\n\nreturn [{ json: { ...ctx, ideogramImageUrl: imageUrl, ideogramCaption: caption, usesFallback: !imageUrl } }];"
+      },
+      "id": "parse-ideogram",
+      "name": "Parse Ideogram Result",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        660,
-        150
+        1100,
+        300
       ]
     },
     {
@@ -84,12 +189,11 @@
         "conditions": {
           "options": {
             "caseSensitive": true,
-            "leftValue": "",
             "typeValidation": "strict"
           },
           "conditions": [
             {
-              "leftValue": "={{ $json.success }}",
+              "leftValue": "={{ $json.usesFallback }}",
               "rightValue": true,
               "operator": {
                 "type": "boolean",
@@ -100,59 +204,10 @@
           "combinator": "and"
         }
       },
-      "id": "route-success",
-      "name": "Gemini Success?",
+      "id": "route-fallback",
+      "name": "Ideogram Failed?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
-      "position": [
-        880,
-        150
-      ]
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "https://multimodalart-ideogram4.hf.space/gradio_api/call/infer",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Content-Type",
-              "value": "application/json"
-            },
-            {
-              "name": "Authorization",
-              "value": "={{ $env.HF_TOKEN ? \"Bearer \" + $env.HF_TOKEN : \"\" }}"
-            }
-          ]
-        },
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({\n  data: [\n    $json.imagePrompt + '. T-shirt graphic, transparent background, bold flat vector illustration, print-ready, high contrast.',\n    \"None\",\n    1024,\n    1024,\n    3\n  ]\n}) }}",
-        "options": {
-          "timeout": 30000
-        }
-      },
-      "id": "ideogram-submit",
-      "name": "Ideogram Submit Job",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        1100,
-        300
-      ]
-    },
-    {
-      "parameters": {
-        "url": "={{ \"https://multimodalart-ideogram4.hf.space/gradio_api/call/infer/\" + $json.event_id }}",
-        "options": {
-          "timeout": 120000
-        }
-      },
-      "id": "ideogram-poll",
-      "name": "Ideogram Poll Result",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
       "position": [
         1320,
         300
@@ -160,41 +215,74 @@
     },
     {
       "parameters": {
-        "jsCode": "const ctx = $('Split Into Concepts').first().json;\nconst raw = $input.first().json;\n// Gradio returns {data: [[{url: '...'}]]} or similar\nconst imgUrl = raw?.data?.[0]?.[0]?.url || raw?.data?.[0]?.url || raw?.data?.[0] || '';\nreturn [{ json: { ...ctx, imageBase64: '', imageUrl: imgUrl, provider: 'ideogram', success: !!imgUrl } }];"
+        "method": "GET",
+        "url": "={{ \"https://image.pollinations.ai/prompt/\" + encodeURIComponent($json.imagePrompt + \", isolated on pure white background, bold flat vector illustration, screen print style, 3-5 spot colors max, no gradients, no shadows, no textures, high contrast, print-ready t-shirt graphic, centered composition, professional POD design\") }}",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "width",
+              "value": "1024"
+            },
+            {
+              "name": "height",
+              "value": "1024"
+            },
+            {
+              "name": "nologo",
+              "value": "true"
+            },
+            {
+              "name": "model",
+              "value": "flux"
+            },
+            {
+              "name": "enhance",
+              "value": "true"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
       },
-      "id": "parse-ideogram",
-      "name": "Parse Ideogram Result",
+      "id": "pollinations-fallback",
+      "name": "Pollinations Fallback",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1540,
+        150
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pass through whichever input arrived (Pollinations binary or Ideogram JSON)\nreturn $input.all().map(i => ({ json: i.json, binary: i.binary || {} }));"
+      },
+      "id": "merge-image",
+      "name": "Merge Image Result",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1540,
+        1760,
         300
       ]
     },
     {
       "parameters": {
-        "jsCode": "const item = $input.first().json;\nconst niche    = item.niche    || 'unknown';\nconst id       = item.id       || Date.now();\nconst ts       = new Date().toISOString().replace(/[:.]/g, '-');\nconst fileName = `design_${niche}_${id}_${ts}.png`;\n\nreturn [{\n  json: {\n    niche,\n    conceptId:      id,\n    title:          item.title          || '',\n    phrase:         item.phrase         || '',\n    tone:           item.tone           || '',\n    source:         item.source         || '',\n    targetAudience: item.targetAudience || '',\n    sellingAngle:   item.sellingAngle   || '',\n    imagePrompt:    item.imagePrompt    || '',\n    imageUrl:       item.imageUrl       || '',\n    imageBase64:    item.imageBase64    || '',\n    provider:       item.provider       || '',\n    fileName,\n    generatedAt:    new Date().toISOString()\n  }\n}];"
+        "jsCode": "const ctx = $('Split Into Concepts').first().json;\nconst ideogram = $('Parse Ideogram Result').first().json;\n\n// Check which path we came from\nconst fromPollinations = !!$input.first().binary?.data;\nlet imageUrl = '';\nlet provider = 'ideogram';\n\nif (fromPollinations) {\n  // Pollinations path \u2014 build URL\n  const podSuffix = ', isolated on pure white background, bold flat vector illustration, screen print style, 3-5 spot colors max, no gradients, no shadows, no textures, high contrast, print-ready t-shirt graphic, centered composition, professional POD design';\n  imageUrl = 'https://image.pollinations.ai/prompt/' + encodeURIComponent((ctx.imagePrompt || '') + podSuffix) + '?width=1024&height=1024&nologo=true&model=flux&enhance=true';\n  provider = 'pollinations-fallback';\n} else {\n  imageUrl = ideogram.ideogramImageUrl || '';\n  provider = 'ideogram';\n}\n\nreturn [{ json: { ...ctx, resolvedImageUrl: imageUrl, ideogramCaption: ideogram.ideogramCaption || '', provider }, binary: $input.first().binary || {} }];"
       },
-      "id": "prepare-record",
-      "name": "Prepare PNG Record",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        1760,
-        250
-      ]
-    },
-    {
-      "parameters": {
-        "jsCode": "const items = $input.all();\nreturn [{ json: { designs: items.map(i => i.json) } }];"
-      },
-      "id": "collect-designs",
-      "name": "Collect All Designs",
+      "id": "normalise-image",
+      "name": "Normalise Image",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
         1980,
-        250
+        300
       ]
     }
   ],
@@ -214,72 +302,36 @@
       "main": [
         [
           {
-            "node": "Gemini Imagen 3",
+            "node": "Ideogram Submit",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Gemini Imagen 3": {
+    "Ideogram Submit": {
       "main": [
         [
           {
-            "node": "Check Gemini Result",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Ideogram Submit Job",
+            "node": "Wait for Ideogram",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Check Gemini Result": {
+    "Wait for Ideogram": {
       "main": [
         [
           {
-            "node": "Gemini Success?",
+            "node": "Ideogram Poll",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Gemini Success?": {
-      "main": [
-        [
-          {
-            "node": "Prepare PNG Record",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Ideogram Submit Job",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Ideogram Submit Job": {
-      "main": [
-        [
-          {
-            "node": "Ideogram Poll Result",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Ideogram Poll Result": {
+    "Ideogram Poll": {
       "main": [
         [
           {
@@ -291,6 +343,68 @@
       ]
     },
     "Parse Ideogram Result": {
+      "main": [
+        [
+          {
+            "node": "Ideogram Failed?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ideogram Failed?": {
+      "main": [
+        [
+          {
+            "node": "Pollinations Fallback",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Merge Image Result",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Pollinations Fallback": {
+      "main": [
+        [
+          {
+            "node": "Merge Image Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Image Result": {
+      "main": [
+        [
+          {
+            "node": "Normalise Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalise Image": {
+      "main": [
+        [
+          {
+            "node": "Remove Background",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Background": {
       "main": [
         [
           {
@@ -314,14 +428,16 @@
     }
   },
   "settings": {
-    "executionOrder": "v1"
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
   },
   "staticData": null,
   "meta": null,
   "pinData": null,
-  "versionId": "8eb574f2-5e17-444f-a6a0-24f32534a55f",
-  "activeVersionId": null,
-  "versionCounter": 26,
+  "versionId": "d2ae3e45-416c-426c-8b76-a8c0a3ed1bce",
+  "activeVersionId": "d2ae3e45-416c-426c-8b76-a8c0a3ed1bce",
+  "versionCounter": 63,
   "triggerCount": 0,
   "tags": [],
   "shared": [
