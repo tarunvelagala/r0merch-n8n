@@ -63,7 +63,7 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        1160,
+        1400,
         300
       ]
     },
@@ -305,7 +305,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        680,
+        900,
         300
       ],
       "onError": "continueErrorOutput",
@@ -327,7 +327,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({\n  model: 'llama-3.1-8b-instant',\n  messages: [{\n    role: 'user',\n    content: 'You are a POD design strategist. Based on these REAL bestselling t-shirt titles for the \"'\n           + $('Read Niches').first().json.niche\n           + '\" niche:\\n\\n'\n           + ($json?.shopping_results || []).slice(0,8).map(r => '- ' + r.title).join('\\n')\n           + '\\n\\nDescribe the dominant design style in ONE sentence (max 20 words).'\n           + ' Focus on: phrase patterns, tone, typography, graphics.'\n           + ' Return ONLY the style description, nothing else.'\n  }],\n  max_tokens: 60,\n  temperature: 0.3\n}) }}"
+        "jsonBody": "={{ JSON.stringify({\n  model: 'llama-3.1-8b-instant',\n  messages: [{\n    role: 'user',\n    content: 'You are a POD design strategist. Based on these REAL bestselling t-shirt titles for the \"'\n           + $json.niche\n           + '\" niche:\\n\\n'\n           + ($json.serpResults?.shopping_results || []).slice(0,8).map(r => '- ' + r.title).join('\\n')\n           + '\\n\\nDescribe the dominant design style in ONE sentence (max 20 words).'\n           + ' Focus on: phrase patterns, tone, typography, graphics.'\n           + ' Return ONLY the style description, nothing else.'\n  }],\n  max_tokens: 60,\n  temperature: 0.3\n}) }}"
       }
     },
     {
@@ -336,11 +336,24 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        920,
+        1160,
         300
       ],
       "parameters": {
-        "jsCode": "const niche = $('Read Niches').first().json.niche;\nconst raw = $input.first().json?.choices?.[0]?.message?.content || '';\nconst design_style = raw.trim() || 'bold two-word phrases, minimalist graphic, clean urban typography';\nreturn [{ json: {\n  niche,\n  design_style,\n  marketing_pages: 'r/' + niche.replace(/[^a-zA-Z0-9]/g, '')\n} }];"
+        "jsCode": "// Niche comes from Store Niche Context which preserved it from Read Niches\nconst niche = $('Store Niche Context').first().json.niche || '';\nconst raw = $input.first().json?.choices?.[0]?.message?.content || '';\nconst design_style = raw.trim() || 'bold two-word phrases, minimalist graphic, clean urban typography';\nreturn [{ json: {\n  niche,\n  design_style,\n  marketing_pages: 'r/' + niche.replace(/[^a-zA-Z0-9]/g, '')\n} }];"
+      }
+    },
+    {
+      "id": "store-niche",
+      "name": "Store Niche Context",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        300
+      ],
+      "parameters": {
+        "jsCode": "// Store niche from Read Niches in $json so it flows through to Parse Niche Style\nconst niche = $('Read Niches').item?.json?.niche || $input.first().json?.niche || '';\nconst serpResults = $input.first().json;\nreturn [{ json: { niche, serpResults } }];"
       }
     }
   ],
@@ -459,14 +472,14 @@
       "main": [
         [
           {
-            "node": "Analyze Design Style",
+            "node": "Store Niche Context",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "Parse Niche Style",
+            "node": "Store Niche Context",
             "type": "main",
             "index": 0
           }
@@ -507,6 +520,17 @@
         [
           {
             "node": "Read Niches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store Niche Context": {
+      "main": [
+        [
+          {
+            "node": "Analyze Design Style",
             "type": "main",
             "index": 0
           }
