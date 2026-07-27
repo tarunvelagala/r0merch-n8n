@@ -20,37 +20,33 @@
     },
     {
       "parameters": {
-        "url": "https://www.googleapis.com/customsearch/v1",
+        "url": "https://serpapi.com/search.json",
         "sendQuery": true,
         "queryParameters": {
           "parameters": [
             {
-              "name": "key",
-              "value": "={{ $env.GOOGLE_API_KEY }}"
-            },
-            {
-              "name": "cx",
-              "value": "={{ $env.GOOGLE_CSE_ID }}"
+              "name": "engine",
+              "value": "google_trends"
             },
             {
               "name": "q",
-              "value": "={{ $json.niche + ' t-shirt trending 2025 2026' }}"
+              "value": "={{ $('Execute Workflow Trigger').first().json.niche + ' t-shirt' }}"
             },
             {
-              "name": "num",
-              "value": "10"
+              "name": "api_key",
+              "value": "={{ $env.SERPAPI_KEY }}"
             },
             {
-              "name": "gl",
-              "value": "us"
+              "name": "data_type",
+              "value": "TIMESERIES"
             },
             {
-              "name": "hl",
-              "value": "en"
+              "name": "date",
+              "value": "today 12-m"
             },
             {
-              "name": "sort",
-              "value": "date"
+              "name": "geo",
+              "value": "US"
             }
           ]
         },
@@ -117,7 +113,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche;\nconst tr = (() => { try { return $('SerpAPI Timeseries').first()?.json || {}; } catch(_) { return {}; } })();\nconst rr = (() => { try { return $('SerpAPI Related Queries').first()?.json || {}; } catch(_) { return {}; } })();\n\n// CSE doesn't have timeseries \u2014 extract trend signals from search results\nconst items = (tr?.items || []);\nconst relatedItems = (rr?.items || []);\n\n// Extract trending queries from titles and snippets\nconst allText = [...items, ...relatedItems].map(r => r.title + ' ' + (r.snippet || '')).join(' ');\nconst risingQueries = items.slice(0, 5).map(r => r.title).filter(Boolean);\nconst topQueries = [...items, ...relatedItems].slice(0, 8).map(r =>\n  (r.title || '').replace(/t-shirt|tshirt|shirt/gi, '').trim()\n).filter(Boolean);\n\n// Detect trend direction from recency of results\nconst trendDirection = items.length > 5 ? 'rising' : 'stable';\n\nreturn [{ json: { source: 'google_trends', niche, data: {\n  timeline: [],\n  trendDirection,\n  peakMonths: [],\n  lowMonths: [],\n  risingQueries,\n  topQueries\n} } }];"
+        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche;\nconst tr = (() => { try { return $('SerpAPI Timeseries').first()?.json || {}; } catch(_) { return {}; } })();\nconst rr = (() => { try { return $('SerpAPI Related Queries').first()?.json || {}; } catch(_) { return {}; } })();\nconst timeline = (tr?.interest_over_time?.timeline_data||tr?.items||[]).map(t=>({date:t.date||'',value:t.values?.[0]?.extracted_value??0}));\nconst avg = arr => arr.length?arr.reduce((s,v)=>s+v,0)/arr.length:0;\nconst r4=avg(timeline.slice(-4).map(t=>t.value)),p4=avg(timeline.slice(-8,-4).map(t=>t.value));\nconst trendDirection=r4>p4*1.1?'rising':r4<p4*0.9?'falling':'stable';\nconst rising=(rr?.related_queries?.rising||[]).map(r=>r.query);\nconst top=(rr?.related_queries?.top||[]).map(r=>r.query);\nreturn [{json:{source:'google_trends',niche,data:{timeline,trendDirection,peakMonths:[],lowMonths:[],risingQueries:rising.length?rising:top.slice(0,5),topQueries:top}}}];"
       },
       "id": "parse-trends",
       "name": "Parse Trends",
