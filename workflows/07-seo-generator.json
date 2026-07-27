@@ -20,7 +20,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Single design per execution \u2014 just pass it through\nconst raw = $input.first().json;\nconst design = raw.concept || raw;\nconst niche = raw.niche || design.niche || '';\nreturn [{ json: { niche, ...design } }];"
+        "jsCode": "const raw = $input.all()[0]?.json || {};\n// designs may arrive as JSON string or object\nlet design = raw.designs || raw.concept || raw;\nif (typeof design === 'string') {\n  try { design = JSON.parse(design); } catch(_) {}\n}\n// If design is an array, take first item\nif (Array.isArray(design)) design = design[0] || {};\nconst niche = raw.niche || design.niche || '';\nreturn [{ json: { niche, ...design } }];"
       },
       "id": "split-designs",
       "name": "Unpack Design",
