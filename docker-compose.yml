@@ -10,7 +10,7 @@ services:
       - /Users/C5404787/n8n/files:/home/node/.n8n-files
       - ./workflows:/workflows
       - ./workflow.json:/workflow.json:ro
-      - ./niches.csv:/niches.csv:ro
+      # niches.csv is kept in sync manually: cp niches.csv /Users/C5404787/n8n/files/niches.csv
       - ./docker-entrypoint.sh:/r0merch-entrypoint.sh:ro
     entrypoint: ["/bin/sh", "/r0merch-entrypoint.sh"]
     env_file:

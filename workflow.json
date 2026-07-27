@@ -11,7 +11,7 @@
         300
       ],
       "parameters": {
-        "fileSelector": "/niches.csv",
+        "fileSelector": "/home/node/.n8n-files/niches.csv",
         "options": {}
       }
     },
