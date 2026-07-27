@@ -66,21 +66,25 @@
     },
     {
       "parameters": {
-        "url": "https://serpapi.com/search.json",
+        "url": "https://www.googleapis.com/customsearch/v1",
         "sendQuery": true,
         "queryParameters": {
           "parameters": [
             {
-              "name": "engine",
-              "value": "google"
+              "name": "key",
+              "value": "={{ $env.GOOGLE_API_KEY }}"
+            },
+            {
+              "name": "cx",
+              "value": "={{ $env.GOOGLE_CSE_ID }}"
             },
             {
               "name": "q",
               "value": "={{ 'site:etsy.com ' + $json.niche + ' t-shirt bestseller' }}"
             },
             {
-              "name": "api_key",
-              "value": "={{ $env.SERPAPI_KEY }}"
+              "name": "num",
+              "value": "10"
             },
             {
               "name": "gl",
@@ -89,10 +93,6 @@
             {
               "name": "hl",
               "value": "en"
-            },
-            {
-              "name": "num",
-              "value": "20"
             }
           ]
         },
@@ -112,7 +112,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche;\nconst raw = (() => { try { return $('Etsy via Google').first()?.json || {}; } catch(_) { return {}; } })();\nconst results = (raw?.organic_results || []).filter(r => r.link?.includes('etsy.com'));\nconst data = results.map(r => ({\n  title:   r.title   || '',\n  url:     r.link    || '',\n  price:   '',\n  image:   r.thumbnail || '',\n  rating:  0,\n  reviews: 0,\n  tags:    (r.title || '').toLowerCase().split(/[\\s,|]+/).filter(t => t.length > 3),\n  snippet: r.snippet || ''\n}));\nreturn [{ json: { source: 'etsy', niche, data } }];"
+        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche;\nconst raw = (() => { try { return $('Etsy via Google').first()?.json || {}; } catch(_) { return {}; } })();\nconst results = (raw?.items || []).filter(r => r.link?.includes('etsy.com') || r.formattedUrl?.includes('etsy.com'));\nconst data = results.map(r => ({\n  title:   r.title   || '',\n  url:     r.link    || '',\n  price:   '',\n  image:   r.thumbnail || '',\n  rating:  0,\n  reviews: 0,\n  tags:    (r.title || '').toLowerCase().split(/[\\s,|]+/).filter(t => t.length > 3),\n  snippet: r.snippet || ''\n}));\nreturn [{ json: { source: 'etsy', niche, data } }];"
       },
       "id": "parse-etsy",
       "name": "Parse Etsy Results",

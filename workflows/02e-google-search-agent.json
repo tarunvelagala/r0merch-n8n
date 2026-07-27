@@ -2,7 +2,7 @@
   "updatedAt": "2099-01-01T00:00:00.000Z",
   "createdAt": "2026-07-25T15:18:37.645Z",
   "id": "1fb17f86-9092-4ea6-b5cd-4631ca01134c",
-  "name": "r0merch — Google Search Agent",
+  "name": "r0merch \u2014 Google Search Agent",
   "description": null,
   "active": true,
   "isArchived": false,
@@ -20,33 +20,33 @@
     },
     {
       "parameters": {
-        "url": "https://serpapi.com/search.json",
+        "url": "https://www.googleapis.com/customsearch/v1",
         "sendQuery": true,
         "queryParameters": {
           "parameters": [
             {
-              "name": "engine",
-              "value": "google"
+              "name": "key",
+              "value": "={{ $env.GOOGLE_API_KEY }}"
+            },
+            {
+              "name": "cx",
+              "value": "={{ $env.GOOGLE_CSE_ID }}"
             },
             {
               "name": "q",
               "value": "={{ $json.niche + ' t-shirt best selling design 2025' }}"
             },
             {
-              "name": "api_key",
-              "value": "={{ $env.SERPAPI_KEY }}"
-            },
-            {
               "name": "num",
-              "value": "20"
-            },
-            {
-              "name": "hl",
-              "value": "en"
+              "value": "10"
             },
             {
               "name": "gl",
               "value": "us"
+            },
+            {
+              "name": "hl",
+              "value": "en"
             }
           ]
         },
@@ -66,33 +66,33 @@
     },
     {
       "parameters": {
-        "url": "https://serpapi.com/search.json",
+        "url": "https://www.googleapis.com/customsearch/v1",
         "sendQuery": true,
         "queryParameters": {
           "parameters": [
             {
-              "name": "engine",
-              "value": "google"
+              "name": "key",
+              "value": "={{ $env.GOOGLE_API_KEY }}"
+            },
+            {
+              "name": "cx",
+              "value": "={{ $env.GOOGLE_CSE_ID }}"
             },
             {
               "name": "q",
               "value": "={{ $json.niche + ' t-shirt print on demand niche ideas' }}"
             },
             {
-              "name": "api_key",
-              "value": "={{ $env.SERPAPI_KEY }}"
-            },
-            {
               "name": "num",
               "value": "10"
             },
             {
-              "name": "hl",
-              "value": "en"
-            },
-            {
               "name": "gl",
               "value": "us"
+            },
+            {
+              "name": "hl",
+              "value": "en"
             }
           ]
         },
@@ -113,7 +113,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche;\nconst mainRaw  = $('SerpAPI Google Search').first()?.json || {};\nconst nicheRaw = (() => { try { return $('SerpAPI Niche Ideas Search').first()?.json || {}; } catch(_) { return {}; } })();\nconst m = r => ({title:r.title||'',url:r.link||'',snippet:r.snippet||''});\nconst organic = (mainRaw?.organic_results||[]).map(m);\nconst relatedSearches = [...(mainRaw?.related_searches||[]).map(s=>s.query),...(nicheRaw?.related_searches||[]).map(s=>s.query)].filter(Boolean);\nconst peopleAlsoAsk = (mainRaw?.related_questions||[]).map(q=>q.question).filter(Boolean);\nreturn [{json:{source:'google_search',niche,data:{organic,relatedSearches,peopleAlsoAsk}}}];"
+        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche;\nconst mainRaw  = $('SerpAPI Google Search').first()?.json || {};\nconst nicheRaw = (() => { try { return $('SerpAPI Niche Ideas Search').first()?.json || {}; } catch(_) { return {}; } })();\nconst m = r => ({title:r.title||'',url:r.link||'',snippet:r.snippet||''});\nconst organic = (mainRaw?.items||[]).map(m);\nconst relatedSearches = [...((mainRaw?.queries?.request || [])||[]).map(s=>s.query),...(nicheRaw?.related_searches||[]).map(s=>s.query)].filter(Boolean);\nconst peopleAlsoAsk = ([]||[]).map(q=>q.question).filter(Boolean);\nreturn [{json:{source:'google_search',niche,data:{organic,relatedSearches,peopleAlsoAsk}}}];"
       },
       "id": "parse-google-search",
       "name": "Parse Google Results",

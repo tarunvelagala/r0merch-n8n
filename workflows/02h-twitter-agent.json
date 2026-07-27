@@ -2,7 +2,7 @@
   "updatedAt": "2099-01-01T00:00:00.000Z",
   "createdAt": "2026-07-25T16:19:41.459Z",
   "id": "3d7e9f12-a841-4c56-b234-8f1e2a3b4c5d",
-  "name": "r0merch — Twitter Agent",
+  "name": "r0merch \u2014 Twitter Agent",
   "description": null,
   "active": true,
   "isArchived": false,
@@ -20,21 +20,25 @@
     },
     {
       "parameters": {
-        "url": "https://serpapi.com/search.json",
+        "url": "https://www.googleapis.com/customsearch/v1",
         "sendQuery": true,
         "queryParameters": {
           "parameters": [
             {
-              "name": "engine",
-              "value": "google"
+              "name": "key",
+              "value": "={{ $env.GOOGLE_API_KEY }}"
+            },
+            {
+              "name": "cx",
+              "value": "={{ $env.GOOGLE_CSE_ID }}"
             },
             {
               "name": "q",
               "value": "={{ 'site:x.com OR site:twitter.com ' + $json.niche + ' t-shirt' }}"
             },
             {
-              "name": "api_key",
-              "value": "={{ $env.SERPAPI_KEY }}"
+              "name": "num",
+              "value": "10"
             },
             {
               "name": "gl",
@@ -43,14 +47,6 @@
             {
               "name": "hl",
               "value": "en"
-            },
-            {
-              "name": "num",
-              "value": "20"
-            },
-            {
-              "name": "tbs",
-              "value": "qdr:w"
             }
           ]
         },
@@ -70,21 +66,25 @@
     },
     {
       "parameters": {
-        "url": "https://serpapi.com/search.json",
+        "url": "https://www.googleapis.com/customsearch/v1",
         "sendQuery": true,
         "queryParameters": {
           "parameters": [
             {
-              "name": "engine",
-              "value": "google"
+              "name": "key",
+              "value": "={{ $env.GOOGLE_API_KEY }}"
+            },
+            {
+              "name": "cx",
+              "value": "={{ $env.GOOGLE_CSE_ID }}"
             },
             {
               "name": "q",
               "value": "={{ 'site:x.com OR site:twitter.com ' + $json.niche + ' trending viral meme' }}"
             },
             {
-              "name": "api_key",
-              "value": "={{ $env.SERPAPI_KEY }}"
+              "name": "num",
+              "value": "10"
             },
             {
               "name": "gl",
@@ -93,14 +93,6 @@
             {
               "name": "hl",
               "value": "en"
-            },
-            {
-              "name": "num",
-              "value": "20"
-            },
-            {
-              "name": "tbs",
-              "value": "qdr:w"
             }
           ]
         },

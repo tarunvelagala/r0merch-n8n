@@ -20,21 +20,25 @@
     },
     {
       "parameters": {
-        "url": "https://serpapi.com/search.json",
+        "url": "https://www.googleapis.com/customsearch/v1",
         "sendQuery": true,
         "queryParameters": {
           "parameters": [
             {
-              "name": "engine",
-              "value": "google"
+              "name": "key",
+              "value": "={{ $env.GOOGLE_API_KEY }}"
+            },
+            {
+              "name": "cx",
+              "value": "={{ $env.GOOGLE_CSE_ID }}"
             },
             {
               "name": "q",
               "value": "={{ 'site:amazon.com/dp ' + $json.niche + ' t-shirt best selling graphic tee' }}"
             },
             {
-              "name": "api_key",
-              "value": "={{ $env.SERPAPI_KEY }}"
+              "name": "num",
+              "value": "10"
             },
             {
               "name": "gl",
@@ -43,10 +47,6 @@
             {
               "name": "hl",
               "value": "en"
-            },
-            {
-              "name": "num",
-              "value": "20"
             }
           ]
         },
@@ -66,7 +66,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche;\nconst raw = $('Amazon via Google').first()?.json || {};\nconst results = (raw?.organic_results || []).filter(r => r.link?.includes('amazon.com'));\nconst data = results.map(r => ({\n  title:   r.title   || '',\n  url:     r.link    || '',\n  price:   '',\n  image:   r.thumbnail || '',\n  rating:  0,\n  reviews: 0,\n  asin:    (r.link || '').match(/\\/dp\\/([A-Z0-9]{10})/)?.[1] || '',\n  snippet: r.snippet || ''\n}));\nreturn [{ json: { source: 'amazon', niche, data } }];"
+        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche;\nconst raw = $('Amazon via Google').first()?.json || {};\nconst results = (raw?.items || []).filter(r => r.link?.includes || r.formattedUrl?.includes('amazon.com'));\nconst data = results.map(r => ({\n  title:   r.title   || '',\n  url:     r.link    || '',\n  price:   '',\n  image:   r.thumbnail || '',\n  rating:  0,\n  reviews: 0,\n  asin:    (r.link || '').match(/\\/dp\\/([A-Z0-9]{10})/)?.[1] || '',\n  snippet: r.snippet || ''\n}));\nreturn [{ json: { source: 'amazon', niche, data } }];"
       },
       "id": "parse-amazon",
       "name": "Parse Amazon Results",
