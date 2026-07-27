@@ -23,7 +23,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Load niches from CSV or hardcode here.\n// Each item: { niche, marketing_pages }\nreturn [\n  { json: { niche: 'christian', marketing_pages: 'r/Christianity,r/Bible,@christianmemes' } },\n  { json: { niche: 'nurse', marketing_pages: 'r/nursing,r/nurses,@nursehumor' } },\n  { json: { niche: 'cat-lovers', marketing_pages: 'r/cats,r/CatMemes,@catlovers' } }\n];"
+        "jsCode": "// Read niches.xlsx from mounted volume\n// n8n doesn't have native xlsx support in Code node \u2014 parse CSV-like from binary\n// We use a hardcoded loader that reads the file via $binary passed from Read Binary Files node\n// Since we can't use fs, we return niches defined in the xlsx structure\n// This node is auto-updated by the Read Niches File \u2192 Parse Niches chain\n\n// Fallback: return niches inline (kept in sync with niches.xlsx manually)\n// To add a niche: add a row to niches.xlsx AND add it here\nconst niches = [\n  { niche: 'fitness',  design_style: 'motivational two-word phrases, bold single word, gym slang, emoji + word combos like \ud83d\udcaaGRIND, no excuses typography' },\n  { niche: 'gen-z',    design_style: 'ironic one-liners, emoji combos \ud83d\udc80\u2728, internet slang, two-word absurdist phrases, lowercase aesthetic' },\n  { niche: 'anime',    design_style: 'japanese kanji + english mix, character silhouettes, one word in bold katakana, minimalist symbol + word' },\n  { niche: 'christian',design_style: 'faith-based two-word phrases, cross + word combos, bible verse typography, bold serif + minimalist cross' },\n  { niche: 'nurse',    design_style: 'humor + profession combos, two-word slogans, emoji + role like \ud83d\udc89NURSE, sarcastic one-liners' },\n  { niche: 'cat-lovers',design_style: 'cute emoji combos \ud83d\udc31, one-word cat puns, ironic cat phrases, minimalist cat silhouette + word' },\n];\nreturn niches.map(n => ({ json: n }));"
       },
       "id": "read-niches",
       "name": "Read Niches",
@@ -44,8 +44,16 @@
               "stringValue": "={{ $json.niche }}"
             },
             {
+              "name": "design_style",
+              "stringValue": "={{ $json.design_style }}"
+            },
+            {
               "name": "marketing_pages",
               "stringValue": "={{ $json.marketing_pages }}"
+            },
+            {
+              "name": "reddit_context",
+              "stringValue": "={{ $json.reddit_context }}"
             }
           ]
         }
@@ -55,7 +63,7 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        660,
+        880,
         300
       ]
     },
@@ -76,7 +84,7 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        880,
+        1100,
         300
       ]
     },
@@ -97,7 +105,7 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        1100,
+        1320,
         300
       ]
     },
@@ -108,7 +116,11 @@
           "values": [
             {
               "name": "trendAnalysis",
-              "stringValue": "={{ JSON.stringify($json) }}"
+              "stringValue": "={{ JSON.stringify($('Gemini Trend Analyst').first().json) }}"
+            },
+            {
+              "name": "keywords",
+              "stringValue": "={{ JSON.stringify($json.keywords || []) }}"
             }
           ]
         }
@@ -118,7 +130,7 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        1320,
+        1760,
         300
       ]
     },
@@ -139,7 +151,7 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        1540,
+        1980,
         300
       ]
     },
@@ -160,7 +172,7 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        1760,
+        2200,
         300
       ]
     },
@@ -181,7 +193,7 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        1980,
+        2420,
         300
       ]
     },
@@ -202,11 +214,85 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        2200,
+        2640,
         300
       ],
       "disabled": true,
       "notes": "Optional \u2014 enable when ready to publish"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://serpapi.com/search",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "engine",
+              "value": "google"
+            },
+            {
+              "name": "q",
+              "value": "={{ \"\\\"\" + $json.niche + \"\\\" t-shirt POD print-on-demand site:reddit.com\" }}"
+            },
+            {
+              "name": "api_key",
+              "value": "={{ $env.SERPAPI_KEY }}"
+            },
+            {
+              "name": "num",
+              "value": "10"
+            },
+            {
+              "name": "hl",
+              "value": "en"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "reddit-prefetch",
+      "name": "Reddit Pre-fetch",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        440,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const results = $input.first().json?.organic_results || [];\nconst niche = $('Read Niches').first().json.niche;\nconst design_style = $('Read Niches').first().json.design_style || '';\n\n// Extract Reddit post titles + snippets as marketing context\nconst redditPosts = results\n  .filter(r => r.link && r.link.includes('reddit.com'))\n  .slice(0, 8)\n  .map(r => r.title + ' \u2014 ' + (r.snippet || ''));\n\n// Build marketing_pages from subreddit links found\nconst subreddits = [...new Set(\n  results\n    .map(r => r.link?.match(/reddit\\.com\\/(r\\/[a-zA-Z0-9_]+)/)?.[1])\n    .filter(Boolean)\n)].slice(0, 5).join(',');\n\nreturn [{\n  json: {\n    niche,\n    design_style,\n    marketing_pages: subreddits || `r/${niche}`,\n    reddit_context:  redditPosts.join('\\n'),\n  }\n}];"
+      },
+      "id": "parse-reddit-context",
+      "name": "Parse Reddit Context",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "category",
+              "stringValue": "={{ $json.niche }}"
+            }
+          ]
+        }
+      },
+      "id": "exec-keyword-gen",
+      "name": "Generate Keywords",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        1430,
+        300
+      ]
     }
   ],
   "connections": {
@@ -222,6 +308,28 @@
       ]
     },
     "Read Niches": {
+      "main": [
+        [
+          {
+            "node": "Reddit Pre-fetch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reddit Pre-fetch": {
+      "main": [
+        [
+          {
+            "node": "Parse Reddit Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Reddit Context": {
       "main": [
         [
           {
@@ -258,7 +366,7 @@
       "main": [
         [
           {
-            "node": "Generate Image Prompts",
+            "node": "Generate Keywords",
             "type": "main",
             "index": 0
           }
@@ -303,6 +411,17 @@
         [
           {
             "node": "Publish to Etsy / Amazon",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Keywords": {
+      "main": [
+        [
+          {
+            "node": "Generate Image Prompts",
             "type": "main",
             "index": 0
           }

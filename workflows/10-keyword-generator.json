@@ -1,7 +1,11 @@
 {
-  "name": "r0merch — Keyword Generator",
+  "updatedAt": "2026-07-27T11:32:17.681Z",
+  "createdAt": "2026-07-27T11:32:17.681Z",
   "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "name": "r0merch — Keyword Generator",
+  "description": null,
   "active": true,
+  "isArchived": false,
   "nodes": [
     {
       "parameters": {},
@@ -9,7 +13,10 @@
       "name": "Execute Workflow Trigger",
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1,
-      "position": [0, 300]
+      "position": [
+        0,
+        300
+      ]
     },
     {
       "parameters": {
@@ -19,7 +26,10 @@
       "name": "Unpack Input",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [220, 300]
+      "position": [
+        220,
+        300
+      ]
     },
     {
       "parameters": {
@@ -28,8 +38,14 @@
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "Authorization", "value": "={{ 'Bearer ' + $env.GROQ_API_KEY }}" },
-            { "name": "Content-Type",  "value": "application/json" }
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + $env.GROQ_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
           ]
         },
         "sendBody": true,
@@ -40,7 +56,10 @@
       "name": "Groq Keyword Generator",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [440, 300],
+      "position": [
+        440,
+        300
+      ],
       "onError": "continueErrorOutput"
     },
     {
@@ -51,18 +70,97 @@
       "name": "Parse Keywords",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [660, 300]
+      "position": [
+        660,
+        300
+      ]
     }
   ],
   "connections": {
-    "Execute Workflow Trigger": { "main": [[{ "node": "Unpack Input",          "type": "main", "index": 0 }]] },
-    "Unpack Input":              { "main": [[{ "node": "Groq Keyword Generator","type": "main", "index": 0 }]] },
-    "Groq Keyword Generator":    { "main": [
-      [{ "node": "Parse Keywords", "type": "main", "index": 0 }],
-      [{ "node": "Parse Keywords", "type": "main", "index": 0 }]
-    ]},
-    "Groq Keyword Generator error": { "main": [[{ "node": "Parse Keywords", "type": "main", "index": 0 }]] }
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Unpack Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Unpack Input": {
+      "main": [
+        [
+          {
+            "node": "Groq Keyword Generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Keyword Generator": {
+      "main": [
+        [
+          {
+            "node": "Parse Keywords",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Parse Keywords",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Keyword Generator error": {
+      "main": [
+        [
+          {
+            "node": "Parse Keywords",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
   },
-  "settings": { "executionOrder": "v1" },
-  "tags": ["pod", "keywords", "r0merch"]
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": null,
+  "versionId": "4509a042-424d-4455-b387-9d2e8c5a5dde",
+  "activeVersionId": "4509a042-424d-4455-b387-9d2e8c5a5dde",
+  "versionCounter": 4,
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-07-27T11:32:17.683Z",
+      "createdAt": "2026-07-27T11:32:17.683Z",
+      "role": "workflow:owner",
+      "workflowId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "projectId": "A5qWeG5doYXJG0tr",
+      "project": {
+        "updatedAt": "2026-03-29T08:57:26.442Z",
+        "createdAt": "2026-03-29T08:55:38.920Z",
+        "id": "A5qWeG5doYXJG0tr",
+        "name": "Tarun Velagala <tarunvelagala80@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "7a3b5da8-30cb-4aea-98f3-9838086695e3"
+      }
+    }
+  ],
+  "versionMetadata": {
+    "name": null,
+    "description": null
+  }
 }
