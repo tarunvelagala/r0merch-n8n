@@ -243,19 +243,6 @@
     },
     {
       "parameters": {
-        "jsCode": "// Each item flowing through has niche from Analyze Design Style's input\n// $json here is the Groq response \u2014 need niche from the previous context\n// Use $input.item to get the current execution item index\nconst allStoreItems = $('Store Niche Context').all();\nconst currentIndex = $itemIndex;\nconst storeItem = allStoreItems[currentIndex] || allStoreItems[0];\nconst niche = storeItem?.json?.niche || '';\n\nconst raw = $input.item.json?.choices?.[0]?.message?.content || '';\nconst design_style = raw.trim() || 'bold two-word phrases, minimalist graphic, clean urban typography';\nreturn { json: {\n  niche,\n  design_style,\n  marketing_pages: 'r/' + niche.replace(/[^a-zA-Z0-9]/g, '')\n} };"
-      },
-      "id": "parse-niche-style",
-      "name": "Parse Niche Style",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        1120,
-        304
-      ]
-    },
-    {
-      "parameters": {
         "options": {}
       },
       "type": "n8n-nodes-base.splitOut",
@@ -278,6 +265,19 @@
       ],
       "parameters": {
         "jsCode": "// Process ALL items \u2014 one output per niche\nreturn $input.all().map(item => {\n  const niche = item.json?.niche || '';\n  const serpResults = item.json;\n  return { json: { niche, serpResults } };\n});"
+      }
+    },
+    {
+      "id": "merge-niche-back",
+      "name": "Merge Niche Back",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1156,
+        304
+      ],
+      "parameters": {
+        "jsCode": "// Match each Groq response back to its niche using Store Niche Context\nconst storeItems = $('Store Niche Context').all();\nreturn $input.all().map((item, i) => {\n  const niche = storeItems[i]?.json?.niche || storeItems[0]?.json?.niche || '';\n  const raw = item.json?.choices?.[0]?.message?.content || '';\n  const design_style = raw.trim() || 'bold two-word phrases, minimalist graphic, clean urban typography';\n  return { json: { niche, design_style, marketing_pages: 'r/' + niche.replace(/[^a-zA-Z0-9]/g,'') } };\n});"
       }
     }
   ],
@@ -414,25 +414,14 @@
       "main": [
         [
           {
-            "node": "Parse Niche Style",
+            "node": "Merge Niche Back",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "Parse Niche Style",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Parse Niche Style": {
-      "main": [
-        [
-          {
-            "node": "Research Agent",
+            "node": "Merge Niche Back",
             "type": "main",
             "index": 0
           }
@@ -455,6 +444,17 @@
         [
           {
             "node": "Analyze Design Style",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Niche Back": {
+      "main": [
+        [
+          {
+            "node": "Research Agent",
             "type": "main",
             "index": 0
           }
