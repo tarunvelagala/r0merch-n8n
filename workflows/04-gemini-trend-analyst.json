@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-07-27T03:35:44.000Z",
+  "updatedAt": "2099-01-01T00:00:00.000Z",
   "createdAt": "2026-07-25T15:18:41.499Z",
   "id": "56d91c94-825f-4b48-90eb-08625926ef3e",
   "name": "r0merch \u2014 Gemini Trend Analyst",
@@ -20,22 +20,27 @@
     },
     {
       "parameters": {
-        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
-        "sendQuery": true,
-        "queryParameters": {
+        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "sendBody": true,
+        "specifyBody": "json",
+        "sendHeaders": true,
+        "headerParameters": {
           "parameters": [
             {
-              "name": "key",
-              "value": "={{ $env.GEMINI_API_KEY }}"
+              "name": "Authorization",
+              "value": "={{ \"Bearer \" + $env.GROQ_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
             }
           ]
         },
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({\n  contents: [{\n    parts: [{\n      text: `You are a POD (print-on-demand) trend analyst. Below is structured market research data for the \"${$json.trendReport ? JSON.parse($json.trendReport).niche : $json.niche}\" niche.\\n\\nResearch data:\\n${JSON.stringify($json.trendReport ? JSON.parse($json.trendReport) : $json, null, 2)}\\n\\nBased on this data, identify:\\n1. Recurring colors (with hex codes where possible)\\n2. Popular typography styles\\n3. Common illustrations and icons\\n4. Preferred layouts\\n5. Underserved opportunities (low competition, real demand)\\n6. Saturated ideas to avoid\\n7. Emerging trends (from rising queries and low-competition gaps)\\n8. Recommended audience segments\\n9. Seasonal considerations\\n10. Top 5 design directions\\n\\nReturn ONLY a JSON object. No markdown, no explanation.\\nShape:\\n{\\n  \"recurringColors\": [],\\n  \"typographyStyles\": [],\\n  \"illustrations\": [],\\n  \"layouts\": [],\\n  \"underservedOpportunities\": [],\\n  \"saturatedIdeas\": [],\\n  \"emergingTrends\": [],\\n  \"audienceSegments\": [],\\n  \"seasonality\": {},\\n  \"topDesignDirections\": []\\n}`\n    }]\n  }],\n  generationConfig: { temperature: 0.4, maxOutputTokens: 2048 }\n}) }}"
+        "method": "POST",
+        "jsonBody": "={{ {\n  model: \"llama-3.1-8b-instant\",\n  messages: [{\n    role: \"user\",\n    content: \"You are a POD trend analyst. Research data for niche: \" + ($json.trendReport ? JSON.parse($json.trendReport).niche : ($json.niche || \"\")) + \"\\n\\n\" + JSON.stringify($json.trendReport ? JSON.parse($json.trendReport) : $json, null, 2) + \"\\n\\nIdentify: 1. Recurring colors (hex) 2. Typography styles 3. Illustrations/icons 4. Layouts 5. Underserved opportunities 6. Saturated ideas 7. Emerging trends 8. Audience segments 9. Seasonality 10. Top 5 design directions.\\n\\nReturn ONLY a JSON object, no markdown:\\n{\\\"recurringColors\\\":[],\\\"typographyStyles\\\":[],\\\"illustrations\\\":[],\\\"layouts\\\":[],\\\"underservedOpportunities\\\":[],\\\"saturatedIdeas\\\":[],\\\"emergingTrends\\\":[],\\\"audienceSegments\\\":[],\\\"seasonality\\\":{},\\\"topDesignDirections\\\":[]}\"\n  }],\n  temperature: 0.4,\n  max_tokens: 2048\n} }}"
       },
       "id": "gemini-analyst",
-      "name": "Gemini Trend Analysis",
+      "name": "Groq Trend Analysis",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
@@ -45,7 +50,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const raw = $input.first().json?.candidates?.[0]?.content?.parts?.[0]?.text || '{}';\nconst match = raw.match(/\\{[\\s\\S]*\\}/);\nlet analysis = {};\ntry { analysis = JSON.parse(match?.[0] || '{}'); } catch (_) {}\n\nconst niche = (() => {\n  try { return JSON.parse($('Execute Workflow Trigger').first().json.trendReport || '{}').niche; } catch(_) { return ''; }\n})();\n\nreturn [{ json: { niche, ...analysis } }];"
+        "jsCode": "const raw = $input.first().json?.choices?.[0]?.message?.content || '{}';\nconst match = raw.match(/\\{[\\s\\S]*\\}/);\nlet analysis = {};\ntry { analysis = JSON.parse(match?.[0] || '{}'); } catch (_) {}\n\nconst niche = (() => {\n  try { return JSON.parse($('Execute Workflow Trigger').first().json.trendReport || '{}').niche; } catch(_) { return ''; }\n})();\n\nreturn [{ json: { niche, ...analysis } }];"
       },
       "id": "parse-analysis",
       "name": "Parse Trend Analysis",
@@ -62,14 +67,14 @@
       "main": [
         [
           {
-            "node": "Gemini Trend Analysis",
+            "node": "Groq Trend Analysis",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Gemini Trend Analysis": {
+    "Groq Trend Analysis": {
       "main": [
         [
           {
@@ -82,14 +87,16 @@
     }
   },
   "settings": {
-    "executionOrder": "v1"
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
   },
   "staticData": null,
   "meta": null,
   "pinData": null,
-  "versionId": "8e9d83b7-0e9c-457b-a1b7-4097bf7d1833",
-  "activeVersionId": null,
-  "versionCounter": 26,
+  "versionId": "66f6cd59-f19e-447b-b02d-dcebb229a5f4",
+  "activeVersionId": "66f6cd59-f19e-447b-b02d-dcebb229a5f4",
+  "versionCounter": 47,
   "triggerCount": 0,
   "tags": [],
   "shared": [

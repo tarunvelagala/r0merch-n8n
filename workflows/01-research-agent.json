@@ -131,6 +131,20 @@
     },
     {
       "parameters": {
+        "workflowId": "3d7e9f12-a841-4c56-b234-8f1e2a3b4c5d",
+        "options": {}
+      },
+      "id": "exec-twitter",
+      "name": "Twitter Agent",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        448,
+        1456
+      ]
+    },
+    {
+      "parameters": {
         "mode": "append",
         "options": {}
       },
@@ -204,6 +218,11 @@
           },
           {
             "node": "Vision Agent",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Twitter Agent",
             "type": "main",
             "index": 0
           }
@@ -283,6 +302,17 @@
             "node": "Merge All Results",
             "type": "main",
             "index": 6
+          }
+        ]
+      ]
+    },
+    "Twitter Agent": {
+      "main": [
+        [
+          {
+            "node": "Merge All Results",
+            "type": "main",
+            "index": 7
           }
         ]
       ]

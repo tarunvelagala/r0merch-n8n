@@ -1,8 +1,8 @@
 {
-  "updatedAt": "2026-07-27T03:35:44.000Z",
+  "updatedAt": "2026-07-27T04:55:19.379Z",
   "createdAt": "2026-07-25T15:18:46.337Z",
   "id": "8770f81f-e7ce-469e-a60b-410df33f951f",
-  "name": "r0merch \u2014 Publisher (Optional)",
+  "name": "r0merch — Publisher (Optional)",
   "description": null,
   "active": true,
   "isArchived": false,
@@ -34,7 +34,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "https://openapi.etsy.com/v3/application/shops/{{ $env.ETSY_SHOP_ID }}/listings",
+        "url": "={{ 'https://openapi.etsy.com/v3/application/shops/' + $env.ETSY_SHOP_ID + '/listings' }}",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
@@ -44,7 +44,7 @@
             },
             {
               "name": "Authorization",
-              "value": "Bearer {{ $env.ETSY_ACCESS_TOKEN }}"
+              "value": "={{ 'Bearer ' + $env.ETSY_ACCESS_TOKEN }}"
             },
             {
               "name": "Content-Type",
@@ -70,7 +70,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "https://sellingpartnerapi-na.amazon.com/listings/2021-08-01/items/{{ $env.AMAZON_SELLER_ID }}/{{ $json.seoFileName }}",
+        "url": "={{ 'https://sellingpartnerapi-na.amazon.com/listings/2021-08-01/items/' + $env.AMAZON_SELLER_ID + '/' + $json.seoFileName }}",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
@@ -130,14 +130,16 @@
     }
   },
   "settings": {
-    "executionOrder": "v1"
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
   },
   "staticData": null,
   "meta": null,
   "pinData": null,
-  "versionId": "2160617e-1fdf-442d-ba2f-1bdb953c4ae8",
-  "activeVersionId": null,
-  "versionCounter": 26,
+  "versionId": "27da401e-0c42-4e7f-bcc5-79d49464c170",
+  "activeVersionId": "27da401e-0c42-4e7f-bcc5-79d49464c170",
+  "versionCounter": 32,
   "triggerCount": 0,
   "tags": [],
   "shared": [

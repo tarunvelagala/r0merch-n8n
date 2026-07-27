@@ -1,8 +1,8 @@
 {
-  "updatedAt": "2026-07-27T03:35:44.000Z",
+  "updatedAt": "2026-07-27T05:33:35.968Z",
   "createdAt": "2026-07-25T15:18:45.367Z",
   "id": "5be92a45-a579-44e8-bf9c-7443d99080c5",
-  "name": "r0merch \u2014 Database",
+  "name": "r0merch — Database",
   "description": null,
   "active": true,
   "isArchived": false,
@@ -30,42 +30,6 @@
         220,
         300
       ]
-    },
-    {
-      "parameters": {
-        "documentId": "={{ $env.GOOGLE_SHEET_ID }}",
-        "sheetName": "Designs",
-        "columns": {
-          "mappingMode": "defineBelow",
-          "value": {
-            "Niche": "={{ $json.niche }}",
-            "Concept ID": "={{ $json.conceptId }}",
-            "Title": "={{ $json.title }}",
-            "Phrase": "={{ $json.phrase }}",
-            "Tone": "={{ $json.tone }}",
-            "Target Audience": "={{ $json.targetAudience }}",
-            "Selling Angle": "={{ $json.sellingAngle }}",
-            "Image Prompt": "={{ $json.imagePrompt }}",
-            "PNG URL": "={{ $json.imageUrl }}",
-            "Etsy Title": "={{ $json.etsyTitle }}",
-            "Etsy Tags": "={{ ($json.etsyTags || []).join(', ') }}",
-            "Amazon Title": "={{ $json.amazonTitle }}",
-            "Amazon Keywords": "={{ $json.amazonKeywords }}",
-            "SEO Filename": "={{ $json.seoFileName }}",
-            "Created Date": "={{ $json.generatedAt }}"
-          }
-        },
-        "options": {}
-      },
-      "id": "save-google-sheets",
-      "name": "Save to Google Sheets",
-      "type": "n8n-nodes-base.googleSheets",
-      "typeVersion": 4,
-      "position": [
-        440,
-        150
-      ],
-      "notes": "Set GOOGLE_SHEET_ID in n8n Variables. Requires Google Sheets OAuth2 credential."
     },
     {
       "parameters": {
@@ -147,6 +111,33 @@
       ],
       "disabled": true,
       "notes": "Set AIRTABLE_BASE_ID in n8n Variables. Enable when ready."
+    },
+    {
+      "parameters": {
+        "jsCode": "const record = $input.first().json;\nconst niche = record.niche || record.etsyTitle || 'design';\nconst ts = new Date().toISOString().replace(/[:.]/g, '-');\nconst fileName = `design_${niche}_${ts}.json`;\nconst content = JSON.stringify(record, null, 2);\n\n// Use $binary to write file via n8n's binary system\nconst binaryData = await this.helpers.prepareBinaryData(\n  Buffer.from(content, 'utf8'),\n  fileName,\n  'application/json'\n);\n\nreturn [{ json: { fileName, saved: true }, binary: { data: binaryData } }];"
+      },
+      "id": "to-binary",
+      "name": "Convert to Binary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        150
+      ]
+    },
+    {
+      "parameters": {
+        "fileName": "=/home/node/.n8n-files/={{ $binary.data.fileName }}",
+        "dataPropertyName": "data"
+      },
+      "id": "write-file",
+      "name": "Write to File",
+      "type": "n8n-nodes-base.writeBinaryFile",
+      "typeVersion": 1,
+      "position": [
+        660,
+        150
+      ]
     }
   ],
   "connections": {
@@ -165,7 +156,7 @@
       "main": [
         [
           {
-            "node": "Save to Google Sheets",
+            "node": "Convert to Binary",
             "type": "main",
             "index": 0
           },
@@ -181,17 +172,32 @@
           }
         ]
       ]
+    },
+    "Convert to Binary": {
+      "main": [
+        [
+          {
+            "node": "Write to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
-    "executionOrder": "v1"
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed"
   },
   "staticData": null,
   "meta": null,
   "pinData": null,
-  "versionId": "8b71f9ea-20e1-4f50-982d-c10cd314adba",
-  "activeVersionId": null,
-  "versionCounter": 26,
+  "versionId": "2d888b0a-5486-4ff4-874d-aef450aaee7d",
+  "activeVersionId": "2d888b0a-5486-4ff4-874d-aef450aaee7d",
+  "versionCounter": 41,
   "triggerCount": 0,
   "tags": [],
   "shared": [
