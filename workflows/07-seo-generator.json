@@ -2,7 +2,7 @@
   "updatedAt": "2099-01-01T00:00:00.000Z",
   "createdAt": "2026-07-25T15:18:44.396Z",
   "id": "70f2fdb2-215a-4dd5-968b-aceac3989e2f",
-  "name": "r0merch — SEO Generator",
+  "name": "r0merch \u2014 SEO Generator",
   "description": null,
   "active": true,
   "isArchived": false,
@@ -20,7 +20,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const raw = $input.all()[0]?.json || {};\nlet design = raw.designs || raw.concept || raw;\nif (typeof design === 'string') {\n  try { design = JSON.parse(design); } catch(_) {}\n}\nif (Array.isArray(design)) design = design[0] || {};\n// niche: direct field takes priority over nested\nconst niche = raw.niche || design.niche || '';\nreturn [{ json: { niche, ...design, niche } }];"
+        "jsCode": "// Niche passed directly from orchestrator workflowInputs\nconst _triggerInput = $input.all()[0]?.json || {};\nconst _niche = _triggerInput.niche || '';\n\nconst raw = $input.all()[0]?.json || {};\nlet design = raw.designs || raw.concept || raw;\nif (typeof design === 'string') {\n  try { design = JSON.parse(design); } catch(_) {}\n}\nif (Array.isArray(design)) design = design[0] || {};\n// niche: direct field takes priority over nested\nconst niche = _niche || raw.niche || design.niche || '';\nreturn [{ json: { niche, ...design, niche } }];"
       },
       "id": "split-designs",
       "name": "Unpack Design",

@@ -73,6 +73,10 @@
             {
               "name": "researchData",
               "stringValue": "={{ JSON.stringify($json) }}"
+            },
+            {
+              "name": "niche",
+              "stringValue": "={{ $json.niche }}"
             }
           ]
         }
@@ -82,7 +86,7 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        2224,
+        2240,
         128
       ]
     },
@@ -107,7 +111,7 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        2656,
+        2688,
         128
       ]
     },
@@ -118,11 +122,11 @@
           "values": [
             {
               "name": "trendAnalysis",
-              "stringValue": "={{ JSON.stringify($('Gemini Trend Analyst').first().json) }}"
+              "stringValue": "={{ JSON.stringify($json) }}"
             },
             {
               "name": "niche",
-              "stringValue": "={{ $('Gemini Trend Analyst').first().json.niche || $json.niche }}"
+              "stringValue": "={{ $json.niche }}"
             }
           ]
         }
@@ -132,7 +136,7 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        3520,
+        3584,
         128
       ]
     },
@@ -143,7 +147,7 @@
           "values": [
             {
               "name": "concept",
-              "stringValue": "={{ JSON.stringify($json.concept) }}"
+              "stringValue": "={{ JSON.stringify($json.concept || $json) }}"
             },
             {
               "name": "niche",
@@ -157,7 +161,7 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        3952,
+        4032,
         128
       ]
     },
@@ -182,7 +186,7 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        4384,
+        4480,
         128
       ]
     },
@@ -194,6 +198,10 @@
             {
               "name": "records",
               "stringValue": "={{ JSON.stringify($json) }}"
+            },
+            {
+              "name": "niche",
+              "stringValue": "={{ $json.niche }}"
             }
           ]
         }
@@ -203,8 +211,8 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        4816,
-        128
+        4928,
+        200
       ]
     },
     {
@@ -231,6 +239,10 @@
             {
               "name": "category",
               "stringValue": "={{ $json.niche }}"
+            },
+            {
+              "name": "niche",
+              "stringValue": "={{ $json.niche }}"
             }
           ]
         }
@@ -240,7 +252,7 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        3088,
+        3136,
         128
       ]
     },
@@ -324,8 +336,7 @@
     },
     {
       "parameters": {
-        "amount": 8,
-        "unit": "seconds"
+        "amount": 8
       },
       "id": "wait-analyze-style",
       "name": "Cooldown Analyze",
@@ -352,7 +363,7 @@
     },
     {
       "parameters": {
-        "jsCode": "return $input.all().map(item => ({\n  json: { niche: item.json?.niche || '', serpResults: item.json }\n}));"
+        "jsCode": "return $input.all().map(item => ({\n  json: { niche: $('Loop Over Items').first().json.niche || '', serpResults: item.json }\n}));"
       },
       "id": "store-niche",
       "name": "Store Niche Context",
@@ -377,14 +388,11 @@
       ]
     },
     {
-      "parameters": {
-        "amount": 5,
-        "unit": "seconds"
-      },
+      "parameters": {},
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        2000,
+        2016,
         128
       ],
       "id": "69d8e9c0-cfb8-448d-853e-28fa3e68efff",
@@ -393,13 +401,12 @@
     },
     {
       "parameters": {
-        "amount": 2,
-        "unit": "seconds"
+        "amount": 2
       },
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        2432,
+        2464,
         128
       ],
       "id": "bd6df7c6-6dc1-445a-8e8b-e774aebc5db0",
@@ -408,13 +415,12 @@
     },
     {
       "parameters": {
-        "amount": 15,
-        "unit": "seconds"
+        "amount": 15
       },
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        2864,
+        2912,
         128
       ],
       "id": "8e32914a-7cef-47a3-ae98-69b306e63454",
@@ -422,14 +428,11 @@
       "webhookId": "82f3049f-e1a1-4adb-8edb-4edd63596ad4"
     },
     {
-      "parameters": {
-        "amount": 5,
-        "unit": "seconds"
-      },
+      "parameters": {},
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        3296,
+        3360,
         128
       ],
       "id": "1f38b0f0-81be-4ea0-ac0c-12d48f3a3e92",
@@ -438,13 +441,12 @@
     },
     {
       "parameters": {
-        "amount": 12,
-        "unit": "seconds"
+        "amount": 12
       },
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        3728,
+        3808,
         128
       ],
       "id": "4d375c91-b8a3-44d4-9e97-5c2a653fc20b",
@@ -453,13 +455,12 @@
     },
     {
       "parameters": {
-        "amount": 3,
-        "unit": "seconds"
+        "amount": 3
       },
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        4160,
+        4256,
         128
       ],
       "id": "34067b37-c8c1-4d16-a175-89cb8832b70e",
@@ -468,13 +469,12 @@
     },
     {
       "parameters": {
-        "amount": 10,
-        "unit": "seconds"
+        "amount": 10
       },
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        4592,
+        4704,
         128
       ],
       "id": "5d91bfc3-f30f-4aa8-8d68-87958ed8c7e3",
@@ -769,7 +769,6 @@
       ]
     }
   },
-  "updatedAt": "2026-07-27 13:58:07.429",
   "settings": {
     "executionOrder": "v1"
   },
