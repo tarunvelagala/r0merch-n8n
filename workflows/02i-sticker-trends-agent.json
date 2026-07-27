@@ -205,6 +205,95 @@
         "amount": 8,
         "unit": "seconds"
       }
+    },
+    {
+      "id": "check-cse-02i-sticker-trends-agent",
+      "name": "CSE Has Results?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        700,
+        150
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ ($json.items || $json.organic_results || $json.shopping_results || []).length > 0 }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "serp-fallback-02i-sticker-trends-agent",
+      "name": "SerpAPI Fallback",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        960,
+        310
+      ],
+      "onError": "continueErrorOutput",
+      "parameters": {
+        "url": "https://serpapi.com/search.json",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "engine",
+              "value": "google"
+            },
+            {
+              "name": "q",
+              "value": "={{ ($('Unpack Input').first().json.niche || 'fitness') + ' sticker trending design cute funny aesthetic' }}"
+            },
+            {
+              "name": "api_key",
+              "value": "={{ $env.SERPAPI_KEY }}"
+            },
+            {
+              "name": "gl",
+              "value": "us"
+            },
+            {
+              "name": "hl",
+              "value": "en"
+            },
+            {
+              "name": "num",
+              "value": "20"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 25000
+        }
+      }
+    },
+    {
+      "id": "merge-cse-serp-02i-sticker-trends-agent",
+      "name": "Merge CSE/SerpAPI",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1220,
+        150
+      ],
+      "parameters": {
+        "jsCode": "// Use whichever result has data \u2014 CSE or SerpAPI fallback\nconst item = $input.first().json;\n// Normalize: map SerpAPI organic_results to items if needed\nif (!item.items && item.organic_results) {\n  item.items = item.organic_results.map(r => ({ title: r.title, link: r.link, snippet: r.snippet, displayLink: r.source }));\n}\nif (!item.items && item.shopping_results) {\n  item.items = item.shopping_results.map(r => ({ title: r.title, link: r.link, snippet: r.snippet }));\n}\nreturn [{ json: item }];"
+      }
     }
   ],
   "connections": {
@@ -292,6 +381,24 @@
       "main": [
         [
           {
+            "node": "CSE Has Results?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "SerpAPI Fallback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CSE Has Results?": {
+      "main": [
+        [
+          {
             "node": "Parse Sticker Signals",
             "type": "main",
             "index": 0
@@ -299,7 +406,36 @@
         ],
         [
           {
-            "node": "Skip Error",
+            "node": "SerpAPI Fallback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SerpAPI Fallback": {
+      "main": [
+        [
+          {
+            "node": "Merge CSE/SerpAPI",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Parse Sticker Signals",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge CSE/SerpAPI": {
+      "main": [
+        [
+          {
+            "node": "Parse Sticker Signals",
             "type": "main",
             "index": 0
           }
