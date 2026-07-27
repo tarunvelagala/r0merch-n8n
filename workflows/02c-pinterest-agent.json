@@ -156,7 +156,7 @@
         ],
         [
           {
-            "node": "Parse Pinterest Results",
+            "node": "Skip Error",
             "type": "main",
             "index": 0
           }

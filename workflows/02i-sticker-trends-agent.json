@@ -212,11 +212,6 @@
             "node": "Google Shopping Stickers",
             "type": "main",
             "index": 0
-          },
-          {
-            "node": "Redbubble Stickers",
-            "type": "main",
-            "index": 0
           }
         ]
       ]
@@ -232,7 +227,7 @@
         ],
         [
           {
-            "node": "Parse Sticker Signals",
+            "node": "Skip Error",
             "type": "main",
             "index": 0
           }

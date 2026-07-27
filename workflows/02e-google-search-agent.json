@@ -144,11 +144,6 @@
             "node": "SerpAPI Google Search",
             "type": "main",
             "index": 0
-          },
-          {
-            "node": "SerpAPI Niche Ideas Search",
-            "type": "main",
-            "index": 0
           }
         ]
       ]
@@ -164,7 +159,7 @@
         ],
         [
           {
-            "node": "Parse Google Results",
+            "node": "Skip Error",
             "type": "main",
             "index": 0
           }

@@ -144,11 +144,6 @@
             "node": "SerpAPI Timeseries",
             "type": "main",
             "index": 0
-          },
-          {
-            "node": "SerpAPI Related Queries",
-            "type": "main",
-            "index": 0
           }
         ]
       ]
@@ -164,7 +159,7 @@
         ],
         [
           {
-            "node": "Parse Trends",
+            "node": "Skip Error",
             "type": "main",
             "index": 0
           }

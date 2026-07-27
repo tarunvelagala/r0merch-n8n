@@ -199,11 +199,6 @@
             "node": "SerpAPI Twitter Search",
             "type": "main",
             "index": 0
-          },
-          {
-            "node": "SerpAPI Twitter Viral",
-            "type": "main",
-            "index": 0
           }
         ]
       ]
@@ -219,7 +214,7 @@
         ],
         [
           {
-            "node": "Collect Tweet Snippets",
+            "node": "Skip Error",
             "type": "main",
             "index": 0
           }
