@@ -180,6 +180,17 @@
         1180,
         300
       ]
+    },
+    {
+      "id": "skip-error",
+      "name": "Skip Error",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        900,
+        600
+      ],
+      "parameters": {}
     }
   ],
   "connections": {
