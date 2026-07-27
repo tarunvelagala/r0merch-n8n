@@ -108,7 +108,7 @@
         2200,
         300
       ],
-      "disabled": false,
+      "disabled": true,
       "notes": "Enable when REMOVE_BG_API_KEY is set in .env (50 free calls/month at remove.bg)"
     },
     {
@@ -126,7 +126,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ { data: [$json.imagePrompt + \", isolated on pure white background, bold flat vector illustration, screen print style, 3-5 spot colors max, no gradients, no shadows, no textures, high contrast, print-ready t-shirt graphic, centered composition, professional POD design\", \"Quality \u00b7 48 steps\", \"Ideogram (remote)\", 1024, 1024, $json.id || 42, false] } }}"
+        "jsonBody": "={{ { data: [$json.imagePrompt + \", transparent background (alpha channel), bold flat vector illustration, screen print style, 3-5 spot colors max, no gradients, no shadows, no textures, high contrast, print-ready t-shirt graphic, centered composition, professional POD design\", \"Quality \u00b7 48 steps\", \"Ideogram (remote)\", 1024, 1024, $json.id || 42, false] } }}"
       },
       "id": "ideogram-submit",
       "name": "Ideogram Submit",
@@ -397,7 +397,7 @@
       "main": [
         [
           {
-            "node": "Remove Background",
+            "node": "Prepare PNG Record",
             "type": "main",
             "index": 0
           }
