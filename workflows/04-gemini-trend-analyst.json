@@ -2,7 +2,7 @@
   "updatedAt": "2099-01-01T00:00:00.000Z",
   "createdAt": "2026-07-25T15:18:41.499Z",
   "id": "56d91c94-825f-4b48-90eb-08625926ef3e",
-  "name": "r0merch — Gemini Trend Analyst",
+  "name": "r0merch \u2014 Gemini Trend Analyst",
   "description": null,
   "active": true,
   "isArchived": false,
@@ -37,7 +37,7 @@
           ]
         },
         "method": "POST",
-        "jsonBody": "={{ {\n  model: \"llama-3.1-8b-instant\",\n  messages: [{\n    role: \"user\",\n    content: \"You are a POD trend analyst. Research data for niche: \" + ($json.trendReport ? JSON.parse($json.trendReport).niche : ($json.niche || \"\")) + \"\\n\\n\" + (() => { try { return $json.trendReport ? $json.trendReport : JSON.stringify($json); } catch(_) { return \"{}\"; } })() + \"\\n\\nIdentify: 1. Recurring colors (hex) 2. Typography styles 3. Illustrations/icons 4. Layouts 5. Underserved opportunities 6. Saturated ideas 7. Emerging trends 8. Audience segments 9. Seasonality 10. Top 5 design directions.\\n\\nReturn ONLY a JSON object, no markdown:\\n{\\\"recurringColors\\\":[],\\\"typographyStyles\\\":[],\\\"illustrations\\\":[],\\\"layouts\\\":[],\\\"underservedOpportunities\\\":[],\\\"saturatedIdeas\\\":[],\\\"emergingTrends\\\":[],\\\"audienceSegments\\\":[],\\\"seasonality\\\":{},\\\"topDesignDirections\\\":[]}\"\n  }],\n  temperature: 0.4,\n  max_tokens: 2048\n} }}"
+        "jsonBody": "={{ {\n  model: \"llama-3.1-8b-instant\",\n  messages: [{\n    role: \"user\",\n    content: \"You are a POD trend analyst. Research data for niche: \" + ($json.trendReport ? JSON.parse($json.trendReport).niche : ($json.niche || \"\")) + \"\\n\\n\" + (() => { try { return $json.trendReport ? $json.trendReport : JSON.stringify($json); } catch(_) { return \"{}\"; } })() + \"\\n\\nBased on this data, identify POD t-shirt design signals:\\n1. recurringColors: 3-5 hex colors that work for this niche\\n2. typographyStyles: MUST fill this - font styles matching niche culture. Examples: Bold condensed sans-serif, Distressed varsity, Clean minimalist sans, Hand-lettered script, Retro slab serif, All-caps stencil\\n3. illustrations: graphic elements and icons for this niche\\n4. layouts: MUST fill this - t-shirt layout styles. Examples: Large centered chest print, Left chest small logo, All-over repeat pattern, Vertical stacked text, Oversized back print, Sleeve wrap\\n5. underservedOpportunities: low competition angles with real demand\\n6. saturatedIdeas: overused concepts to avoid\\n7. emergingTrends: rising signals from the data\\n8. audienceSegments: specific buyer personas\\n9. seasonality: peak buying periods as object\\n10. topDesignDirections: 5 specific actionable design directions\\n\\nReturn ONLY a JSON object, no markdown:\\n{\\\"recurringColors\\\":[],\\\"typographyStyles\\\":[],\\\"illustrations\\\":[],\\\"layouts\\\":[],\\\"underservedOpportunities\\\":[],\\\"saturatedIdeas\\\":[],\\\"emergingTrends\\\":[],\\\"audienceSegments\\\":[],\\\"seasonality\\\":{},\\\"topDesignDirections\\\":[]}\"\n  }],\n  temperature: 0.4,\n  max_tokens: 2048\n} }}"
       },
       "id": "gemini-analyst",
       "name": "Groq Trend Analysis",
