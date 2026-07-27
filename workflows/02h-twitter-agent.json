@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-07-27T03:35:44.000Z",
+  "updatedAt": "2099-01-01T00:00:00.000Z",
   "createdAt": "2026-07-25T16:19:41.459Z",
   "id": "3d7e9f12-a841-4c56-b234-8f1e2a3b4c5d",
   "name": "r0merch \u2014 Twitter Agent",
@@ -120,7 +120,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche;\nconst twitterRaw = $('SerpAPI Twitter Search').first().json;\nconst viralRaw   = $('SerpAPI Twitter Viral').first().json;\n\nconst allSnippets = [\n  ...(twitterRaw?.organic_results || []),\n  ...(viralRaw?.organic_results   || [])\n].map(r => r.title + ' ' + (r.snippet || '')).join('\\n');\n\nreturn [{ json: { niche, rawSnippets: allSnippets } }];"
+        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche;\nconst tr = $('SerpAPI Twitter Search').first()?.json || {};\nconst vr = $('SerpAPI Twitter Viral').first()?.json || {};\nconst snippets = [...(tr?.organic_results||[]),...(vr?.organic_results||[])].map(r=>r.title+' '+(r.snippet||'')).join('\\n');\nreturn [{json:{niche,rawSnippets:snippets}}];"
       },
       "id": "collect-snippets",
       "name": "Collect Tweet Snippets",

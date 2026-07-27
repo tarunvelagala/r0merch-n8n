@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-07-27T03:35:44.000Z",
+  "updatedAt": "2099-01-01T00:00:00.000Z",
   "createdAt": "2026-07-25T15:18:37.645Z",
   "id": "1fb17f86-9092-4ea6-b5cd-4631ca01134c",
   "name": "r0merch \u2014 Google Search Agent",
@@ -112,7 +112,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche;\nconst mainRaw  = $('SerpAPI Google Search').first().json;\nconst nicheRaw = $('SerpAPI Niche Ideas Search').first().json;\n\nconst mapResult = r => ({\n  title:    r.title   || '',\n  url:      r.link    || '',\n  snippet:  r.snippet || '',\n  position: r.position || 0\n});\n\nconst organic      = (mainRaw?.organic_results  || []).map(mapResult);\nconst nicheResults = (nicheRaw?.organic_results || []).map(mapResult);\n\nconst relatedSearches = [\n  ...(mainRaw?.related_searches  || []).map(s => s.query),\n  ...(nicheRaw?.related_searches || []).map(s => s.query)\n].filter(Boolean);\n\nconst peopleAlsoAsk = (mainRaw?.related_questions || []).map(q => q.question).filter(Boolean);\n\nconst data = { organic, nicheResults, relatedSearches, peopleAlsoAsk };\n\nreturn [{ json: { source: 'google_search', niche, data } }];"
+        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche;\nconst mainRaw  = $('SerpAPI Google Search').first()?.json || {};\nconst nicheRaw = $('SerpAPI Niche Ideas Search').first()?.json || {};\nconst m = r => ({title:r.title||'',url:r.link||'',snippet:r.snippet||''});\nconst organic = (mainRaw?.organic_results||[]).map(m);\nconst relatedSearches = [...(mainRaw?.related_searches||[]).map(s=>s.query),...(nicheRaw?.related_searches||[]).map(s=>s.query)].filter(Boolean);\nconst peopleAlsoAsk = (mainRaw?.related_questions||[]).map(q=>q.question).filter(Boolean);\nreturn [{json:{source:'google_search',niche,data:{organic,relatedSearches,peopleAlsoAsk}}}];"
       },
       "id": "parse-google-search",
       "name": "Parse Google Results",

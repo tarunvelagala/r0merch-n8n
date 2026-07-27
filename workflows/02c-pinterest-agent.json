@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-07-27T03:35:44.000Z",
+  "updatedAt": "2099-01-01T00:00:00.000Z",
   "createdAt": "2026-07-25T15:18:35.734Z",
   "id": "09597748-4eb1-4b4c-a646-d802f2156694",
   "name": "r0merch \u2014 Pinterest Agent",
@@ -104,7 +104,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche;\nconst imagesRaw  = $('SerpAPI Google Images').first().json;\nconst trendRaw   = $('SerpAPI Trending Images').first().json;\n\nconst mapResult = r => ({\n  title:       r.title || '',\n  url:         r.link  || r.original || '',\n  image:       r.original || r.thumbnail || '',\n  source:      r.source || '',\n  snippet:     r.snippet || ''\n});\n\nconst pins     = (imagesRaw?.images_results || []).map(mapResult).slice(0, 20);\nconst trending = (trendRaw?.images_results  || []).map(mapResult).slice(0, 10);\n\nconst trendingKeywords = [\n  ...(imagesRaw?.suggested_searches || []).map(s => s.name || s.q || s).filter(Boolean),\n  ...(trendRaw?.suggested_searches  || []).map(s => s.name || s.q || s).filter(Boolean)\n].slice(0, 20);\n\nconst data = {\n  pins: [...pins, ...trending],\n  trendingKeywords\n};\n\nreturn [{ json: { source: 'pinterest', niche, data } }];"
+        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche;\nconst imagesRaw = $('SerpAPI Google Images').first()?.json || {};\nconst trendRaw  = $('SerpAPI Trending Images').first()?.json || {};\nconst m = r => ({title:r.title||'',url:r.link||r.original||'',image:r.original||r.thumbnail||''});\nconst pins = (imagesRaw?.images_results||[]).map(m).slice(0,20);\nconst trending = (trendRaw?.images_results||[]).map(m).slice(0,10);\nconst trendingKeywords = [...(imagesRaw?.suggested_searches||[]).map(s=>s.name||s.q||s),...(trendRaw?.suggested_searches||[]).map(s=>s.name||s.q||s)].slice(0,20);\nreturn [{json:{source:'pinterest',niche,data:{pins:[...pins,...trending],trendingKeywords}}}];"
       },
       "id": "parse-results",
       "name": "Parse Pinterest Results",

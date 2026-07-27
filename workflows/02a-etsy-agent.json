@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-07-27T03:35:44.000Z",
+  "updatedAt": "2099-01-01T00:00:00.000Z",
   "createdAt": "2026-07-25T15:18:33.804Z",
   "id": "25b7d461-1692-4fab-8739-5419bed842c5",
   "name": "r0merch \u2014 Etsy Agent",
@@ -112,7 +112,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche;\nconst shoppingRaw = $('SerpAPI Etsy Shopping').first().json;\nconst organicRaw  = $('SerpAPI Etsy Organic').first().json;\n\n// Shopping results \u2014 have price, image, rating\nconst shopping = (shoppingRaw?.shopping_results || []).map(r => ({\n  title:    r.title   || '',\n  url:      r.link    || '',\n  price:    r.price   || '',\n  image:    r.thumbnail || '',\n  rating:   r.rating  || 0,\n  reviews:  r.reviews || 0,\n  tags:     [],\n  source:   'google_shopping'\n}));\n\n// Organic results \u2014 extract tags from title keywords\nconst organic = (organicRaw?.organic_results || [])\n  .filter(r => r.link?.includes('etsy.com'))\n  .map(r => ({\n    title:    r.title   || '',\n    url:      r.link    || '',\n    price:    '',\n    image:    r.thumbnail || '',\n    rating:   0,\n    reviews:  0,\n    tags:     (r.title || '').toLowerCase().split(/[\\s,|\u2013-]+/).filter(t => t.length > 3),\n    source:   'google_organic'\n  }));\n\nconst data = [...shopping, ...organic].slice(0, 30);\n\nreturn [{ json: { source: 'etsy', niche, data } }];"
+        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche;\nconst shoppingRaw = $('SerpAPI Etsy Shopping').first()?.json || {};\nconst organicRaw  = $('SerpAPI Etsy Organic').first()?.json || {};\nconst shopping = (shoppingRaw?.shopping_results||[]).map(r=>({title:r.title||'',url:r.link||'',price:r.price||'',image:r.thumbnail||'',rating:r.rating||0,reviews:r.reviews||0,tags:[],source:'google_shopping'}));\nconst organic = (organicRaw?.organic_results||[]).filter(r=>r.link?.includes('etsy.com')).map(r=>({title:r.title||'',url:r.link||'',price:'',image:r.thumbnail||'',rating:0,reviews:0,tags:(r.title||'').toLowerCase().split(/[\\s,|]+/).filter(t=>t.length>3),source:'google_organic'}));\nreturn [{json:{source:'etsy',niche,data:[...shopping,...organic].slice(0,30)}}];"
       },
       "id": "parse-etsy",
       "name": "Parse Etsy Results",
