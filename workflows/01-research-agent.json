@@ -145,7 +145,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const niche = $('Unpack Input').first().json.niche || '';\n\nconst safe = (nodeName, def) => {\n  try {\n    const items = $(nodeName).all();\n    const found = items.find(i => i.json?.source || i.json?.data);\n    if (!found) return def;\n    const j = found.json;\n    return j.data ?? j ?? def;\n  } catch(_) { return def; }\n};\n\nreturn [{ json: {\n  niche,\n  etsy:         safe('Etsy Agent',          []),\n  amazon:       safe('Amazon Agent',         []),\n  pinterest:    safe('Pinterest Agent',      { pins:[], trendingKeywords:[] }),\n  reddit:       safe('Reddit Agent',         []),\n  googleSearch: safe('Google Search Agent',  { organic:[], relatedSearches:[], peopleAlsoAsk:[] }),\n  googleTrends: safe('Google Trends Agent',  { timeline:[], trendDirection:'stable', risingQueries:[], topQueries:[] }),\n  vision:       safe('Vision Agent',         []),\n  twitter:      safe('Twitter Agent',        {}),\n  stickers:     safe('Sticker Trends Agent', { colors:[], styles:[], iconThemes:[], originalConcepts:[] }),\n  collectedAt:  new Date().toISOString()\n} }];"
+        "jsCode": "const niche = $('Unpack Input').first().json.niche || '';\n\nconst safe = (nodeName, def) => {\n  try {\n    const items = $(nodeName).all();\n    const found = items.find(i => i.json?.source || i.json?.data);\n    if (!found) return def;\n    return found.json.data ?? def;\n  } catch(_) { return def; }\n};\n\nreturn [{ json: {\n  niche,\n  etsy:         [],\n  amazon:       [],\n  pinterest:    { pins:[], trendingKeywords:[] },\n  reddit:       [],\n  googleSearch: safe('Google Search Agent',  { organic:[], relatedSearches:[], peopleAlsoAsk:[] }),\n  googleTrends: safe('Google Trends Agent',  { timeline:[], trendDirection:'stable', risingQueries:[], topQueries:[] }),\n  vision:       [],\n  twitter:      safe('Twitter Agent',        {}),\n  stickers:     safe('Sticker Trends Agent', { colors:[], styles:[], iconThemes:[], originalConcepts:[] }),\n  collectedAt:  new Date().toISOString()\n} }];"
       },
       "id": "combine-research",
       "name": "Combine Research",
@@ -194,37 +194,12 @@
       "main": [
         [
           {
-            "node": "Etsy Agent",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Amazon Agent",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Pinterest Agent",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Reddit Agent",
-            "type": "main",
-            "index": 0
-          },
-          {
             "node": "Google Search Agent",
             "type": "main",
             "index": 0
           },
           {
             "node": "Google Trends Agent",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Vision Agent",
             "type": "main",
             "index": 0
           },
