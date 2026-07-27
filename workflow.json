@@ -23,7 +23,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Read niches from /niches.csv (mounted from project root)\n// Add/remove rows in niches.csv to change what the pipeline processes\n// Format: one niche per line (header row: niche)\nconst fs = require('fs');\n\nlet lines = [];\ntry {\n  const raw = fs.readFileSync('/niches.csv', 'utf8');\n  lines = raw.split('\\n')\n    .map(l => l.trim())\n    .filter(l => l && l.toLowerCase() !== 'niche');\n} catch(e) {\n  // Fallback if file not found\n  lines = ['fitness', 'nurse', 'cat-lovers'];\n}\n\n// Design style lookup \u2014 edit here to customise per niche\n// If niche not listed here, a default style is used\nconst styleMap = {\n  'fitness':    'motivational two-word phrases, bold single word, gym slang, emoji + word combos like \ud83d\udcaaGRIND',\n  'gen-z':      'ironic one-liners, emoji combos \ud83d\udc80\u2728, internet slang, two-word absurdist phrases, lowercase aesthetic',\n  'anime':      'japanese kanji + english mix, character silhouettes, one word in bold katakana',\n  'christian':  'faith-based two-word phrases, cross + word combos, bible verse typography',\n  'nurse':      'humor + profession combos, two-word slogans, emoji + role like \ud83d\udc89NURSE, sarcastic one-liners',\n  'cat-lovers': 'cute emoji combos \ud83d\udc31, one-word cat puns, ironic cat phrases, minimalist cat silhouette + word',\n  'dog-lovers': 'dog puns, pawsitive vibes, playful one-liners, bold + cute',\n  'teacher':    'sarcastic teacher humor, two-word phrases, pencil/apple motifs, bold serif',\n  'veteran':    'patriotic bold phrases, military symbols, honor + duty typography',\n  'mom':        'mom humor, coffee + chaos, two-word relatable phrases, soft bold',\n  'dad':        'dad joke one-liners, two-word groan phrases, minimal graphic + word',\n};\n\nconst defaultStyle = 'bold two-word phrases, minimalist graphic, clean typography, urban aesthetic';\n\nreturn lines.map(niche => ({\n  json: {\n    niche,\n    design_style: styleMap[niche.toLowerCase()] || defaultStyle,\n    marketing_pages: `r/${niche.replace(/[^a-zA-Z0-9]/g, '')}`\n  }\n}));"
+        "jsCode": "const fs = require('fs');\nlet lines = [];\ntry {\n  const raw = fs.readFileSync('/niches.csv', 'utf8');\n  lines = raw.split('\\n').map(l => l.trim()).filter(l => l && l.toLowerCase() !== 'niche');\n} catch(e) {\n  lines = ['fitness', 'nurse', 'cat-lovers'];\n}\nreturn lines.map(niche => ({ json: { niche } }));"
       },
       "id": "read-niches",
       "name": "Read Niches",
@@ -63,7 +63,7 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        880,
+        1160,
         300
       ]
     },
@@ -240,6 +240,96 @@
         1430,
         300
       ]
+    },
+    {
+      "id": "style-search",
+      "name": "Research Design Style",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        440,
+        300
+      ],
+      "onError": "continueErrorOutput",
+      "parameters": {
+        "url": "https://serpapi.com/search.json",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "engine",
+              "value": "google_shopping"
+            },
+            {
+              "name": "q",
+              "value": "={{ $json.niche + ' t-shirt bestseller' }}"
+            },
+            {
+              "name": "api_key",
+              "value": "={{ $env.SERPAPI_KEY }}"
+            },
+            {
+              "name": "gl",
+              "value": "us"
+            },
+            {
+              "name": "hl",
+              "value": "en"
+            },
+            {
+              "name": "num",
+              "value": "10"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 20000
+        }
+      }
+    },
+    {
+      "id": "analyze-style",
+      "name": "Analyze Design Style",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        680,
+        300
+      ],
+      "onError": "continueErrorOutput",
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + $env.GROQ_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  model: 'llama-3.1-8b-instant',\n  messages: [{\n    role: 'user',\n    content: 'You are a POD design strategist. Based on these REAL bestselling t-shirt titles for the \"'\n           + $('Read Niches').first().json.niche\n           + '\" niche:\\n\\n'\n           + ($json?.shopping_results || []).slice(0,8).map(r => '- ' + r.title).join('\\n')\n           + '\\n\\nDescribe the dominant design style in ONE sentence (max 20 words).'\n           + ' Focus on: phrase patterns, tone, typography, graphics.'\n           + ' Return ONLY the style description, nothing else.'\n  }],\n  max_tokens: 60,\n  temperature: 0.3\n}) }}"
+      }
+    },
+    {
+      "id": "parse-niche-style",
+      "name": "Parse Niche Style",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        920,
+        300
+      ],
+      "parameters": {
+        "jsCode": "const niche = $('Read Niches').first().json.niche;\nconst raw = $input.first().json?.choices?.[0]?.message?.content || '';\nconst design_style = raw.trim() || 'bold two-word phrases, minimalist graphic, clean urban typography';\nreturn [{ json: {\n  niche,\n  design_style,\n  marketing_pages: 'r/' + niche.replace(/[^a-zA-Z0-9]/g, '')\n} }];"
+      }
     }
   ],
   "connections": {
@@ -258,7 +348,7 @@
       "main": [
         [
           {
-            "node": "Research Agent",
+            "node": "Research Design Style",
             "type": "main",
             "index": 0
           }
@@ -347,6 +437,53 @@
         [
           {
             "node": "Generate Image Prompts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Research Design Style": {
+      "main": [
+        [
+          {
+            "node": "Analyze Design Style",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Parse Niche Style",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze Design Style": {
+      "main": [
+        [
+          {
+            "node": "Parse Niche Style",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Parse Niche Style",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Niche Style": {
+      "main": [
+        [
+          {
+            "node": "Research Agent",
             "type": "main",
             "index": 0
           }
