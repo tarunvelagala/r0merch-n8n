@@ -1,18 +1,19 @@
 {
+  "id": "1790571d-754c-4445-be73-1c370705998b",
   "name": "r0merch \u2014 Main Orchestrator",
   "nodes": [
     {
+      "parameters": {
+        "jsCode": "// \u270f\ufe0f EDIT THIS LIST to add/remove niches\n// One niche name per entry \u2014 the pipeline runs once per niche\nconst niches = [\n  'fitness',\n  'gen-z',\n  'nurse',\n  'christian',\n  'cat-lovers',\n];\n\nreturn niches.map(niche => ({ json: { niche } }));"
+      },
       "id": "read-niches",
       "name": "Read Niches",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        220,
-        300
-      ],
-      "parameters": {
-        "jsCode": "// \u270f\ufe0f EDIT THIS LIST to add/remove niches\n// One niche name per entry \u2014 the pipeline runs once per niche\nconst niches = [\n  'fitness',\n  'gen-z',\n  'nurse',\n  'christian',\n  'cat-lovers',\n];\n\nreturn niches.map(niche => ({ json: { niche } }));"
-      }
+        224,
+        304
+      ]
     },
     {
       "parameters": {
@@ -31,203 +32,119 @@
       "typeVersion": 1.2,
       "position": [
         0,
-        300
+        304
       ]
     },
     {
       "parameters": {
         "workflowId": "f978e116-7fe9-465d-8bb2-c61587fae2b9",
-        "workflowInputs": {
-          "values": [
-            {
-              "name": "niche",
-              "stringValue": "={{ $json.niche }}"
-            },
-            {
-              "name": "design_style",
-              "stringValue": "={{ $json.design_style }}"
-            },
-            {
-              "name": "marketing_pages",
-              "stringValue": "={{ $json.marketing_pages }}"
-            },
-            {
-              "name": "reddit_context",
-              "stringValue": "={{ $json.reddit_context }}"
-            }
-          ]
-        }
+        "options": {}
       },
       "id": "exec-research",
       "name": "Research Agent",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        1400,
-        300
+        1344,
+        304
       ]
     },
     {
       "parameters": {
         "workflowId": "bfa7568e-33a0-4ab6-8494-667e213eea00",
-        "workflowInputs": {
-          "values": [
-            {
-              "name": "researchData",
-              "stringValue": "={{ JSON.stringify($json) }}"
-            }
-          ]
-        }
+        "options": {}
       },
       "id": "exec-trend-agg",
       "name": "Trend Aggregator",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        1100,
-        300
+        1568,
+        304
       ]
     },
     {
       "parameters": {
         "workflowId": "56d91c94-825f-4b48-90eb-08625926ef3e",
-        "workflowInputs": {
-          "values": [
-            {
-              "name": "trendReport",
-              "stringValue": "={{ JSON.stringify($json) }}"
-            },
-            {
-              "name": "niche",
-              "stringValue": "={{ $json.niche }}"
-            }
-          ]
-        }
+        "options": {}
       },
       "id": "exec-gemini-analyst",
       "name": "Gemini Trend Analyst",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        1320,
-        300
+        1792,
+        304
       ]
     },
     {
       "parameters": {
         "workflowId": "6673d7e3-9b47-450e-81c9-b470e83e7230",
-        "workflowInputs": {
-          "values": [
-            {
-              "name": "trendAnalysis",
-              "stringValue": "={{ JSON.stringify($('Gemini Trend Analyst').first().json) }}"
-            },
-            {
-              "name": "niche",
-              "stringValue": "={{ $('Gemini Trend Analyst').first().json.niche || $json.niche }}"
-            }
-          ]
-        }
+        "options": {}
       },
       "id": "exec-prompt-gen",
       "name": "Generate Image Prompts",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        1760,
-        300
+        2240,
+        304
       ]
     },
     {
       "parameters": {
         "workflowId": "a7e13a5f-b228-40c9-b37a-c91545985814",
-        "workflowInputs": {
-          "values": [
-            {
-              "name": "concept",
-              "stringValue": "={{ JSON.stringify($json.concept) }}"
-            },
-            {
-              "name": "niche",
-              "stringValue": "={{ $json.niche }}"
-            }
-          ]
-        }
+        "options": {}
       },
       "id": "exec-image-gen",
       "name": "Generate PNG Designs",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        1980,
-        300
+        2464,
+        304
       ]
     },
     {
       "parameters": {
         "workflowId": "70f2fdb2-215a-4dd5-968b-aceac3989e2f",
-        "workflowInputs": {
-          "values": [
-            {
-              "name": "designs",
-              "stringValue": "={{ JSON.stringify($json) }}"
-            },
-            {
-              "name": "niche",
-              "stringValue": "={{ $json.niche }}"
-            }
-          ]
-        }
+        "options": {}
       },
       "id": "exec-seo-gen",
       "name": "Generate SEO Metadata",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        2200,
-        300
+        2688,
+        304
       ]
     },
     {
       "parameters": {
         "workflowId": "5be92a45-a579-44e8-bf9c-7443d99080c5",
-        "workflowInputs": {
-          "values": [
-            {
-              "name": "records",
-              "stringValue": "={{ JSON.stringify($json) }}"
-            }
-          ]
-        }
+        "options": {}
       },
       "id": "exec-database",
       "name": "Save to Database",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        2420,
-        300
+        2912,
+        304
       ]
     },
     {
       "parameters": {
         "workflowId": "8770f81f-e7ce-469e-a60b-410df33f951f",
-        "workflowInputs": {
-          "values": [
-            {
-              "name": "listings",
-              "stringValue": "={{ JSON.stringify($json) }}"
-            }
-          ]
-        }
+        "options": {}
       },
       "id": "exec-publisher",
       "name": "Publish to Etsy / Amazon",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        2640,
-        300
+        3136,
+        304
       ],
       "disabled": true,
       "notes": "Optional \u2014 enable when ready to publish"
@@ -235,34 +152,18 @@
     {
       "parameters": {
         "workflowId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-        "workflowInputs": {
-          "values": [
-            {
-              "name": "category",
-              "stringValue": "={{ $json.niche }}"
-            }
-          ]
-        }
+        "options": {}
       },
       "id": "exec-keyword-gen",
       "name": "Generate Keywords",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        1430,
-        300
+        2016,
+        304
       ]
     },
     {
-      "id": "style-search",
-      "name": "Research Design Style",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        440,
-        300
-      ],
-      "onError": "continueErrorOutput",
       "parameters": {
         "url": "https://serpapi.com/search.json",
         "sendQuery": true,
@@ -297,18 +198,18 @@
         "options": {
           "timeout": 20000
         }
-      }
-    },
-    {
-      "id": "analyze-style",
-      "name": "Analyze Design Style",
+      },
+      "id": "style-search",
+      "name": "Research Design Style",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        900,
-        300
+        448,
+        304
       ],
-      "onError": "continueErrorOutput",
+      "onError": "continueErrorOutput"
+    },
+    {
       "parameters": {
         "method": "POST",
         "url": "https://api.groq.com/openai/v1/chat/completions",
@@ -327,21 +228,44 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({\n  model: 'llama-3.1-8b-instant',\n  messages: [{\n    role: 'user',\n    content: 'You are a POD design strategist. Based on these REAL bestselling t-shirt titles for the \"'\n           + $json.niche\n           + '\" niche:\\n\\n'\n           + ($json.serpResults?.shopping_results || []).slice(0,8).map(r => '- ' + r.title).join('\\n')\n           + '\\n\\nDescribe the dominant design style in ONE sentence (max 20 words).'\n           + ' Focus on: phrase patterns, tone, typography, graphics.'\n           + ' Return ONLY the style description, nothing else.'\n  }],\n  max_tokens: 60,\n  temperature: 0.3\n}) }}"
-      }
+        "jsonBody": "={{ JSON.stringify({\n  model: 'llama-3.1-8b-instant',\n  messages: [{\n    role: 'user',\n    content: 'You are a POD design strategist. Based on these REAL bestselling t-shirt titles for the \"'\n           + $json.niche\n           + '\" niche:\\n\\n'\n           + ($json.serpResults?.shopping_results || []).slice(0,8).map(r => '- ' + r.title).join('\\n')\n           + '\\n\\nDescribe the dominant design style in ONE sentence (max 20 words).'\n           + ' Focus on: phrase patterns, tone, typography, graphics.'\n           + ' Return ONLY the style description, nothing else.'\n  }],\n  max_tokens: 60,\n  temperature: 0.3\n}) }}",
+        "options": {}
+      },
+      "id": "analyze-style",
+      "name": "Analyze Design Style",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        896,
+        304
+      ],
+      "onError": "continueErrorOutput"
     },
     {
+      "parameters": {
+        "jsCode": "// Niche comes from Store Niche Context which preserved it from Read Niches\nconst niche = $('Store Niche Context').first().json.niche || '';\nconst raw = $input.first().json?.choices?.[0]?.message?.content || '';\nconst design_style = raw.trim() || 'bold two-word phrases, minimalist graphic, clean urban typography';\nreturn [{ json: {\n  niche,\n  design_style,\n  marketing_pages: 'r/' + niche.replace(/[^a-zA-Z0-9]/g, '')\n} }];"
+      },
       "id": "parse-niche-style",
       "name": "Parse Niche Style",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1160,
-        300
-      ],
+        1120,
+        304
+      ]
+    },
+    {
       "parameters": {
-        "jsCode": "// Niche comes from Store Niche Context which preserved it from Read Niches\nconst niche = $('Store Niche Context').first().json.niche || '';\nconst raw = $input.first().json?.choices?.[0]?.message?.content || '';\nconst design_style = raw.trim() || 'bold two-word phrases, minimalist graphic, clean urban typography';\nreturn [{ json: {\n  niche,\n  design_style,\n  marketing_pages: 'r/' + niche.replace(/[^a-zA-Z0-9]/g, '')\n} }];"
-      }
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        608,
+        544
+      ],
+      "id": "f12efe98-d0a0-49b3-b7dc-793fab6c41a3",
+      "name": "Split Out"
     },
     {
       "id": "store-niche",
@@ -538,18 +462,17 @@
       ]
     }
   },
-  "active": false,
+  "updatedAt": "2099-01-01T00:00:00.000Z",
+  "active": true,
   "settings": {
     "executionOrder": "v1"
-  },
-  "meta": {
-    "instanceId": ""
   },
   "tags": [
     "pod",
     "orchestrator",
     "r0merch"
   ],
-  "id": "1790571d-754c-4445-be73-1c370705998b",
-  "updatedAt": "2026-07-27T03:33:01.000Z"
+  "meta": {
+    "instanceId": ""
+  }
 }
