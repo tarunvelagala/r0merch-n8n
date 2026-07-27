@@ -1,8 +1,8 @@
 {
-  "updatedAt": "2026-07-27T03:35:44.000Z",
+  "updatedAt": "2099-01-01T00:00:00.000Z",
   "createdAt": "2026-07-25T15:18:34.784Z",
   "id": "5263dc0c-b3cc-4962-b9d0-de12fb260b56",
-  "name": "r0merch — Amazon Agent",
+  "name": "r0merch \u2014 Amazon Agent",
   "description": null,
   "active": true,
   "isArchived": false,
@@ -26,32 +26,36 @@
           "parameters": [
             {
               "name": "engine",
-              "value": "amazon"
+              "value": "google"
             },
             {
-              "name": "k",
-              "value": "={{ $json.niche + ' t-shirt' }}"
-            },
-            {
-              "name": "amazon_domain",
-              "value": "amazon.com"
+              "name": "q",
+              "value": "={{ 'site:amazon.com/dp ' + $json.niche + ' t-shirt best selling graphic tee' }}"
             },
             {
               "name": "api_key",
               "value": "={{ $env.SERPAPI_KEY }}"
             },
             {
-              "name": "department",
-              "value": "fashion-mens-graphic-tees"
+              "name": "gl",
+              "value": "us"
+            },
+            {
+              "name": "hl",
+              "value": "en"
+            },
+            {
+              "name": "num",
+              "value": "20"
             }
           ]
         },
         "options": {
-          "timeout": 30000
+          "timeout": 25000
         }
       },
-      "id": "amazon-fetch",
-      "name": "SerpAPI Amazon Search",
+      "id": "amazon-google-search",
+      "name": "Amazon via Google",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
@@ -62,7 +66,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche;\nconst results = $input.first().json?.organic_results || [];\n\nconst data = results.map(item => ({\n  title:   item.title || '',\n  url:     item.link  || `https://www.amazon.com/dp/${item.asin}`,\n  price:   item.price?.raw || item.price || '',\n  image:   item.thumbnail || '',\n  rating:  item.rating || 0,\n  reviews: item.reviews?.total || item.ratings_total || 0,\n  asin:    item.asin || '',\n  bsr:     item.bestseller_rank || null\n}));\n\nreturn [{ json: { source: 'amazon', niche, data } }];"
+        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche;\nconst raw = $('Amazon via Google').first()?.json || {};\nconst results = (raw?.organic_results || []).filter(r => r.link?.includes('amazon.com'));\nconst data = results.map(r => ({\n  title:   r.title   || '',\n  url:     r.link    || '',\n  price:   '',\n  image:   r.thumbnail || '',\n  rating:  0,\n  reviews: 0,\n  asin:    (r.link || '').match(/\\/dp\\/([A-Z0-9]{10})/)?.[1] || '',\n  snippet: r.snippet || ''\n}));\nreturn [{ json: { source: 'amazon', niche, data } }];"
       },
       "id": "parse-amazon",
       "name": "Parse Amazon Results",
@@ -79,14 +83,14 @@
       "main": [
         [
           {
-            "node": "SerpAPI Amazon Search",
+            "node": "Amazon via Google",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "SerpAPI Amazon Search": {
+    "Amazon via Google": {
       "main": [
         [
           {

@@ -39,11 +39,11 @@
           "parameters": [
             {
               "name": "engine",
-              "value": "google_shopping"
+              "value": "google"
             },
             {
               "name": "q",
-              "value": "={{ ($json.niche || 'fitness') + ' sticker trending design' }}"
+              "value": "={{ ($json.niche || 'fitness') + ' sticker trending design cute funny aesthetic' }}"
             },
             {
               "name": "api_key",
@@ -68,7 +68,7 @@
         }
       },
       "id": "shopping-stickers",
-      "name": "Google Shopping Stickers",
+      "name": "Sticker Google Search",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
@@ -126,7 +126,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const niche = $('Unpack Input').first().json.niche;\nconst shopRaw = $('Google Shopping Stickers').first()?.json || {};\n\nconst results = shopRaw?.shopping_results || [];\n\n// Extract price signals\nconst prices = results.map(r => parseFloat((r.price || '').replace(/[^0-9.]/g, ''))).filter(p => p > 0);\nconst avgPrice = prices.length ? (prices.reduce((s,p) => s+p, 0) / prices.length).toFixed(2) : null;\n\n// Top titles as inspiration seeds\nconst inspirationSeeds = results.slice(0, 10).map(r => r.title).filter(Boolean);\n\n// Extract keywords from titles (all meaningful words)\nconst stopWords = new Set(['sticker','stickers','the','a','an','for','of','and','or','in','on','with','by','to','is','at','it','its','be','as','this','that','are','was','were','been','from']);\nconst allWords = results\n  .flatMap(r => (r.title || '').toLowerCase().split(/[\\s\\-\\/,.|&]+/))\n  .filter(w => w.length > 3 && !stopWords.has(w));\n\n// Frequency count\nconst freq = {};\nallWords.forEach(w => { freq[w] = (freq[w] || 0) + 1; });\nconst topWords = Object.entries(freq).sort((a,b) => b[1]-a[1]).slice(0, 20).map(([w]) => w);\n\n// Categorize by type\nconst colorTerms = ['black','white','red','blue','green','yellow','pink','purple','orange','gold','silver','neon','pastel','rainbow','bright','dark','colorful'];\nconst styleTerms = ['minimalist','vintage','retro','bold','cute','funny','aesthetic','cartoon','kawaii','floral','geometric','abstract','watercolor','flat','typographic','hand-drawn','grunge','boho'];\nconst iconTerms  = ['skull','heart','star','moon','sun','flower','leaf','wave','mountain','cat','dog','mushroom','ghost','lightning','crown','diamond','butterfly','dumbbell','weights','yoga','running','gym'];\n\nconst colors = topWords.filter(w => colorTerms.some(c => w.includes(c)));\nconst styles = topWords.filter(w => styleTerms.some(s => w.includes(s)));\nconst iconThemes = topWords.filter(w => iconTerms.some(i => w.includes(i)));\n\n// Also scan full titles for these terms\nconst fullText = results.map(r => r.title || '').join(' ').toLowerCase();\nconst scanFor = (terms) => [...new Set(terms.filter(t => fullText.includes(t)))];\n\nreturn [{ json: {\n  source: 'stickers',\n  niche,\n  data: {\n    colors:           scanFor(colorTerms).slice(0, 8),\n    styles:           scanFor(styleTerms).slice(0, 8),\n    iconThemes:       scanFor(iconTerms).slice(0, 8),\n    topKeywords:      topWords.slice(0, 15),\n    inspirationSeeds,\n    avgStickerPrice:  avgPrice,\n    totalResults:     results.length,\n    legalNote:        'Style signals from public metadata only'\n  }\n} }];"
+        "jsCode": "const niche = $('Unpack Input').first().json.niche;\nconst shopRaw = $('Sticker Google Search').first()?.json || {};\n\nconst results = shopRaw?.shopping_results || [];\n\n// Extract price signals\nconst prices = results.map(r => parseFloat((r.price || '').replace(/[^0-9.]/g, ''))).filter(p => p > 0);\nconst avgPrice = prices.length ? (prices.reduce((s,p) => s+p, 0) / prices.length).toFixed(2) : null;\n\n// Top titles as inspiration seeds\nconst inspirationSeeds = results.slice(0, 10).map(r => r.title).filter(Boolean);\n\n// Extract keywords from titles (all meaningful words)\nconst stopWords = new Set(['sticker','stickers','the','a','an','for','of','and','or','in','on','with','by','to','is','at','it','its','be','as','this','that','are','was','were','been','from']);\nconst allWords = results\n  .flatMap(r => (r.title || '').toLowerCase().split(/[\\s\\-\\/,.|&]+/))\n  .filter(w => w.length > 3 && !stopWords.has(w));\n\n// Frequency count\nconst freq = {};\nallWords.forEach(w => { freq[w] = (freq[w] || 0) + 1; });\nconst topWords = Object.entries(freq).sort((a,b) => b[1]-a[1]).slice(0, 20).map(([w]) => w);\n\n// Categorize by type\nconst colorTerms = ['black','white','red','blue','green','yellow','pink','purple','orange','gold','silver','neon','pastel','rainbow','bright','dark','colorful'];\nconst styleTerms = ['minimalist','vintage','retro','bold','cute','funny','aesthetic','cartoon','kawaii','floral','geometric','abstract','watercolor','flat','typographic','hand-drawn','grunge','boho'];\nconst iconTerms  = ['skull','heart','star','moon','sun','flower','leaf','wave','mountain','cat','dog','mushroom','ghost','lightning','crown','diamond','butterfly','dumbbell','weights','yoga','running','gym'];\n\nconst colors = topWords.filter(w => colorTerms.some(c => w.includes(c)));\nconst styles = topWords.filter(w => styleTerms.some(s => w.includes(s)));\nconst iconThemes = topWords.filter(w => iconTerms.some(i => w.includes(i)));\n\n// Also scan full titles for these terms\nconst fullText = results.map(r => r.title || '').join(' ').toLowerCase();\nconst scanFor = (terms) => [...new Set(terms.filter(t => fullText.includes(t)))];\n\nreturn [{ json: {\n  source: 'stickers',\n  niche,\n  data: {\n    colors:           scanFor(colorTerms).slice(0, 8),\n    styles:           scanFor(styleTerms).slice(0, 8),\n    iconThemes:       scanFor(iconTerms).slice(0, 8),\n    topKeywords:      topWords.slice(0, 15),\n    inspirationSeeds,\n    avgStickerPrice:  avgPrice,\n    totalResults:     results.length,\n    legalNote:        'Style signals from public metadata only'\n  }\n} }];"
       },
       "id": "parse-stickers",
       "name": "Parse Sticker Signals",
@@ -223,25 +223,7 @@
       "main": [
         [
           {
-            "node": "Google Shopping Stickers",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Google Shopping Stickers": {
-      "main": [
-        [
-          {
-            "node": "Parse Sticker Signals",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Skip Error",
+            "node": "Sticker Google Search",
             "type": "main",
             "index": 0
           }
@@ -300,6 +282,24 @@
         [
           {
             "node": "Groq Sticker Concepts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sticker Google Search": {
+      "main": [
+        [
+          {
+            "node": "Parse Sticker Signals",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Skip Error",
             "type": "main",
             "index": 0
           }

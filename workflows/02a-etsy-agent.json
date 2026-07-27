@@ -2,7 +2,7 @@
   "updatedAt": "2099-01-01T00:00:00.000Z",
   "createdAt": "2026-07-25T15:18:33.804Z",
   "id": "25b7d461-1692-4fab-8739-5419bed842c5",
-  "name": "r0merch — Etsy Agent",
+  "name": "r0merch \u2014 Etsy Agent",
   "description": null,
   "active": true,
   "isArchived": false,
@@ -112,7 +112,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche;\nconst shoppingRaw = $('SerpAPI Etsy Shopping').first()?.json || {};\nconst organicRaw  = (() => { try { return $('SerpAPI Etsy Organic').first()?.json || {}; } catch(_) { return {}; } })();\nconst shopping = (shoppingRaw?.shopping_results||[]).map(r=>({title:r.title||'',url:r.link||'',price:r.price||'',image:r.thumbnail||'',rating:r.rating||0,reviews:r.reviews||0,tags:[],source:'google_shopping'}));\nconst organic = (organicRaw?.organic_results||[]).filter(r=>r.link?.includes('etsy.com')).map(r=>({title:r.title||'',url:r.link||'',price:'',image:r.thumbnail||'',rating:0,reviews:0,tags:(r.title||'').toLowerCase().split(/[\\s,|]+/).filter(t=>t.length>3),source:'google_organic'}));\nreturn [{json:{source:'etsy',niche,data:[...shopping,...organic].slice(0,30)}}];"
+        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche;\nconst raw = (() => { try { return $('Etsy via Google').first()?.json || {}; } catch(_) { return {}; } })();\nconst results = (raw?.organic_results || []).filter(r => r.link?.includes('etsy.com'));\nconst data = results.map(r => ({\n  title:   r.title   || '',\n  url:     r.link    || '',\n  price:   '',\n  image:   r.thumbnail || '',\n  rating:  0,\n  reviews: 0,\n  tags:    (r.title || '').toLowerCase().split(/[\\s,|]+/).filter(t => t.length > 3),\n  snippet: r.snippet || ''\n}));\nreturn [{ json: { source: 'etsy', niche, data } }];"
       },
       "id": "parse-etsy",
       "name": "Parse Etsy Results",
@@ -140,12 +140,7 @@
       "main": [
         [
           {
-            "node": "SerpAPI Etsy Shopping",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "SerpAPI Etsy Organic",
+            "node": "Etsy via Google",
             "type": "main",
             "index": 0
           }
