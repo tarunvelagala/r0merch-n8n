@@ -20,7 +20,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Niche passed directly from orchestrator workflowInputs\nconst _triggerInput = $input.all()[0]?.json || {};\nconst _niche = _triggerInput.niche || '';\n\nconst raw = $input.all()[0]?.json || {};\nlet design = raw.designs || raw.concept || raw;\nif (typeof design === 'string') {\n  try { design = JSON.parse(design); } catch(_) {}\n}\nif (Array.isArray(design)) design = design[0] || {};\n// niche: direct field takes priority over nested\nconst niche = _niche || raw.niche || design.niche || '';\nreturn [{ json: { niche, ...design, niche } }];"
+        "jsCode": "const raw = $input.all()[0]?.json || {};\nconst niche = raw.niche || '';\n\n// design could be:\n// - a JSON string containing the concept object\n// - an object directly\n// - raw itself (flat record from image generator)\nlet design = {};\nconst rawDesign = raw.designs || raw.concept || null;\n\nif (rawDesign === null) {\n  // raw IS the design record\n  design = raw;\n} else if (typeof rawDesign === 'string') {\n  try {\n    const parsed = JSON.parse(rawDesign);\n    design = Array.isArray(parsed) ? (parsed[0] || {}) : parsed;\n  } catch(_) {\n    // It's a plain string keyword \u2014 use raw as the design\n    design = raw;\n  }\n} else if (Array.isArray(rawDesign)) {\n  design = rawDesign[0] || {};\n} else {\n  design = rawDesign;\n}\n\n// Ensure design is a plain object not a string\nif (typeof design !== 'object' || design === null) design = raw;\n\nreturn [{ json: { niche: niche || design.niche || '', ...design } }];"
       },
       "id": "split-designs",
       "name": "Unpack Design",
