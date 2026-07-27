@@ -1,8 +1,8 @@
 {
-  "updatedAt": "2026-07-27T12:04:02.912Z",
+  "updatedAt": "2099-01-01T00:00:00.000Z",
   "createdAt": "2026-07-27T12:04:02.912Z",
   "id": "b2c3d4e5-f6a7-8901-bcde-f23456789012",
-  "name": "r0merch — Sticker Trends Agent",
+  "name": "r0merch \u2014 Sticker Trends Agent",
   "description": null,
   "active": true,
   "isArchived": false,
@@ -121,11 +121,12 @@
         440,
         450
       ],
-      "onError": "continueErrorOutput"
+      "onError": "continueErrorOutput",
+      "disabled": true
     },
     {
       "parameters": {
-        "jsCode": "const niche = $('Unpack Input').first().json.niche;\nconst shopRaw = $('Google Shopping Stickers').first()?.json || {};\nconst rbRaw   = $('Redbubble Stickers').first()?.json || {};\n\n// Extract style signals from sticker titles/descriptions — NOT copying designs\n// We only extract: color words, style descriptors, typography hints, theme keywords\nconst colorWords = /\\b(black|white|red|blue|green|yellow|pink|purple|orange|gold|silver|neon|pastel|vintage|retro|dark|light|minimal|bold|bright|muted|earthy|rainbow)\\b/gi;\nconst styleWords = /\\b(minimalist|vintage|retro|bold|cute|funny|aesthetic|cottagecore|y2k|vaporwave|grunge|gothic|kawaii|anime|boho|floral|geometric|abstract|hand-drawn|watercolor|cartoon|flat|outline|line art|sketch|typographic|lettering)\\b/gi;\nconst iconWords  = /\\b(skull|heart|star|moon|sun|flower|leaf|wave|mountain|cat|dog|mushroom|ghost|lightning|crown|diamond|butterfly|bee|plant|tree|coffee|pizza|space|planet|alien|rainbow|cloud|fire|peace|yin yang)\\b/gi;\n\nconst extractTerms = (text, regex) => [...new Set((text.match(regex) || []).map(s => s.toLowerCase()))];\n\nconst allTitles = [\n  ...(shopRaw?.shopping_results || []).map(r => r.title + ' ' + (r.snippet || '')),\n  ...(rbRaw?.organic_results    || []).filter(r => r.link?.includes('redbubble')).map(r => r.title + ' ' + (r.snippet || ''))\n].join(' ');\n\nconst colors     = extractTerms(allTitles, colorWords).slice(0, 12);\nconst styles     = extractTerms(allTitles, styleWords).slice(0, 10);\nconst iconThemes = extractTerms(allTitles, iconWords).slice(0, 10);\n\n// Extract price range signals (popular price points = validated demand)\nconst prices = (shopRaw?.shopping_results || [])\n  .map(r => parseFloat((r.price || '').replace(/[^0-9.]/g, '')))\n  .filter(p => p > 0);\nconst avgPrice  = prices.length ? (prices.reduce((s,p) => s+p, 0) / prices.length).toFixed(2) : null;\n\n// Top sticker titles as inspiration seeds (public metadata — not design IP)\nconst inspirationSeeds = [\n  ...(shopRaw?.shopping_results || []).slice(0, 8).map(r => r.title),\n  ...(rbRaw?.organic_results    || []).slice(0, 5).map(r => r.title)\n].filter(Boolean).slice(0, 10);\n\nreturn [{ json: {\n  source: 'stickers',\n  niche,\n  data: {\n    colors,\n    styles,\n    iconThemes,\n    inspirationSeeds,\n    avgStickerPrice: avgPrice,\n    totalResults: (shopRaw?.shopping_results || []).length + (rbRaw?.organic_results || []).length,\n    legalNote: 'Style signals extracted from public metadata only — no design copying'\n  }\n} }];"
+        "jsCode": "const niche = $('Unpack Input').first().json.niche;\nconst shopRaw = $('Google Shopping Stickers').first()?.json || {};\nconst rbRaw   = $('Redbubble Stickers').first()?.json || {};\n\n// Extract style signals from sticker titles/descriptions \u2014 NOT copying designs\n// We only extract: color words, style descriptors, typography hints, theme keywords\nconst colorWords = /\\b(black|white|red|blue|green|yellow|pink|purple|orange|gold|silver|neon|pastel|vintage|retro|dark|light|minimal|bold|bright|muted|earthy|rainbow)\\b/gi;\nconst styleWords = /\\b(minimalist|vintage|retro|bold|cute|funny|aesthetic|cottagecore|y2k|vaporwave|grunge|gothic|kawaii|anime|boho|floral|geometric|abstract|hand-drawn|watercolor|cartoon|flat|outline|line art|sketch|typographic|lettering)\\b/gi;\nconst iconWords  = /\\b(skull|heart|star|moon|sun|flower|leaf|wave|mountain|cat|dog|mushroom|ghost|lightning|crown|diamond|butterfly|bee|plant|tree|coffee|pizza|space|planet|alien|rainbow|cloud|fire|peace|yin yang)\\b/gi;\n\nconst extractTerms = (text, regex) => [...new Set((text.match(regex) || []).map(s => s.toLowerCase()))];\n\nconst allTitles = [\n  ...(shopRaw?.shopping_results || []).map(r => r.title + ' ' + (r.snippet || '')),\n  ...(rbRaw?.organic_results    || []).filter(r => r.link?.includes('redbubble')).map(r => r.title + ' ' + (r.snippet || ''))\n].join(' ');\n\nconst colors     = extractTerms(allTitles, colorWords).slice(0, 12);\nconst styles     = extractTerms(allTitles, styleWords).slice(0, 10);\nconst iconThemes = extractTerms(allTitles, iconWords).slice(0, 10);\n\n// Extract price range signals (popular price points = validated demand)\nconst prices = (shopRaw?.shopping_results || [])\n  .map(r => parseFloat((r.price || '').replace(/[^0-9.]/g, '')))\n  .filter(p => p > 0);\nconst avgPrice  = prices.length ? (prices.reduce((s,p) => s+p, 0) / prices.length).toFixed(2) : null;\n\n// Top sticker titles as inspiration seeds (public metadata \u2014 not design IP)\nconst inspirationSeeds = [\n  ...(shopRaw?.shopping_results || []).slice(0, 8).map(r => r.title),\n  ...(rbRaw?.organic_results    || []).slice(0, 5).map(r => r.title)\n].filter(Boolean).slice(0, 10);\n\nreturn [{ json: {\n  source: 'stickers',\n  niche,\n  data: {\n    colors,\n    styles,\n    iconThemes,\n    inspirationSeeds,\n    avgStickerPrice: avgPrice,\n    totalResults: (shopRaw?.shopping_results || []).length + (rbRaw?.organic_results || []).length,\n    legalNote: 'Style signals extracted from public metadata only \u2014 no design copying'\n  }\n} }];"
       },
       "id": "parse-stickers",
       "name": "Parse Sticker Signals",
@@ -231,14 +232,14 @@
       "main": [
         [
           {
-            "node": "Parse Sticker Signals",
+            "node": "Skip Error",
             "type": "main",
-            "index": 1
+            "index": 0
           }
         ],
         [
           {
-            "node": "Parse Sticker Signals",
+            "node": "Skip Error",
             "type": "main",
             "index": 0
           }

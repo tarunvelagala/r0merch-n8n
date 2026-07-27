@@ -100,7 +100,8 @@
         220,
         450
       ],
-      "onError": "continueErrorOutput"
+      "onError": "continueErrorOutput",
+      "disabled": true
     },
     {
       "parameters": {
@@ -155,14 +156,14 @@
       "main": [
         [
           {
-            "node": "Parse Pinterest Results",
+            "node": "Skip Error",
             "type": "main",
-            "index": 1
+            "index": 0
           }
         ],
         [
           {
-            "node": "Parse Pinterest Results",
+            "node": "Skip Error",
             "type": "main",
             "index": 0
           }

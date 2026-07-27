@@ -116,7 +116,8 @@
         220,
         450
       ],
-      "onError": "continueErrorOutput"
+      "onError": "continueErrorOutput",
+      "disabled": true
     },
     {
       "parameters": {
@@ -218,14 +219,14 @@
       "main": [
         [
           {
-            "node": "Collect Tweet Snippets",
+            "node": "Skip Error",
             "type": "main",
-            "index": 1
+            "index": 0
           }
         ],
         [
           {
-            "node": "Collect Tweet Snippets",
+            "node": "Skip Error",
             "type": "main",
             "index": 0
           }

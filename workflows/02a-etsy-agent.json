@@ -122,6 +122,17 @@
         440,
         300
       ]
+    },
+    {
+      "id": "skip-error",
+      "name": "Skip Error",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        660,
+        500
+      ],
+      "parameters": {}
     }
   ],
   "connections": {
@@ -171,6 +182,24 @@
         [
           {
             "node": "Parse Etsy Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Etsy Organic": {
+      "main": [
+        [
+          {
+            "node": "Skip Error",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Skip Error",
             "type": "main",
             "index": 0
           }
