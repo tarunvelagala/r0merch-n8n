@@ -2,7 +2,7 @@
   "updatedAt": "2099-01-01T00:00:00.000Z",
   "createdAt": "2026-07-25T15:18:32.854Z",
   "id": "f978e116-7fe9-465d-8bb2-c61587fae2b9",
-  "name": "r0merch — Research Agent",
+  "name": "r0merch \u2014 Research Agent",
   "description": null,
   "active": true,
   "isArchived": false,
@@ -358,7 +358,7 @@
       "main": [
         [
           {
-            "node": "Combine Research",
+            "node": "Merge All Results",
             "type": "main",
             "index": 0
           }
