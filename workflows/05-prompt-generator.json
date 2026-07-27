@@ -2,7 +2,7 @@
   "updatedAt": "2099-01-01T00:00:00.000Z",
   "createdAt": "2026-07-25T15:18:42.488Z",
   "id": "6673d7e3-9b47-450e-81c9-b470e83e7230",
-  "name": "r0merch — Prompt Generator",
+  "name": "r0merch \u2014 Prompt Generator",
   "description": null,
   "active": true,
   "isArchived": false,
@@ -86,7 +86,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const raw = $input.first().json?.choices?.[0]?.message?.content || '[]';\nconst clean = raw.replace(/```json|```/g, '').trim();\nconst match = clean.match(/\\[[\\s\\S]*\\]/);\nlet concepts = [];\ntry { concepts = JSON.parse(match?.[0] || '[]'); } catch (_) {}\n\nconst input = $('Execute Workflow Trigger').first().json;\nlet report = input;\ntry { if (input.trendAnalysis) report = JSON.parse(input.trendAnalysis); } catch(_) {}\nconst niche = input.niche || report.niche || '';\n\n// Score each concept — prefer opportunity/underserved, then twitter, then seasonal\nconst scores = { opportunity: 3, underserved: 3, twitter: 2, seasonal: 1, evergreen: 1 };\nconst scored = concepts.map(c => ({ ...c, _score: scores[c.source] || 1 }));\nconst best = scored.sort((a, b) => b._score - a._score)[0] || concepts[0];\ndelete best?._score;\n\n// Return single best concept (not an array) — one image per niche\nreturn [{ json: { niche, concept: best, concepts } }];"
+        "jsCode": "const raw = $input.first().json?.choices?.[0]?.message?.content || '[]';\nconst clean = raw.replace(/```json|```/g, '').trim();\nconst match = clean.match(/\\[[\\s\\S]*\\]/);\nlet concepts = [];\ntry { concepts = JSON.parse(match?.[0] || '[]'); } catch (_) {}\n\nconst input = $('Execute Workflow Trigger').first().json;\nlet report = input;\ntry { if (input.trendAnalysis) report = JSON.parse(input.trendAnalysis); } catch(_) {}\nconst niche = input.niche || report.niche || '';\n\n// Score each concept \u2014 prefer opportunity/underserved, then twitter, then seasonal\nconst scores = { opportunity: 3, underserved: 3, twitter: 2, seasonal: 1, evergreen: 1 };\nconst scored = concepts.map(c => ({ ...c, _score: scores[c.source] || 1 }));\nconst best = scored.sort((a, b) => b._score - a._score)[0] || concepts[0];\ndelete best?._score;\n\n// Return single best concept (not an array) \u2014 one image per niche\nreturn [{ json: { niche, concept: best, concepts } }];"
       },
       "id": "parse-concepts",
       "name": "Pick Best Concept",
