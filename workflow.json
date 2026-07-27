@@ -324,7 +324,8 @@
     },
     {
       "parameters": {
-        "amount": 10
+        "amount": 8,
+        "unit": "seconds"
       },
       "id": "wait-analyze-style",
       "name": "Cooldown Analyze",
@@ -377,7 +378,8 @@
     },
     {
       "parameters": {
-        "amount": 10
+        "amount": 5,
+        "unit": "seconds"
       },
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
@@ -391,7 +393,8 @@
     },
     {
       "parameters": {
-        "amount": 10
+        "amount": 2,
+        "unit": "seconds"
       },
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
@@ -405,7 +408,8 @@
     },
     {
       "parameters": {
-        "amount": 10
+        "amount": 15,
+        "unit": "seconds"
       },
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
@@ -419,7 +423,8 @@
     },
     {
       "parameters": {
-        "amount": 10
+        "amount": 5,
+        "unit": "seconds"
       },
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
@@ -433,7 +438,8 @@
     },
     {
       "parameters": {
-        "amount": 10
+        "amount": 12,
+        "unit": "seconds"
       },
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
@@ -447,7 +453,8 @@
     },
     {
       "parameters": {
-        "amount": 10
+        "amount": 3,
+        "unit": "seconds"
       },
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
@@ -461,7 +468,8 @@
     },
     {
       "parameters": {
-        "amount": 10
+        "amount": 10,
+        "unit": "seconds"
       },
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
