@@ -15,6 +15,7 @@ for file in /workflow.json /workflows/*.json; do
     const fs = require('fs');
     const w = JSON.parse(fs.readFileSync('$file','utf8'));
     delete w.tags;
+    w.active = true;
     fs.writeFileSync('$tmp', JSON.stringify(w));
   "
   echo "[r0merch] Importing $base"
@@ -80,6 +81,8 @@ do_export() {
         return; // file is same age or newer — skip
       }
 
+      // Never write active:false back — preserve active state from files
+      if (!w.active) w.active = true;
       fs.writeFileSync(fpath, JSON.stringify(w, null, 2));
       saved++;
     });
