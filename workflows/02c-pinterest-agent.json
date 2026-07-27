@@ -2,7 +2,7 @@
   "updatedAt": "2099-01-01T00:00:00.000Z",
   "createdAt": "2026-07-25T15:18:35.734Z",
   "id": "09597748-4eb1-4b4c-a646-d802f2156694",
-  "name": "r0merch — Pinterest Agent",
+  "name": "r0merch \u2014 Pinterest Agent",
   "description": null,
   "active": true,
   "isArchived": false,
@@ -20,25 +20,29 @@
     },
     {
       "parameters": {
-        "url": "https://serpapi.com/search.json",
+        "url": "https://www.googleapis.com/customsearch/v1",
         "sendQuery": true,
         "queryParameters": {
           "parameters": [
             {
-              "name": "engine",
-              "value": "google_images"
+              "name": "key",
+              "value": "={{ $env.GOOGLE_API_KEY }}"
+            },
+            {
+              "name": "cx",
+              "value": "={{ $env.GOOGLE_CSE_ID }}"
             },
             {
               "name": "q",
               "value": "={{ $json.niche + ' t-shirt design' }}"
             },
             {
-              "name": "api_key",
-              "value": "={{ $env.SERPAPI_KEY }}"
+              "name": "searchType",
+              "value": "image"
             },
             {
-              "name": "hl",
-              "value": "en"
+              "name": "num",
+              "value": "10"
             },
             {
               "name": "gl",
@@ -105,7 +109,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche;\nconst imagesRaw = $('SerpAPI Google Images').first()?.json || {};\nconst trendRaw  = (() => { try { return $('SerpAPI Trending Images').first()?.json || {}; } catch(_) { return {}; } })();\nconst m = r => ({title:r.title||'',url:r.link||r.original||'',image:r.original||r.thumbnail||''});\nconst pins = (imagesRaw?.images_results||[]).map(m).slice(0,20);\nconst trending = (trendRaw?.images_results||[]).map(m).slice(0,10);\nconst trendingKeywords = [...(imagesRaw?.suggested_searches||[]).map(s=>s.name||s.q||s),...(trendRaw?.suggested_searches||[]).map(s=>s.name||s.q||s)].slice(0,20);\nreturn [{json:{source:'pinterest',niche,data:{pins:[...pins,...trending],trendingKeywords}}}];"
+        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche;\nconst ir = (() => { try { return $('SerpAPI Google Images').first()?.json || {}; } catch(_) { return {}; } })();\nconst trendRaw = (() => { try { return $('SerpAPI Trending Images').first()?.json || {}; } catch(_) { return {}; } })();\n\n// CSE image results are in 'items'\nconst mapItem = r => ({\n  title: r.title || '',\n  url:   r.link  || r.image?.contextLink || '',\n  image: r.link  || '',\n  source: r.displayLink || ''\n});\n\nconst pins = (ir?.items || []).map(mapItem).slice(0, 20);\nconst trending = (trendRaw?.items || []).map(mapItem).slice(0, 10);\n\nconst trendingKeywords = [\n  ...(ir?.queries?.nextPage || []).map(q => q.searchTerms).filter(Boolean),\n  ...(ir?.items || []).map(r => r.title).filter(Boolean).slice(0,5)\n].slice(0, 20);\n\nreturn [{ json: { source: 'pinterest', niche, data: { pins: [...pins,...trending], trendingKeywords } } }];"
       },
       "id": "parse-results",
       "name": "Parse Pinterest Results",

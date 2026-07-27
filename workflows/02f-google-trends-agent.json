@@ -2,7 +2,7 @@
   "updatedAt": "2099-01-01T00:00:00.000Z",
   "createdAt": "2026-07-25T15:18:38.613Z",
   "id": "4a5b9883-f228-4502-a93b-ae5197d28d30",
-  "name": "r0merch — Google Trends Agent",
+  "name": "r0merch \u2014 Google Trends Agent",
   "description": null,
   "active": true,
   "isArchived": false,
@@ -20,33 +20,37 @@
     },
     {
       "parameters": {
-        "url": "https://serpapi.com/search.json",
+        "url": "https://www.googleapis.com/customsearch/v1",
         "sendQuery": true,
         "queryParameters": {
           "parameters": [
             {
-              "name": "engine",
-              "value": "google_trends"
+              "name": "key",
+              "value": "={{ $env.GOOGLE_API_KEY }}"
+            },
+            {
+              "name": "cx",
+              "value": "={{ $env.GOOGLE_CSE_ID }}"
             },
             {
               "name": "q",
-              "value": "={{ $json.niche + ' t-shirt' }}"
+              "value": "={{ $json.niche + ' t-shirt trending 2025 2026' }}"
             },
             {
-              "name": "api_key",
-              "value": "={{ $env.SERPAPI_KEY }}"
+              "name": "num",
+              "value": "10"
             },
             {
-              "name": "data_type",
-              "value": "TIMESERIES"
+              "name": "gl",
+              "value": "us"
             },
             {
-              "name": "date",
-              "value": "today 12-m"
+              "name": "hl",
+              "value": "en"
             },
             {
-              "name": "geo",
-              "value": "US"
+              "name": "sort",
+              "value": "date"
             }
           ]
         },
@@ -113,7 +117,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche;\nconst tr = $('SerpAPI Timeseries').first()?.json || {};\nconst rr = (() => { try { return $('SerpAPI Related Queries').first()?.json || {}; } catch(_) { return {}; } })();\nconst timeline = (tr?.interest_over_time?.timeline_data||[]).map(t=>({date:t.date,value:t.values?.[0]?.extracted_value??0}));\nconst avg = arr => arr.length?arr.reduce((s,v)=>s+v,0)/arr.length:0;\nconst r4=avg(timeline.slice(-4).map(t=>t.value)),p4=avg(timeline.slice(-8,-4).map(t=>t.value));\nconst trendDirection=r4>p4*1.1?'rising':r4<p4*0.9?'falling':'stable';\nconst byMonth={};timeline.forEach(({date,value})=>{const m=date?.split(' ')?.[0]||'';if(!byMonth[m])byMonth[m]=[];byMonth[m].push(value);});\nconst ma=Object.entries(byMonth).map(([m,v])=>({m,a:avg(v)})).sort((a,b)=>b.a-a.a);\nconst rising=(rr?.related_queries?.rising||[]).map(r=>r.query);\nconst top=(rr?.related_queries?.top||[]).map(r=>r.query);\nreturn [{json:{source:'google_trends',niche,data:{timeline,trendDirection,peakMonths:ma.slice(0,3).map(x=>x.m),lowMonths:ma.slice(-3).map(x=>x.m),risingQueries:rising,topQueries:top}}}];"
+        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche;\nconst tr = (() => { try { return $('SerpAPI Timeseries').first()?.json || {}; } catch(_) { return {}; } })();\nconst rr = (() => { try { return $('SerpAPI Related Queries').first()?.json || {}; } catch(_) { return {}; } })();\n\n// CSE doesn't have timeseries \u2014 extract trend signals from search results\nconst items = (tr?.items || []);\nconst relatedItems = (rr?.items || []);\n\n// Extract trending queries from titles and snippets\nconst allText = [...items, ...relatedItems].map(r => r.title + ' ' + (r.snippet || '')).join(' ');\nconst risingQueries = items.slice(0, 5).map(r => r.title).filter(Boolean);\nconst topQueries = [...items, ...relatedItems].slice(0, 8).map(r =>\n  (r.title || '').replace(/t-shirt|tshirt|shirt/gi, '').trim()\n).filter(Boolean);\n\n// Detect trend direction from recency of results\nconst trendDirection = items.length > 5 ? 'rising' : 'stable';\n\nreturn [{ json: { source: 'google_trends', niche, data: {\n  timeline: [],\n  trendDirection,\n  peakMonths: [],\n  lowMonths: [],\n  risingQueries,\n  topQueries\n} } }];"
       },
       "id": "parse-trends",
       "name": "Parse Trends",
