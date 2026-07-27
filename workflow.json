@@ -277,7 +277,7 @@
         300
       ],
       "parameters": {
-        "jsCode": "// Store niche from Read Niches in $json so it flows through to Parse Niche Style\nconst niche = $('Read Niches').item?.json?.niche || $input.first().json?.niche || '';\nconst serpResults = $input.first().json;\nreturn [{ json: { niche, serpResults } }];"
+        "jsCode": "// Process ALL items \u2014 one output per niche\nreturn $input.all().map(item => {\n  const niche = item.json?.niche || '';\n  const serpResults = item.json;\n  return { json: { niche, serpResults } };\n});"
       }
     }
   ],
