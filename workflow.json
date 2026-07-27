@@ -1,5 +1,7 @@
 {
+  "id": "1790571d-754c-4445-be73-1c370705998b",
   "name": "r0merch \u2014 Main Orchestrator",
+  "active": true,
   "nodes": [
     {
       "parameters": {
@@ -59,7 +61,7 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        1344,
+        1792,
         128
       ]
     },
@@ -80,7 +82,7 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        1568,
+        2224,
         128
       ]
     },
@@ -105,7 +107,7 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        1792,
+        2656,
         128
       ]
     },
@@ -130,7 +132,7 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        2240,
+        3520,
         128
       ]
     },
@@ -155,7 +157,7 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        2464,
+        3952,
         128
       ]
     },
@@ -180,7 +182,7 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        2688,
+        4384,
         128
       ]
     },
@@ -201,8 +203,8 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        2912,
-        200
+        4816,
+        128
       ]
     },
     {
@@ -238,7 +240,7 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        2016,
+        3088,
         128
       ]
     },
@@ -315,7 +317,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        1120,
+        1344,
         128
       ],
       "onError": "continueErrorOutput"
@@ -329,7 +331,7 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        896,
+        1120,
         128
       ],
       "webhookId": "53f60b60-33fa-4e87-9f63-ce683fa5f0d5"
@@ -348,47 +350,130 @@
       "name": "Loop Over Items"
     },
     {
+      "parameters": {
+        "jsCode": "return $input.all().map(item => ({\n  json: { niche: item.json?.niche || '', serpResults: item.json }\n}));"
+      },
       "id": "store-niche",
       "name": "Store Niche Context",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        784,
+        896,
         128
-      ],
-      "parameters": {
-        "jsCode": "return $input.all().map(item => ({\n  json: { niche: item.json?.niche || '', serpResults: item.json }\n}));"
-      }
+      ]
     },
     {
+      "parameters": {
+        "jsCode": "const storeItems = $('Store Niche Context').all();\nreturn $input.all().map((item, i) => {\n  const niche = storeItems[i]?.json?.niche || storeItems[0]?.json?.niche || '';\n  const raw = item.json?.choices?.[0]?.message?.content || '';\n  const design_style = raw.trim() || 'bold two-word phrases, minimalist graphic, clean urban typography';\n  return { json: { niche, design_style, marketing_pages: 'r/' + niche.replace(/[^a-zA-Z0-9]/g,'') } };\n});"
+      },
       "id": "merge-niche-back",
       "name": "Merge Niche Back",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1232,
+        1568,
         128
-      ],
-      "parameters": {
-        "jsCode": "const storeItems = $('Store Niche Context').all();\nreturn $input.all().map((item, i) => {\n  const niche = storeItems[i]?.json?.niche || storeItems[0]?.json?.niche || '';\n  const raw = item.json?.choices?.[0]?.message?.content || '';\n  const design_style = raw.trim() || 'bold two-word phrases, minimalist graphic, clean urban typography';\n  return { json: { niche, design_style, marketing_pages: 'r/' + niche.replace(/[^a-zA-Z0-9]/g,'') } };\n});"
-      }
+      ]
     },
     {
-      "id": "wait-between-niches",
-      "name": "Wait Between Niches",
+      "parameters": {
+        "amount": 10
+      },
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        2912,
+        2000,
         128
       ],
+      "id": "69d8e9c0-cfb8-448d-853e-28fa3e68efff",
+      "name": "Wait",
+      "webhookId": "5faf4665-1d9e-406d-af24-533ce86714d2"
+    },
+    {
       "parameters": {
-        "amount": 30,
-        "unit": "seconds"
-      }
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2432,
+        128
+      ],
+      "id": "bd6df7c6-6dc1-445a-8e8b-e774aebc5db0",
+      "name": "Wait1",
+      "webhookId": "74e76e4a-fa5f-4143-b5ab-58f02458511f"
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2864,
+        128
+      ],
+      "id": "8e32914a-7cef-47a3-ae98-69b306e63454",
+      "name": "Wait2",
+      "webhookId": "82f3049f-e1a1-4adb-8edb-4edd63596ad4"
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        3296,
+        128
+      ],
+      "id": "1f38b0f0-81be-4ea0-ac0c-12d48f3a3e92",
+      "name": "Wait3",
+      "webhookId": "f8f0dcaa-8350-40c6-8320-1a10070352ed"
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        3728,
+        128
+      ],
+      "id": "4d375c91-b8a3-44d4-9e97-5c2a653fc20b",
+      "name": "Wait4",
+      "webhookId": "2a3d474d-aee7-4a27-8d65-5f8b9dec20e3"
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        4160,
+        128
+      ],
+      "id": "34067b37-c8c1-4d16-a175-89cb8832b70e",
+      "name": "Wait5",
+      "webhookId": "6d87e1cd-3083-45ae-9954-287810891066"
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        4592,
+        128
+      ],
+      "id": "5d91bfc3-f30f-4aa8-8d68-87958ed8c7e3",
+      "name": "Wait6",
+      "webhookId": "179f15d2-8e8d-4bd7-aef5-d81fc6aa553f"
     }
   ],
-  "pinData": {},
   "connections": {
     "Schedule Trigger": {
       "main": [
@@ -416,7 +501,7 @@
       "main": [
         [
           {
-            "node": "Trend Aggregator",
+            "node": "Wait",
             "type": "main",
             "index": 0
           }
@@ -427,7 +512,7 @@
       "main": [
         [
           {
-            "node": "Gemini Trend Analyst",
+            "node": "Wait1",
             "type": "main",
             "index": 0
           }
@@ -438,7 +523,7 @@
       "main": [
         [
           {
-            "node": "Generate Keywords",
+            "node": "Wait2",
             "type": "main",
             "index": 0
           }
@@ -449,7 +534,7 @@
       "main": [
         [
           {
-            "node": "Generate PNG Designs",
+            "node": "Wait4",
             "type": "main",
             "index": 0
           }
@@ -460,7 +545,7 @@
       "main": [
         [
           {
-            "node": "Generate SEO Metadata",
+            "node": "Wait5",
             "type": "main",
             "index": 0
           }
@@ -471,7 +556,7 @@
       "main": [
         [
           {
-            "node": "Save to Database",
+            "node": "Wait6",
             "type": "main",
             "index": 0
           }
@@ -482,7 +567,7 @@
       "main": [
         [
           {
-            "node": "Wait Between Niches",
+            "node": "Loop Over Items",
             "type": "main",
             "index": 0
           }
@@ -493,7 +578,7 @@
       "main": [
         [
           {
-            "node": "Generate Image Prompts",
+            "node": "Wait3",
             "type": "main",
             "index": 0
           }
@@ -598,11 +683,77 @@
         ]
       ]
     },
-    "Wait Between Niches": {
+    "Wait": {
       "main": [
         [
           {
-            "node": "Loop Over Items",
+            "node": "Trend Aggregator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Gemini Trend Analyst",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait2": {
+      "main": [
+        [
+          {
+            "node": "Generate Keywords",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait3": {
+      "main": [
+        [
+          {
+            "node": "Generate Image Prompts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait4": {
+      "main": [
+        [
+          {
+            "node": "Generate PNG Designs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait5": {
+      "main": [
+        [
+          {
+            "node": "Generate SEO Metadata",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait6": {
+      "main": [
+        [
+          {
+            "node": "Save to Database",
             "type": "main",
             "index": 0
           }
@@ -610,15 +761,9 @@
       ]
     }
   },
-  "active": true,
+  "updatedAt": "2026-07-27 13:58:07.429",
   "settings": {
-    "executionOrder": "v1",
-    "binaryMode": "separate"
+    "executionOrder": "v1"
   },
-  "versionId": "8ec355b3-77a4-4191-879b-49f44d6c7b4e",
-  "meta": {
-    "instanceId": "a85daf90edc465569c741f3fec78f624a74daab07286d5b528191d81eec738ab"
-  },
-  "id": "1790571d-754c-4445-be73-1c370705998b",
   "tags": []
 }
