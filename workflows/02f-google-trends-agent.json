@@ -153,7 +153,7 @@
           },
           "conditions": [
             {
-              "leftValue": "={{ (() => { const j = $json; const items = j.items || j.organic_results || j.shopping_results || j.interest_over_time?.timeline_data || []; return items.length > 0 && !j.error; })() }}",
+              "leftValue": "={{ (() => { const j=$json; return (j.interest_over_time?.timeline_data||[]).length > 0 || (j.organic_results||j.items||[]).length > 0; })() }}",
               "rightValue": true,
               "operator": {
                 "type": "boolean",
@@ -191,14 +191,6 @@
             {
               "name": "api_key",
               "value": "={{ $env.SERPAPI_KEY }}"
-            },
-            {
-              "name": "gl",
-              "value": "us"
-            },
-            {
-              "name": "hl",
-              "value": "en"
             },
             {
               "name": "data_type",
