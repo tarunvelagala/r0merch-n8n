@@ -38,11 +38,11 @@
             },
             {
               "name": "data_type",
-              "value": "TIMESERIES"
+              "value": "RELATED_QUERIES"
             },
             {
               "name": "date",
-              "value": "today 12-m"
+              "value": "today 3-m"
             },
             {
               "name": "geo",
@@ -55,7 +55,7 @@
         }
       },
       "id": "trends-timeseries-fetch",
-      "name": "SerpAPI Timeseries",
+      "name": "Google Trends Rising",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
@@ -113,7 +113,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche;\nconst tr = (() => { try { return $('SerpAPI Timeseries').first()?.json || {}; } catch(_) { return {}; } })();\nconst rr = (() => { try { return $('SerpAPI Related Queries').first()?.json || {}; } catch(_) { return {}; } })();\nconst timeline = (tr?.interest_over_time?.timeline_data||tr?.items||[]).map(t=>({date:t.date||'',value:t.values?.[0]?.extracted_value??0}));\nconst avg = arr => arr.length?arr.reduce((s,v)=>s+v,0)/arr.length:0;\nconst r4=avg(timeline.slice(-4).map(t=>t.value)),p4=avg(timeline.slice(-8,-4).map(t=>t.value));\nconst trendDirection=r4>p4*1.1?'rising':r4<p4*0.9?'falling':'stable';\nconst rising=(rr?.related_queries?.rising||[]).map(r=>r.query);\nconst top=(rr?.related_queries?.top||[]).map(r=>r.query);\nreturn [{json:{source:'google_trends',niche,data:{timeline,trendDirection,peakMonths:[],lowMonths:[],risingQueries:rising.length?rising:top.slice(0,5),topQueries:top}}}];"
+        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche;\nconst raw = (() => { try { return $('Google Trends Rising').first()?.json || {}; } catch(_) { return {}; } })();\n\n// Extract rising and top related queries \u2014 these are the actionable signals\nconst rising = (raw?.related_queries?.rising || []).slice(0, 10).map(r => r.query).filter(Boolean);\nconst top    = (raw?.related_queries?.top    || []).slice(0, 10).map(r => r.query).filter(Boolean);\n\n// Trend direction from rising count\nconst trendDirection = rising.length > 5 ? 'rising' : rising.length > 2 ? 'stable' : 'stable';\n\nreturn [{ json: { source: 'google_trends', niche, data: {\n  timeline:       [],        // removed \u2014 not useful for POD\n  trendDirection,\n  peakMonths:     [],        // removed \u2014 not actionable\n  lowMonths:      [],\n  risingQueries:  rising,\n  topQueries:     top\n} } }];"
       },
       "id": "parse-trends",
       "name": "Parse Trends",
@@ -153,7 +153,7 @@
           },
           "conditions": [
             {
-              "leftValue": "={{ (() => { const j=$json; return (j.interest_over_time?.timeline_data||[]).length > 0 || (j.organic_results||j.items||[]).length > 0; })() }}",
+              "leftValue": "={{ (() => { const j=$json; return (j.related_queries?.rising||j.related_queries?.top||[]).length > 0 || (j.items||[]).length > 0; })() }}",
               "rightValue": true,
               "operator": {
                 "type": "boolean",
@@ -194,11 +194,11 @@
             },
             {
               "name": "data_type",
-              "value": "TIMESERIES"
+              "value": "RELATED_QUERIES"
             },
             {
               "name": "date",
-              "value": "today 12-m"
+              "value": "today 3-m"
             },
             {
               "name": "geo",
@@ -230,25 +230,7 @@
       "main": [
         [
           {
-            "node": "SerpAPI Timeseries",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "SerpAPI Timeseries": {
-      "main": [
-        [
-          {
-            "node": "CSE Has Results?",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "SerpAPI Fallback",
+            "node": "Google Trends Rising",
             "type": "main",
             "index": 0
           }
@@ -314,6 +296,24 @@
         [
           {
             "node": "Parse Trends",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Trends Rising": {
+      "main": [
+        [
+          {
+            "node": "CSE Has Results?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "SerpAPI Fallback",
             "type": "main",
             "index": 0
           }
