@@ -2,6 +2,33 @@
   "name": "r0merch \u2014 Main Orchestrator",
   "nodes": [
     {
+      "id": "read-niches-file",
+      "name": "Read Niches File",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        0,
+        300
+      ],
+      "parameters": {
+        "operation": "read",
+        "filePath": "/niches.csv"
+      }
+    },
+    {
+      "id": "read-niches",
+      "name": "Read Niches",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        300
+      ],
+      "parameters": {
+        "jsCode": "// Parse niches.csv \u2014 add/remove rows in niches.csv to change pipeline targets\nconst binaryKey = Object.keys($input.first().binary || {})[0] || 'data';\nconst binary = $input.first().binary?.[binaryKey];\nlet lines = ['fitness', 'nurse', 'cat-lovers']; // fallback\nif (binary?.data) {\n  const text = Buffer.from(binary.data, 'base64').toString('utf8');\n  lines = text.split('\\n').map(l => l.trim()).filter(l => l && l.toLowerCase() !== 'niche');\n}\nreturn lines.map(niche => ({ json: { niche } }));"
+      }
+    },
+    {
       "parameters": {
         "rule": {
           "interval": [
@@ -18,19 +45,6 @@
       "typeVersion": 1.2,
       "position": [
         0,
-        300
-      ]
-    },
-    {
-      "parameters": {
-        "jsCode": "const fs = require('fs');\nlet lines = [];\ntry {\n  const raw = fs.readFileSync('/niches.csv', 'utf8');\n  lines = raw.split('\\n').map(l => l.trim()).filter(l => l && l.toLowerCase() !== 'niche');\n} catch(e) {\n  lines = ['fitness', 'nurse', 'cat-lovers'];\n}\nreturn lines.map(niche => ({ json: { niche } }));"
-      },
-      "id": "read-niches",
-      "name": "Read Niches",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        220,
         300
       ]
     },
@@ -337,7 +351,7 @@
       "main": [
         [
           {
-            "node": "Read Niches",
+            "node": "Read Niches File",
             "type": "main",
             "index": 0
           }
@@ -484,6 +498,17 @@
         [
           {
             "node": "Research Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Niches File": {
+      "main": [
+        [
+          {
+            "node": "Read Niches",
             "type": "main",
             "index": 0
           }
