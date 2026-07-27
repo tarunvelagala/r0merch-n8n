@@ -2,22 +2,6 @@
   "name": "r0merch \u2014 Main Orchestrator",
   "nodes": [
     {
-      "id": "read-niches-file",
-      "name": "Read Niches File",
-      "type": "n8n-nodes-base.readWriteFile",
-      "typeVersion": 1,
-      "position": [
-        0,
-        300
-      ],
-      "parameters": {
-        "operation": "read",
-        "fileName": "/home/node/.n8n-files/niches.csv",
-        "dataPropertyName": "data",
-        "options": {}
-      }
-    },
-    {
       "id": "read-niches",
       "name": "Read Niches",
       "type": "n8n-nodes-base.code",
@@ -27,7 +11,7 @@
         300
       ],
       "parameters": {
-        "jsCode": "// readWriteFile outputs binary data \u2014 decode it\nconst item = $input.first();\nlet text = '';\n\n// Try binary output\nconst binaryKey = Object.keys(item.binary || {})[0];\nif (binaryKey) {\n  const b64 = item.binary[binaryKey].data;\n  const bytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0));\n  text = new TextDecoder().decode(bytes);\n} else if (item.json?.data) {\n  text = item.json.data;\n}\n\nconst lines = text\n  .split('\\n')\n  .map(l => l.trim())\n  .filter(l => l && l.toLowerCase() !== 'niche' && l !== '');\n\nconst result = lines.length > 0 ? lines : ['fitness', 'nurse', 'cat-lovers'];\nreturn result.map(niche => ({ json: { niche } }));"
+        "jsCode": "// \u270f\ufe0f EDIT THIS LIST to add/remove niches\n// One niche name per entry \u2014 the pipeline runs once per niche\nconst niches = [\n  'fitness',\n  'gen-z',\n  'nurse',\n  'christian',\n  'cat-lovers',\n];\n\nreturn niches.map(niche => ({ json: { niche } }));"
       }
     },
     {
@@ -353,7 +337,7 @@
       "main": [
         [
           {
-            "node": "Read Niches File",
+            "node": "Read Niches",
             "type": "main",
             "index": 0
           }
