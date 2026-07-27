@@ -121,7 +121,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche;\nconst tr = $('SerpAPI Twitter Search').first()?.json || {};\nconst vr = $('SerpAPI Twitter Viral').first()?.json || {};\nconst snippets = [...(tr?.organic_results||[]),...(vr?.organic_results||[])].map(r=>r.title+' '+(r.snippet||'')).join('\\n');\nreturn [{json:{niche,rawSnippets:snippets}}];"
+        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche;\nconst tr = $('SerpAPI Twitter Search').first()?.json || {};\nconst vr = (() => { try { return $('SerpAPI Twitter Viral').first()?.json || {}; } catch(_) { return {}; } })();\nconst snippets = [...(tr?.organic_results||[]),...(vr?.organic_results||[])].map(r=>r.title+' '+(r.snippet||'')).join('\\n');\nreturn [{json:{niche,rawSnippets:snippets}}];"
       },
       "id": "collect-snippets",
       "name": "Collect Tweet Snippets",

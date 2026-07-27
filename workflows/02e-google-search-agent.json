@@ -113,7 +113,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche;\nconst mainRaw  = $('SerpAPI Google Search').first()?.json || {};\nconst nicheRaw = $('SerpAPI Niche Ideas Search').first()?.json || {};\nconst m = r => ({title:r.title||'',url:r.link||'',snippet:r.snippet||''});\nconst organic = (mainRaw?.organic_results||[]).map(m);\nconst relatedSearches = [...(mainRaw?.related_searches||[]).map(s=>s.query),...(nicheRaw?.related_searches||[]).map(s=>s.query)].filter(Boolean);\nconst peopleAlsoAsk = (mainRaw?.related_questions||[]).map(q=>q.question).filter(Boolean);\nreturn [{json:{source:'google_search',niche,data:{organic,relatedSearches,peopleAlsoAsk}}}];"
+        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche;\nconst mainRaw  = $('SerpAPI Google Search').first()?.json || {};\nconst nicheRaw = (() => { try { return $('SerpAPI Niche Ideas Search').first()?.json || {}; } catch(_) { return {}; } })();\nconst m = r => ({title:r.title||'',url:r.link||'',snippet:r.snippet||''});\nconst organic = (mainRaw?.organic_results||[]).map(m);\nconst relatedSearches = [...(mainRaw?.related_searches||[]).map(s=>s.query),...(nicheRaw?.related_searches||[]).map(s=>s.query)].filter(Boolean);\nconst peopleAlsoAsk = (mainRaw?.related_questions||[]).map(q=>q.question).filter(Boolean);\nreturn [{json:{source:'google_search',niche,data:{organic,relatedSearches,peopleAlsoAsk}}}];"
       },
       "id": "parse-google-search",
       "name": "Parse Google Results",

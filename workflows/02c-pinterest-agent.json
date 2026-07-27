@@ -105,7 +105,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche;\nconst imagesRaw = $('SerpAPI Google Images').first()?.json || {};\nconst trendRaw  = $('SerpAPI Trending Images').first()?.json || {};\nconst m = r => ({title:r.title||'',url:r.link||r.original||'',image:r.original||r.thumbnail||''});\nconst pins = (imagesRaw?.images_results||[]).map(m).slice(0,20);\nconst trending = (trendRaw?.images_results||[]).map(m).slice(0,10);\nconst trendingKeywords = [...(imagesRaw?.suggested_searches||[]).map(s=>s.name||s.q||s),...(trendRaw?.suggested_searches||[]).map(s=>s.name||s.q||s)].slice(0,20);\nreturn [{json:{source:'pinterest',niche,data:{pins:[...pins,...trending],trendingKeywords}}}];"
+        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche;\nconst imagesRaw = $('SerpAPI Google Images').first()?.json || {};\nconst trendRaw  = (() => { try { return $('SerpAPI Trending Images').first()?.json || {}; } catch(_) { return {}; } })();\nconst m = r => ({title:r.title||'',url:r.link||r.original||'',image:r.original||r.thumbnail||''});\nconst pins = (imagesRaw?.images_results||[]).map(m).slice(0,20);\nconst trending = (trendRaw?.images_results||[]).map(m).slice(0,10);\nconst trendingKeywords = [...(imagesRaw?.suggested_searches||[]).map(s=>s.name||s.q||s),...(trendRaw?.suggested_searches||[]).map(s=>s.name||s.q||s)].slice(0,20);\nreturn [{json:{source:'pinterest',niche,data:{pins:[...pins,...trending],trendingKeywords}}}];"
       },
       "id": "parse-results",
       "name": "Parse Pinterest Results",

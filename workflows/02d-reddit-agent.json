@@ -120,7 +120,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const niche = $('Execute Workflow Trigger').first()?.json?.niche || '';\nconst searchRaw    = $('SerpAPI Reddit Search').first()?.json || {};\nconst communityRaw = $('SerpAPI Reddit Community').first()?.json || {};\nconst m = r => ({title:r.title||'',url:r.link||'',snippet:r.snippet||'',sub:(r.link||'').match(/reddit\\.com\\/r\\/([^\\/]+)/)?.[1]||''});\nconst seen = new Set();\nconst data = [...(searchRaw?.organic_results||[]).map(m),...(communityRaw?.organic_results||[]).map(m)].filter(r=>{if(!r.title||seen.has(r.url))return false;seen.add(r.url);return true;});\nreturn [{json:{source:'reddit',niche,data}}];"
+        "jsCode": "const niche = $('Execute Workflow Trigger').first()?.json?.niche || '';\nconst searchRaw    = $('SerpAPI Reddit Search').first()?.json || {};\nconst communityRaw = (() => { try { return $('SerpAPI Reddit Community').first()?.json || {}; } catch(_) { return {}; } })();\nconst m = r => ({title:r.title||'',url:r.link||'',snippet:r.snippet||'',sub:(r.link||'').match(/reddit\\.com\\/r\\/([^\\/]+)/)?.[1]||''});\nconst seen = new Set();\nconst data = [...(searchRaw?.organic_results||[]).map(m),...(communityRaw?.organic_results||[]).map(m)].filter(r=>{if(!r.title||seen.has(r.url))return false;seen.add(r.url);return true;});\nreturn [{json:{source:'reddit',niche,data}}];"
       },
       "id": "parse-reddit",
       "name": "Parse Reddit Posts",
