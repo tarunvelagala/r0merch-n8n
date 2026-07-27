@@ -44,9 +44,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        220,
+        460,
         300
-      ]
+      ],
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -60,6 +61,20 @@
         440,
         300
       ]
+    },
+    {
+      "id": "wait-groq-trend",
+      "name": "Cooldown 15s",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        220,
+        300
+      ],
+      "parameters": {
+        "amount": 15,
+        "unit": "seconds"
+      }
     }
   ],
   "connections": {
@@ -67,7 +82,7 @@
       "main": [
         [
           {
-            "node": "Groq Trend Analysis",
+            "node": "Cooldown 15s",
             "type": "main",
             "index": 0
           }
@@ -79,6 +94,17 @@
         [
           {
             "node": "Parse Trend Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cooldown 15s": {
+      "main": [
+        [
+          {
+            "node": "Groq Trend Analysis",
             "type": "main",
             "index": 0
           }

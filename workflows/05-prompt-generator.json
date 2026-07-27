@@ -79,9 +79,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        680,
+        900,
         300
-      ]
+      ],
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -95,6 +96,20 @@
         920,
         300
       ]
+    },
+    {
+      "id": "wait-concepts",
+      "name": "Cooldown Concepts",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        680,
+        300
+      ],
+      "parameters": {
+        "amount": 12,
+        "unit": "seconds"
+      }
     }
   ],
   "connections": {
@@ -132,6 +147,17 @@
       ]
     },
     "Wait 35s": {
+      "main": [
+        [
+          {
+            "node": "Cooldown Concepts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cooldown Concepts": {
       "main": [
         [
           {

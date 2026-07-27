@@ -236,7 +236,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        896,
+        1116,
         304
       ],
       "onError": "continueErrorOutput"
@@ -278,6 +278,20 @@
       ],
       "parameters": {
         "jsCode": "// Match each Groq response back to its niche using Store Niche Context\nconst storeItems = $('Store Niche Context').all();\nreturn $input.all().map((item, i) => {\n  const niche = storeItems[i]?.json?.niche || storeItems[0]?.json?.niche || '';\n  const raw = item.json?.choices?.[0]?.message?.content || '';\n  const design_style = raw.trim() || 'bold two-word phrases, minimalist graphic, clean urban typography';\n  return { json: { niche, design_style, marketing_pages: 'r/' + niche.replace(/[^a-zA-Z0-9]/g,'') } };\n});"
+      }
+    },
+    {
+      "id": "wait-analyze-style",
+      "name": "Cooldown Analyze",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        896,
+        304
+      ],
+      "parameters": {
+        "amount": 10,
+        "unit": "seconds"
       }
     }
   ],
@@ -443,7 +457,7 @@
       "main": [
         [
           {
-            "node": "Analyze Design Style",
+            "node": "Cooldown Analyze",
             "type": "main",
             "index": 0
           }
@@ -455,6 +469,17 @@
         [
           {
             "node": "Research Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cooldown Analyze": {
+      "main": [
+        [
+          {
+            "node": "Analyze Design Style",
             "type": "main",
             "index": 0
           }

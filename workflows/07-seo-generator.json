@@ -57,9 +57,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        440,
+        660,
         300
-      ]
+      ],
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -86,6 +87,20 @@
         880,
         300
       ]
+    },
+    {
+      "id": "wait-seo",
+      "name": "Cooldown SEO",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        440,
+        300
+      ],
+      "parameters": {
+        "amount": 10,
+        "unit": "seconds"
+      }
     }
   ],
   "connections": {
@@ -134,6 +149,17 @@
       ]
     },
     "Unpack Design": {
+      "main": [
+        [
+          {
+            "node": "Cooldown SEO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cooldown SEO": {
       "main": [
         [
           {
