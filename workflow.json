@@ -4,14 +4,16 @@
     {
       "id": "read-niches-file",
       "name": "Read Niches File",
-      "type": "n8n-nodes-base.readBinaryFile",
+      "type": "n8n-nodes-base.readWriteFile",
       "typeVersion": 1,
       "position": [
         0,
         300
       ],
       "parameters": {
-        "fileSelector": "/home/node/.n8n-files/niches.csv",
+        "operation": "read",
+        "fileName": "/home/node/.n8n-files/niches.csv",
+        "dataPropertyName": "data",
         "options": {}
       }
     },
@@ -25,7 +27,7 @@
         300
       ],
       "parameters": {
-        "jsCode": "// Parse niches.csv \u2014 add/remove rows in niches.csv to change pipeline targets\nconst binaryKey = Object.keys($input.first().binary || {})[0] || 'data';\nconst binary = $input.first().binary?.[binaryKey];\nlet lines = ['fitness', 'nurse', 'cat-lovers']; // fallback\nif (binary?.data) {\n  const text = Buffer.from(binary.data, 'base64').toString('utf8');\n  lines = text.split('\\n').map(l => l.trim()).filter(l => l && l.toLowerCase() !== 'niche');\n}\nreturn lines.map(niche => ({ json: { niche } }));"
+        "jsCode": "// readWriteFile outputs binary data \u2014 decode it\nconst item = $input.first();\nlet text = '';\n\n// Try binary output\nconst binaryKey = Object.keys(item.binary || {})[0];\nif (binaryKey) {\n  const b64 = item.binary[binaryKey].data;\n  const bytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0));\n  text = new TextDecoder().decode(bytes);\n} else if (item.json?.data) {\n  text = item.json.data;\n}\n\nconst lines = text\n  .split('\\n')\n  .map(l => l.trim())\n  .filter(l => l && l.toLowerCase() !== 'niche' && l !== '');\n\nconst result = lines.length > 0 ? lines : ['fitness', 'nurse', 'cat-lovers'];\nreturn result.map(niche => ({ json: { niche } }));"
       }
     },
     {
