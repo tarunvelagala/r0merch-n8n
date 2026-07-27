@@ -2,7 +2,7 @@
   "updatedAt": "2099-01-01T00:00:00.000Z",
   "createdAt": "2026-07-27T11:32:17.681Z",
   "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-  "name": "r0merch — Keyword Generator",
+  "name": "r0merch \u2014 Keyword Generator",
   "description": null,
   "active": true,
   "isArchived": false,
@@ -64,7 +64,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const category = $('Unpack Input').first().json.category;\nconst raw = $input.first().json?.choices?.[0]?.message?.content || '';\nconst keyword = raw.trim().replace(/[\"']/g, '').toUpperCase();\nreturn [{ json: { category, keyword, keywords: [keyword] } }];"
+        "jsCode": "const category = $('Unpack Input').first().json.category || '';\nconst niche = $('Execute Workflow Trigger').first().json.niche || category;\nconst raw = $input.first().json?.choices?.[0]?.message?.content || '';\nconst keyword = raw.trim().replace(/[\"']/g, '').toUpperCase();\nreturn [{ json: { niche, category, keyword, keywords: [keyword] } }];"
       },
       "id": "parse-keywords",
       "name": "Parse Keywords",

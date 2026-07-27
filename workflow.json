@@ -43,7 +43,7 @@
           "values": [
             {
               "name": "niche",
-              "stringValue": "={{ $('Merge Niche Back').first()?.json?.niche || $json?.niche || '' }}"
+              "stringValue": "={{ $json.niche || '' }}"
             },
             {
               "name": "design_style",
@@ -79,7 +79,7 @@
             },
             {
               "name": "niche",
-              "stringValue": "={{ $('Merge Niche Back').first()?.json?.niche || $json?.niche || '' }}"
+              "stringValue": "={{ $json.niche || '' }}"
             }
           ]
         },
@@ -107,7 +107,7 @@
             },
             {
               "name": "niche",
-              "stringValue": "={{ $('Merge Niche Back').first()?.json?.niche || $json?.niche || '' }}"
+              "stringValue": "={{ $json.niche || '' }}"
             }
           ]
         },
@@ -135,7 +135,7 @@
             },
             {
               "name": "niche",
-              "stringValue": "={{ $('Merge Niche Back').first()?.json?.niche || $('Gemini Trend Analyst').first()?.json?.niche || '' }}"
+              "stringValue": "={{ $json.niche || $('Generate Keywords').first()?.json?.niche || '' }}"
             }
           ]
         },
@@ -163,7 +163,7 @@
             },
             {
               "name": "niche",
-              "stringValue": "={{ $('Merge Niche Back').first()?.json?.niche || $json?.niche || '' }}"
+              "stringValue": "={{ $json.niche || '' }}"
             }
           ]
         },
@@ -191,7 +191,7 @@
             },
             {
               "name": "niche",
-              "stringValue": "={{ $('Merge Niche Back').first()?.json?.niche || $json?.niche || '' }}"
+              "stringValue": "={{ $json.niche || '' }}"
             }
           ]
         },
@@ -219,7 +219,7 @@
             },
             {
               "name": "niche",
-              "stringValue": "={{ $('Merge Niche Back').first()?.json?.niche || $json?.niche || '' }}"
+              "stringValue": "={{ $json.niche || '' }}"
             }
           ]
         },
@@ -263,7 +263,7 @@
             },
             {
               "name": "niche",
-              "stringValue": "={{ $('Merge Niche Back').first()?.json?.niche || $json?.niche || '' }}"
+              "stringValue": "={{ $json.niche || '' }}"
             }
           ]
         },

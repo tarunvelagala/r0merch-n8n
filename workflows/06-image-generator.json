@@ -46,7 +46,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Collect fires once per concept \u2014 pass individual items through\n// SEO Generator's Split Designs handles both single items and arrays\nconst item = $input.first().json;\nreturn [{ json: item }];"
+        "jsCode": "const item = $input.first().json;\n// Ensure niche propagates forward\nconst niche = item.niche || $('Unpack Concept').first()?.json?.niche || '';\nreturn [{ json: { ...item, niche } }];"
       },
       "id": "collect-designs",
       "name": "Collect All Designs",

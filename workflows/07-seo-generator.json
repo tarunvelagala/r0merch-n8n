@@ -77,7 +77,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const items = $input.all();\nreturn [{ json: { records: items.map(i => i.json) } }];"
+        "jsCode": "const item = $input.first().json;\nconst niche = item.niche || $('Unpack Design').first()?.json?.niche || '';\nreturn [{ json: { ...item, niche } }];"
       },
       "id": "collect-records",
       "name": "Collect All Records",
