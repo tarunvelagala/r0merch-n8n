@@ -79,21 +79,21 @@
     },
     {
       "parameters": {
-        "url": "https://www.googleapis.com/customsearch/v1",
+        "url": "https://serpapi.com/search.json",
         "sendQuery": true,
         "queryParameters": {
           "parameters": [
             {
-              "name": "key",
-              "value": "={{ $env.GOOGLE_API_KEY }}"
-            },
-            {
-              "name": "cx",
-              "value": "={{ $env.GOOGLE_CSE_ID }}"
+              "name": "engine",
+              "value": "google"
             },
             {
               "name": "q",
               "value": "={{ 'site:redbubble.com/shop sticker ' + $json.niche + ' trending' }}"
+            },
+            {
+              "name": "api_key",
+              "value": "={{ $env.SERPAPI_KEY }}"
             },
             {
               "name": "num",
