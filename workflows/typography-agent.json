@@ -1,0 +1,328 @@
+{
+    "updatedAt": "2026-07-28T09:55:04.839Z",
+    "createdAt": "2026-07-28T03:39:36.417Z",
+    "id": "fv5oPTCyTNEmKm7j",
+    "name": "POD Typography Analyzer Agent",
+    "description": null,
+    "active": false,
+    "isArchived": false,
+    "nodes": [
+        {
+            "parameters": {
+                "jsCode": " const niche = $('Edit Fields').first().json.niche || '';\n  const raw = $('SerperAPI Google Search - Typography').first()?.json || {};\n  const results = raw?.organic || raw?.organic_results || [];\n\n  // Build per-doc word sets for IDF\n  const docs = results.map(r =>\n    ((r.title || '') + ' ' + (r.snippet || '')).toLowerCase()\n    .split(/[\\s\\-\\/,.|&()+]+/)\n    .filter(w => w.length > 3 && /^[a-z]+$/.test(w))\n  );\n\n  // Word frequency across all docs (TF) and doc frequency (IDF)\n  const tf = {}, df = {};\n  docs.forEach(words => {\n    const seen = new Set();\n    words.forEach(w => {\n      tf[w] = (tf[w] || 0) + 1;\n      if (!seen.has(w)) { df[w] = (df[w] || 0) + 1; seen.add(w); }\n    });\n  });\n\n  const n = docs.length || 1;\n  // Words appearing in >80% of docs are stop words, <2 docs are noise\n  const topWords = Object.entries(tf)\n    .filter(([w]) => df[w] >= 2 && df[w] / n < 0.8)\n    .map(([w, count]) => ({ w, score: count * Math.log(n / df[w]) }))\n    .sort((a, b) => b.score - a.score)\n    .slice(0, 30)\n    .map(e => e.w);\n\n  const phrases = results\n    .map(r => r.title || '')\n    .filter(Boolean)\n    .map(title => title.replace(/\\|.*$/, '').trim())\n    .filter(t => t.length > 3 && t.length < 60)\n    .slice(0, 12);\n\n  return [{ json: {\n    source: 'typography',\n    niche,\n    data: {\n      topTypographyTerms: topWords,\n      phrases,\n      totalResults: results.length,\n    }\n  } }];\n"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                624,
+                48
+            ],
+            "id": "864362d3-ed35-4d65-8358-3547f27869a0",
+            "name": "Parse Typography Signals"
+        },
+        {
+            "parameters": {
+                "workflowInputs": {
+                    "values": [
+                        {
+                            "name": "niche"
+                        }
+                    ]
+                }
+            },
+            "type": "n8n-nodes-base.executeWorkflowTrigger",
+            "typeVersion": 1.1,
+            "position": [
+                -48,
+                48
+            ],
+            "id": "9ce46159-53b7-4b67-9f15-41471ee5a8cb",
+            "name": "Execute Workflow Trigger"
+        },
+        {
+            "parameters": {
+                "jsCode": "const triggerData = $('Execute Workflow Trigger').first().json || {};\nconst niche = triggerData.niche\n  || (() => { try { return JSON.parse(triggerData.context || '{}').niche; } catch(_) { return ''; } })()\n  || '';\n\nconst parseJSON = (str, fallback) => {\n  try {\n    const clean = str.replace(/```json|```/g, '').trim();\n    const match = clean.match(/[\\[{][\\s\\S]*[\\]}]/);\n    return JSON.parse(match?.[0] || str);\n  } catch(_) { return fallback; }\n};\n\nconst geminiText = $('Gemini Typography Analyst').first().json?.candidates?.[0]?.content?.parts?.[0]?.text || '{}';\nconst typography = parseJSON(geminiText, {});\n\nconst signalData = (() => {\n  try { return $('Parse Typography Signals').first().json?.data || {}; } catch(_) { return {}; }\n})();\n\nreturn [{ json: {\n  niche,\n  typography: {\n    dominantFontStyle: typography.dominantFontStyle || '',\n    letteringMood:     typography.letteringMood     || '',\n    textLayout:        typography.textLayout         || '',\n    suggestedPhrases:  typography.suggestedPhrases   || [],\n    typographyNotes:   typography.typographyNotes    || '',\n    topTerms:          signalData.topTypographyTerms || [],\n    phrases:           signalData.phrases            || [],\n    totalResults:      signalData.totalResults       || 0,\n  }\n} }];"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                1072,
+                48
+            ],
+            "id": "10e4dbbc-5c3b-4ab8-9ad4-e547df092265",
+            "name": "Merge Typography Output"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https://api.groq.com/openai/v1/chat/completions",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Authorization",
+                            "value": "={{ 'Bearer ' + $env.GROQ_API_KEY }}"
+                        },
+                        {
+                            "name": "Content-Type",
+                            "value": "application/json"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={{\nJSON.stringify({\n  model: \"llama-3.1-8b-instant\",\n  messages: [\n    {\n      role: \"system\",\n      content: \"You are a POD slogan writer. Each slogan you write will be printed on a t-shirt alongside a matching illustration. Return only valid JSON.\"\n    },\n    {\n      role: \"user\",\n      content:\n        'Niche: \"' + $json.niche + '\"\\n\\n' +\n        'Typography signals:\\n' +\n        '- Font style: ' + $json.typography.dominantFontStyle + '\\n' +\n        '- Mood: ' + $json.typography.letteringMood + '\\n' +\n        '- Layout: ' + $json.typography.textLayout + '\\n' +\n        '- Suggested phrases from market: ' +\n        (($json.typography.suggestedPhrases || []).join(', ')) +\n        '\\n\\n' +\n        'Generate 5 original slogans for this niche. Each slogan must:\\n' +\n        '- Be 1-5 words, printable on a t-shirt.\\n' +\n        '- Be completely original (do not copy or closely paraphrase the suggested phrases).\\n' +\n        '- Have a matching illustration concept.\\n' +\n        '- Feel authentic to this niche.\\n\\n' +\n        'Return ONLY this JSON array:\\n' +\n        '[{\\n' +\n        '  \"slogan\": \"the text on the shirt\",\\n' +\n        '  \"illustrationConcept\": \"what artwork sits beside or behind the slogan\",\\n' +\n        '  \"placement\": \"e.g. slogan above illustration, centered chest\",\\n' +\n        '  \"mood\": \"e.g. bold and rebellious\"\\n' +\n        '}]'\n    }\n  ],\n  max_tokens: 600,\n  temperature: 0.85\n})\n}}",
+                "options": {}
+            },
+            "id": "8211bb6c-2c01-4678-9abf-9bed06cbde65",
+            "name": "Groq Slogan Generator",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
+            "position": [
+                1296,
+                48
+            ],
+            "onError": "continueErrorOutput"
+        },
+        {
+            "parameters": {
+                "amount": 8
+            },
+            "type": "n8n-nodes-base.wait",
+            "typeVersion": 1.1,
+            "position": [
+                1744,
+                48
+            ],
+            "id": "4fc67ff3-4fa9-45c0-9b7c-e32e0bf3255b",
+            "name": "Cooldown 8s",
+            "webhookId": "2ce07552-ac8e-4be4-b2b0-2a7346ad1f1e"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "={{ `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent` }}",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Content-Type",
+                            "value": "application/json"
+                        },
+                        {
+                            "name": "x-goog-api-key",
+                            "value": "={{$env.GEMINI_API_KEY}}"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={{ JSON.stringify({\n  contents: [\n    {\n      parts: [\n        {\n          text: `You are a POD typography strategist. Analyze market signals and return ONLY valid JSON.\n\nNiche: \"${$('Parse Typography Signals').first().json.niche}\"\n\nTop recurring terms from bestselling listings:\n${($('Parse Typography Signals').first().json.data?.topTypographyTerms || []).join(\", \")}\n\nSample listing titles:\n${($('Parse Typography Signals').first().json.data?.phrases || [])\n  .slice(0, 6)\n  .map(p => `- ${p}`)\n  .join(\"\\n\")}\n\nClassify the typography patterns and generate original phrase ideas.\n\nReturn ONLY valid JSON.\nDo not use markdown.\nDo not use code fences.\nDo not include explanations.\n\nReturn exactly this JSON object:\n\n{\n  \"dominantFontStyle\": \"e.g. bold sans-serif\",\n  \"letteringMood\": \"e.g. energetic and irreverent\",\n  \"textLayout\": \"e.g. stacked two-line centered\",\n  \"suggestedPhrases\": [\n    \"phrase 1\",\n    \"phrase 2\",\n    \"phrase 3\"\n  ],\n  \"typographyNotes\": \"one sentence on what makes this niche typography distinctive\"\n}`\n        }\n      ]\n    }\n  ],\n  generationConfig: {\n    temperature: 0.5,\n    maxOutputTokens: 1024,\n    responseMimeType: \"application/json\",\n    thinkingConfig: { thinkingBudget: 0 }\n  }\n}) }}",
+                "options": {}
+            },
+            "id": "1638f0e5-c428-4ac4-9c0e-5e5fabd8a16c",
+            "name": "Gemini Typography Analyst",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
+            "position": [
+                848,
+                48
+            ],
+            "onError": "continueErrorOutput"
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "aba6c271-1278-4e76-9a05-bcd163351f88",
+                            "name": "niche",
+                            "value": "gen-z",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [
+                176,
+                48
+            ],
+            "id": "a5610bfc-c099-4e21-9486-2264288db78d",
+            "name": "Edit Fields"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https://google.serper.dev/search",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "X-API-KEY",
+                            "value": "={{ $env.SERPER_API_KEY }}"
+                        },
+                        {
+                            "name": "Content-Type",
+                            "value": "application/json"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={{ JSON.stringify({\n    q: $json.niche + ' t-shirt typography lettering bestseller etsy redbubble amazon 2026',\n    num: 20,\n    gl: 'us',\n    hl: 'en'\n  }) }}",
+                "options": {
+                    "timeout": 30000
+                }
+            },
+            "id": "0cb9fb66-50a0-4051-b9e4-4f08c6317c9f",
+            "name": "SerperAPI Google Search - Typography",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
+            "position": [
+                400,
+                48
+            ],
+            "onError": "continueErrorOutput"
+        },
+        {
+            "parameters": {
+                "jsCode": "// Converts a string property into a readable JSON object\nconst rawString = JSON.parse($input.first().json.choices[0].message.content);\nreturn {\n  \"typography\": rawString\n}"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                1520,
+                48
+            ],
+            "id": "eed8b743-0597-422c-b545-98c81d47c9d7",
+            "name": "Merge Slogan Output"
+        }
+    ],
+    "connections": {
+        "Parse Typography Signals": {
+            "main": [
+                [
+                    {
+                        "node": "Gemini Typography Analyst",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Merge Typography Output": {
+            "main": [
+                [
+                    {
+                        "node": "Groq Slogan Generator",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Groq Slogan Generator": {
+            "main": [
+                [
+                    {
+                        "node": "Merge Slogan Output",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Gemini Typography Analyst": {
+            "main": [
+                [
+                    {
+                        "node": "Merge Typography Output",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Edit Fields": {
+            "main": [
+                [
+                    {
+                        "node": "SerperAPI Google Search - Typography",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "SerperAPI Google Search - Typography": {
+            "main": [
+                [
+                    {
+                        "node": "Parse Typography Signals",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Execute Workflow Trigger": {
+            "main": [
+                [
+                    {
+                        "node": "Edit Fields",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Merge Slogan Output": {
+            "main": [
+                [
+                    {
+                        "node": "Cooldown 8s",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "settings": {
+        "executionOrder": "v1",
+        "binaryMode": "separate",
+        "callerPolicy": "workflowsFromSameOwner",
+        "availableInMCP": false
+    },
+    "staticData": null,
+    "meta": null,
+    "pinData": {},
+    "versionId": "72cfa789-aa2e-4fe5-b388-6f1541134c6b",
+    "activeVersionId": null,
+    "versionCounter": 281,
+    "triggerCount": 0,
+    "shared": [
+        {
+            "updatedAt": "2026-07-28T03:39:36.419Z",
+            "createdAt": "2026-07-28T03:39:36.419Z",
+            "role": "workflow:owner",
+            "workflowId": "fv5oPTCyTNEmKm7j",
+            "projectId": "A5qWeG5doYXJG0tr",
+            "project": {
+                "updatedAt": "2026-03-29T08:57:26.442Z",
+                "createdAt": "2026-03-29T08:55:38.920Z",
+                "id": "A5qWeG5doYXJG0tr",
+                "name": "Tarun Velagala <tarunvelagala80@gmail.com>",
+                "type": "personal",
+                "icon": null,
+                "description": null,
+                "creatorId": "7a3b5da8-30cb-4aea-98f3-9838086695e3"
+            }
+        }
+    ],
+    "tags": [],
+    "activeVersion": null
+}

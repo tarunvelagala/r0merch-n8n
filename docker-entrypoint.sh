@@ -118,9 +118,9 @@ echo "[r0merch] Starting n8n..."
 node -e "
 const sqlite3 = require('/usr/local/lib/node_modules/n8n/node_modules/.pnpm/sqlite3@5.1.7/node_modules/sqlite3/lib/sqlite3.js');
 const db = new sqlite3.Database('/home/node/.n8n/database.sqlite');
-db.run(\"UPDATE workflow_entity SET active = 1 WHERE name LIKE 'r0merch%'\", function(err) {
+db.run(\"UPDATE workflow_entity SET active = 1 WHERE name LIKE 'r0merch —%'\", function(err) {
   if (!err) console.log('[r0merch] Activated ' + this.changes + ' workflows.');
-  db.run(\"UPDATE workflow_entity SET activeVersionId = versionId WHERE name LIKE 'r0merch%' AND activeVersionId IS NULL\", function(err2) {
+  db.run(\"UPDATE workflow_entity SET activeVersionId = versionId WHERE name LIKE 'r0merch —%' AND activeVersionId IS NULL\", function(err2) {
     if (!err2) console.log('[r0merch] Published ' + this.changes + ' draft workflows.');
     db.close();
   });

@@ -1,0 +1,671 @@
+{
+  "updatedAt": "2099-01-01T00:00:00.000Z",
+  "createdAt": "2026-07-25T15:18:32.854Z",
+  "id": "f978e116-7fe9-465d-8bb2-c61587fae2b9",
+  "name": "r0merch \u2014 Research Agent",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "trigger-input",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        688
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.all()[0]?.json || {};\nconst niche = input.niche || '';\nconst marketing_pages = input.marketing_pages || '';\nreturn [{ json: { niche, marketing_pages } }];"
+      },
+      "id": "unpack-input",
+      "name": "Unpack Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        688
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "25b7d461-1692-4fab-8739-5419bed842c5",
+        "options": {}
+      },
+      "id": "exec-etsy",
+      "name": "Etsy Agent",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        448,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "5263dc0c-b3cc-4962-b9d0-de12fb260b56",
+        "options": {}
+      },
+      "id": "exec-amazon",
+      "name": "Amazon Agent",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        448,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "09597748-4eb1-4b4c-a646-d802f2156694",
+        "options": {}
+      },
+      "id": "exec-pinterest",
+      "name": "Pinterest Agent",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        448,
+        496
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "8c4e70a0-cdfa-4f6e-9345-f2895b55ab04",
+        "options": {}
+      },
+      "id": "exec-reddit",
+      "name": "Reddit Agent",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        448,
+        688
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "1fb17f86-9092-4ea6-b5cd-4631ca01134c",
+        "options": {}
+      },
+      "id": "exec-google-search",
+      "name": "Google Search Agent",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        448,
+        880
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "4a5b9883-f228-4502-a93b-ae5197d28d30",
+        "options": {}
+      },
+      "id": "exec-google-trends",
+      "name": "Google Trends Agent",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        448,
+        1072
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "b7a2e73f-4388-431e-9bb3-737dfd7cf77d",
+        "options": {}
+      },
+      "id": "exec-vision",
+      "name": "Vision Agent",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        448,
+        1264
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "3d7e9f12-a841-4c56-b234-8f1e2a3b4c5d",
+        "options": {}
+      },
+      "id": "exec-twitter",
+      "name": "Twitter Agent",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        448,
+        1456
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const niche = $('Unpack Input').first().json.niche || '';\n\nconst safe = (nodeName, def) => {\n  try {\n    const items = $(nodeName).all();\n    const found = items.find(i => i.json?.source || i.json?.data);\n    if (!found) return def;\n    return found.json.data ?? def;\n  } catch(_) { return def; }\n};\n\n// Strip any error fields that leaked in\nconst cleanData = (d) => { if (Array.isArray(d)) return d.map(i => { const c={...i}; delete c.error; return c; }); if (d && typeof d === 'object') { const c={...d}; delete c.error; return c; } return d; };\n\nreturn [{ json: {\n  niche,\n  etsy:         [],\n  amazon:       [],\n  pinterest:    { pins:[], trendingKeywords:[] },\n  reddit:       [],\n  googleSearch: safe('Google Search Agent',  { organic:[], relatedSearches:[], peopleAlsoAsk:[] }),\n  googleTrends: safe('Google Trends Agent',  { timeline:[], trendDirection:'stable', risingQueries:[], topQueries:[] }),\n  vision:       [],\n  twitter:      safe('Twitter Agent',        {}),\n  stickers:     safe('Sticker Trends Agent', { colors:[], styles:[], iconThemes:[], originalConcepts:[] }),\n  collectedAt:  new Date().toISOString()\n} }];"
+      },
+      "id": "combine-research",
+      "name": "Combine Research",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        896,
+        688
+      ]
+    },
+    {
+      "id": "exec-sticker",
+      "name": "Sticker Trends Agent",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        440,
+        1180
+      ],
+      "parameters": {
+        "workflowId": "b2c3d4e5-f6a7-8901-bcde-f23456789012",
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "niche",
+              "stringValue": "={{ $json.niche }}"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Unpack Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Unpack Input": {
+      "main": [
+        [
+          {
+            "node": "Google Search Agent",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Trends Agent",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Twitter Agent",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Sticker Trends Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Etsy Agent": {
+      "main": [
+        [
+          {
+            "node": "Combine Research",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Amazon Agent": {
+      "main": [
+        [
+          {
+            "node": "Combine Research",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinterest Agent": {
+      "main": [
+        [
+          {
+            "node": "Combine Research",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reddit Agent": {
+      "main": [
+        [
+          {
+            "node": "Combine Research",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Search Agent": {
+      "main": [
+        [
+          {
+            "node": "Combine Research",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Trends Agent": {
+      "main": [
+        [
+          {
+            "node": "Combine Research",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vision Agent": {
+      "main": [
+        [
+          {
+            "node": "Combine Research",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Twitter Agent": {
+      "main": [
+        [
+          {
+            "node": "Combine Research",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sticker Trends Agent": {
+      "main": [
+        [
+          {
+            "node": "Combine Research",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "cf42114a-e716-4c73-8527-6505406ef191",
+  "activeVersionId": "cf42114a-e716-4c73-8527-6505406ef191",
+  "versionCounter": 33,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-07-25T15:18:32.856Z",
+      "createdAt": "2026-07-25T15:18:32.856Z",
+      "role": "workflow:owner",
+      "workflowId": "f978e116-7fe9-465d-8bb2-c61587fae2b9",
+      "projectId": "A5qWeG5doYXJG0tr",
+      "project": {
+        "updatedAt": "2026-03-29T08:57:26.442Z",
+        "createdAt": "2026-03-29T08:55:38.920Z",
+        "id": "A5qWeG5doYXJG0tr",
+        "name": "Tarun Velagala <tarunvelagala80@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "7a3b5da8-30cb-4aea-98f3-9838086695e3"
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": {
+    "updatedAt": "2026-07-28T09:21:11.298Z",
+    "createdAt": "2026-07-28T09:21:11.298Z",
+    "versionId": "cf42114a-e716-4c73-8527-6505406ef191",
+    "workflowId": "f978e116-7fe9-465d-8bb2-c61587fae2b9",
+    "nodes": [
+      {
+        "parameters": {},
+        "id": "trigger-input",
+        "name": "Execute Workflow Trigger",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1,
+        "position": [
+          0,
+          688
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "const input = $input.all()[0]?.json || {};\nconst niche = input.niche || '';\nconst marketing_pages = input.marketing_pages || '';\nreturn [{ json: { niche, marketing_pages } }];"
+        },
+        "id": "unpack-input",
+        "name": "Unpack Input",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          224,
+          688
+        ]
+      },
+      {
+        "parameters": {
+          "workflowId": "25b7d461-1692-4fab-8739-5419bed842c5",
+          "options": {}
+        },
+        "id": "exec-etsy",
+        "name": "Etsy Agent",
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1,
+        "position": [
+          448,
+          112
+        ]
+      },
+      {
+        "parameters": {
+          "workflowId": "5263dc0c-b3cc-4962-b9d0-de12fb260b56",
+          "options": {}
+        },
+        "id": "exec-amazon",
+        "name": "Amazon Agent",
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1,
+        "position": [
+          448,
+          304
+        ]
+      },
+      {
+        "parameters": {
+          "workflowId": "09597748-4eb1-4b4c-a646-d802f2156694",
+          "options": {}
+        },
+        "id": "exec-pinterest",
+        "name": "Pinterest Agent",
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1,
+        "position": [
+          448,
+          496
+        ]
+      },
+      {
+        "parameters": {
+          "workflowId": "8c4e70a0-cdfa-4f6e-9345-f2895b55ab04",
+          "options": {}
+        },
+        "id": "exec-reddit",
+        "name": "Reddit Agent",
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1,
+        "position": [
+          448,
+          688
+        ]
+      },
+      {
+        "parameters": {
+          "workflowId": "1fb17f86-9092-4ea6-b5cd-4631ca01134c",
+          "options": {}
+        },
+        "id": "exec-google-search",
+        "name": "Google Search Agent",
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1,
+        "position": [
+          448,
+          880
+        ]
+      },
+      {
+        "parameters": {
+          "workflowId": "4a5b9883-f228-4502-a93b-ae5197d28d30",
+          "options": {}
+        },
+        "id": "exec-google-trends",
+        "name": "Google Trends Agent",
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1,
+        "position": [
+          448,
+          1072
+        ]
+      },
+      {
+        "parameters": {
+          "workflowId": "b7a2e73f-4388-431e-9bb3-737dfd7cf77d",
+          "options": {}
+        },
+        "id": "exec-vision",
+        "name": "Vision Agent",
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1,
+        "position": [
+          448,
+          1264
+        ]
+      },
+      {
+        "parameters": {
+          "workflowId": "3d7e9f12-a841-4c56-b234-8f1e2a3b4c5d",
+          "options": {}
+        },
+        "id": "exec-twitter",
+        "name": "Twitter Agent",
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1,
+        "position": [
+          448,
+          1456
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "const niche = $('Unpack Input').first().json.niche || '';\n\nconst safe = (nodeName, def) => {\n  try {\n    const items = $(nodeName).all();\n    const found = items.find(i => i.json?.source || i.json?.data);\n    if (!found) return def;\n    return found.json.data ?? def;\n  } catch(_) { return def; }\n};\n\n// Strip any error fields that leaked in\nconst cleanData = (d) => { if (Array.isArray(d)) return d.map(i => { const c={...i}; delete c.error; return c; }); if (d && typeof d === 'object') { const c={...d}; delete c.error; return c; } return d; };\n\nreturn [{ json: {\n  niche,\n  etsy:         [],\n  amazon:       [],\n  pinterest:    { pins:[], trendingKeywords:[] },\n  reddit:       [],\n  googleSearch: safe('Google Search Agent',  { organic:[], relatedSearches:[], peopleAlsoAsk:[] }),\n  googleTrends: safe('Google Trends Agent',  { timeline:[], trendDirection:'stable', risingQueries:[], topQueries:[] }),\n  vision:       [],\n  twitter:      safe('Twitter Agent',        {}),\n  stickers:     safe('Sticker Trends Agent', { colors:[], styles:[], iconThemes:[], originalConcepts:[] }),\n  collectedAt:  new Date().toISOString()\n} }];"
+        },
+        "id": "combine-research",
+        "name": "Combine Research",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          896,
+          688
+        ]
+      },
+      {
+        "id": "exec-sticker",
+        "name": "Sticker Trends Agent",
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1,
+        "position": [
+          440,
+          1180
+        ],
+        "parameters": {
+          "workflowId": "b2c3d4e5-f6a7-8901-bcde-f23456789012",
+          "workflowInputs": {
+            "values": [
+              {
+                "name": "niche",
+                "stringValue": "={{ $json.niche }}"
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Execute Workflow Trigger": {
+        "main": [
+          [
+            {
+              "node": "Unpack Input",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Unpack Input": {
+        "main": [
+          [
+            {
+              "node": "Google Search Agent",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Google Trends Agent",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Twitter Agent",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Sticker Trends Agent",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Etsy Agent": {
+        "main": [
+          [
+            {
+              "node": "Combine Research",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Amazon Agent": {
+        "main": [
+          [
+            {
+              "node": "Combine Research",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Pinterest Agent": {
+        "main": [
+          [
+            {
+              "node": "Combine Research",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Reddit Agent": {
+        "main": [
+          [
+            {
+              "node": "Combine Research",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Google Search Agent": {
+        "main": [
+          [
+            {
+              "node": "Combine Research",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Google Trends Agent": {
+        "main": [
+          [
+            {
+              "node": "Combine Research",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Vision Agent": {
+        "main": [
+          [
+            {
+              "node": "Combine Research",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Twitter Agent": {
+        "main": [
+          [
+            {
+              "node": "Combine Research",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Sticker Trends Agent": {
+        "main": [
+          [
+            {
+              "node": "Combine Research",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "import",
+    "name": null,
+    "description": null,
+    "autosaved": false,
+    "workflowPublishHistory": []
+  }
+}

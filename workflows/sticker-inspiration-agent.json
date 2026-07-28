@@ -1,0 +1,345 @@
+{
+  "updatedAt": "2026-07-28T13:14:34.879Z",
+  "createdAt": "2026-07-28T08:14:48.449Z",
+  "id": "hqW3sxjuGwt3UUdB",
+  "name": "POD Stickers Inspiration Agent",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "url": "https://google.serper.dev/search",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "engine",
+              "value": "google"
+            },
+            {
+              "name": "q",
+              "value": "={{ $json.niche + ' sticker pack bestseller etsy redbubble stickermule 2026' }}"
+            },
+            {
+              "name": "gl",
+              "value": "us"
+            },
+            {
+              "name": "hl",
+              "value": "en"
+            },
+            {
+              "name": "num",
+              "value": "20"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": "={{ $env.SERPER_API_KEY }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 25000
+        }
+      },
+      "id": "c9eaba78-68b7-48b3-977e-0f5ea0390903",
+      "name": "Sticker Google Search",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        352,
+        -432
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Error Occurred - POD Stickers Generator"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1024,
+        -336
+      ],
+      "id": "5548becd-7212-4f0e-ad84-490edb1cce09",
+      "name": "Stop and Error"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1f62049c-e03c-40fc-8d19-c8741154186f",
+              "leftValue": "={{ $json.niche }}",
+              "rightValue": "={{ null }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        128,
+        -112
+      ],
+      "id": "87d9e78b-1715-4d54-a320-c65e6d3a44d0",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "55dfa30d-b649-40f0-928f-a7a7e0be529d",
+              "name": "niche",
+              "value": "={{ $('Execute Workflow Trigger').first().json.niche || (()=>{ try { return JSON.parse($('Execute Workflow Trigger').first().json.context||'{}').niche; } catch(_){ return ''; } })() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        352,
+        -112
+      ],
+      "id": "df4655ba-05e2-4ecc-abc8-8d2344c9b6cb",
+      "name": "Set Niche Value"
+    },
+    {
+      "parameters": {
+        "amount": 8
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        576,
+        -496
+      ],
+      "id": "f91ee808-ce4e-49ea-b0aa-3cdecf352c2e",
+      "name": "Countdown - 8s",
+      "webhookId": "c78ccab3-727c-4043-a45d-8aa976d33fd2"
+    },
+    {
+      "parameters": {
+        "jsCode": "const content = $input.first().json.choices[0].message.content;\nconst data = JSON.parse(content);\nreturn data.map(item => ({\n  json: item\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1024,
+        -544
+      ],
+      "id": "24589058-4688-47b2-8be2-596bab85e483",
+      "name": "Jsonify Sticker Concepts"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.groq.com/openai/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + $env.GROQ_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  model: \"llama-3.1-8b-instant\",\n  messages: [\n    {\n      role: \"system\",\n      content: \"You are a POD design trend analyst. Return only valid JSON array, no markdown, no code fences.\"\n    },\n    {\n      role: \"user\",\n      content: `Based on these sticker market signals for the $('Execute Workflow Trigger').item.json.niche niche, generate ORIGINAL t-shirt design concepts.\n\nSticker market signals:\n- Top recurring terms: ${($json.data?.topStickerTerms || []).slice(0, 15).join(\", \")}\n- Inspiration seeds (themes only, DO NOT copy): ${($json.data?.inspirationSeeds || []).slice(0, 5).join(\" | \")}\n\nGenerate exactly 3 original concepts.\n\nRequirements:\n- Be inspired by the trends, but do NOT copy them.\n- Return ONLY valid JSON.\n- No markdown.\n- No code fences.\n- No explanations.\n- Every string must be enclosed in double quotes.\n\nReturn exactly this JSON array:\n\n[\n  {\n    \"concept\": \"brief description\",\n    \"phrase\": \"1-3 word slogan\",\n    \"style\": \"visual style\",\n    \"colors\": [\"color1\", \"color2\"],\n    \"icons\": [\"element1\", \"element2\"],\n    \"legalNote\": \"original design\"\n  }\n]`\n    }\n  ],\n  max_tokens: 1024,\n  temperature: 0.8\n}) }}",
+        "options": {}
+      },
+      "id": "fff43494-54cf-4c24-98dc-b8d12c188baa",
+      "name": "Groq Sticker Concepts",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        800,
+        -496
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "niche"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        128,
+        -432
+      ],
+      "id": "f8c1b63f-1faf-4a9f-967f-b3bfa9126ad8",
+      "name": "Execute Workflow Trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "const niche = $('Execute Workflow Trigger').first().json.niche || '';\nconst concepts = $input.all().map(i => i.json).filter(Boolean);\n\n// Get raw results from Sticker Google Search for signal extraction\nconst raw = $('Sticker Google Search').first()?.json || {};\nconst results = raw?.organic || raw?.organic_results || raw?.items || [];\nconst inspirationSeeds = results.map(r => r.title || '').filter(Boolean).slice(0, 10);\n\nreturn [{ json: {\n  source: 'stickers',\n  niche,\n  stickers: {\n    concepts,\n    inspirationSeeds,\n    totalResults: results.length,\n  }\n} }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1248,
+        -544
+      ],
+      "id": "d6f77170-d919-47ed-b0d2-d77ba056061e",
+      "name": "Merge Sticker Output"
+    }
+  ],
+  "connections": {
+    "Sticker Google Search": {
+      "main": [
+        [
+          {
+            "node": "Countdown - 8s",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Set Niche Value",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Set Niche Value": {
+      "main": [
+        []
+      ]
+    },
+    "Countdown - 8s": {
+      "main": [
+        [
+          {
+            "node": "Groq Sticker Concepts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Sticker Concepts": {
+      "main": [
+        [
+          {
+            "node": "Jsonify Sticker Concepts",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Jsonify Sticker Concepts": {
+      "main": [
+        [
+          {
+            "node": "Merge Sticker Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Sticker Google Search",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "04e772d9-9e4c-4ad0-9446-778ae1209d0c",
+  "activeVersionId": null,
+  "versionCounter": 324,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-07-28T08:14:48.451Z",
+      "createdAt": "2026-07-28T08:14:48.451Z",
+      "role": "workflow:owner",
+      "workflowId": "hqW3sxjuGwt3UUdB",
+      "projectId": "A5qWeG5doYXJG0tr",
+      "project": {
+        "updatedAt": "2026-03-29T08:57:26.442Z",
+        "createdAt": "2026-03-29T08:55:38.920Z",
+        "id": "A5qWeG5doYXJG0tr",
+        "name": "Tarun Velagala <tarunvelagala80@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "7a3b5da8-30cb-4aea-98f3-9838086695e3"
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": null
+}

@@ -1,0 +1,296 @@
+{
+  "updatedAt": "2099-01-01T00:00:00.000Z",
+  "createdAt": "2026-07-27T11:32:17.681Z",
+  "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "name": "r0merch \u2014 Keyword Generator",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "trigger-input",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.all()[0]?.json || {};\nconst category = input.category || input.niche || 'streetwear';\nreturn [{ json: { category } }];"
+      },
+      "id": "unpack",
+      "name": "Unpack Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + $env.GROQ_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: \"llama-3.1-8b-instant\", messages: [{ role: \"user\", content: \"You are a POD market analyst for r0merch. For the \\\"\" + $json.category + \"\\\" niche, identify the SINGLE best print-on-demand t-shirt keyword right now. Criteria: high search demand, low competition, emotionally resonant, 1-3 words max, visually printable, trending on Etsy/Amazon.\\n\\nExamples: fitness=GRIND MODE, nurse=SAVING LIVES, cat-lovers=CAT MOM\\n\\nReturn ONLY the keyword, nothing else. No quotes, no explanation.\" }], max_tokens: 20, temperature: 0.5 }) }}"
+      },
+      "id": "groq-keywords",
+      "name": "Groq Keyword Generator",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        440,
+        300
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const category = $('Unpack Input').first().json.category || '';\nconst niche = $('Execute Workflow Trigger').first().json.niche || category;\nconst raw = $input.first().json?.choices?.[0]?.message?.content || '';\nconst keyword = raw.trim().replace(/[\"']/g, '').toUpperCase();\nreturn [{ json: { niche, category, keyword, keywords: [keyword] } }];"
+      },
+      "id": "parse-keywords",
+      "name": "Parse Keywords",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Unpack Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Unpack Input": {
+      "main": [
+        [
+          {
+            "node": "Groq Keyword Generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Keyword Generator": {
+      "main": [
+        [
+          {
+            "node": "Parse Keywords",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Parse Keywords",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Keyword Generator error": {
+      "main": [
+        [
+          {
+            "node": "Parse Keywords",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": null,
+  "versionId": "f7ab8946-e5aa-4798-af92-c8244df49db3",
+  "activeVersionId": "f7ab8946-e5aa-4798-af92-c8244df49db3",
+  "versionCounter": 10,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-07-27T11:32:17.683Z",
+      "createdAt": "2026-07-27T11:32:17.683Z",
+      "role": "workflow:owner",
+      "workflowId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "projectId": "A5qWeG5doYXJG0tr",
+      "project": {
+        "updatedAt": "2026-03-29T08:57:26.442Z",
+        "createdAt": "2026-03-29T08:55:38.920Z",
+        "id": "A5qWeG5doYXJG0tr",
+        "name": "Tarun Velagala <tarunvelagala80@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "7a3b5da8-30cb-4aea-98f3-9838086695e3"
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": {
+    "updatedAt": "2026-07-28T09:21:30.032Z",
+    "createdAt": "2026-07-28T09:21:30.032Z",
+    "versionId": "f7ab8946-e5aa-4798-af92-c8244df49db3",
+    "workflowId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "nodes": [
+      {
+        "parameters": {},
+        "id": "trigger-input",
+        "name": "Execute Workflow Trigger",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1,
+        "position": [
+          0,
+          300
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "const input = $input.all()[0]?.json || {};\nconst category = input.category || input.niche || 'streetwear';\nreturn [{ json: { category } }];"
+        },
+        "id": "unpack",
+        "name": "Unpack Input",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          220,
+          300
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.groq.com/openai/v1/chat/completions",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "={{ 'Bearer ' + $env.GROQ_API_KEY }}"
+              },
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({ model: \"llama-3.1-8b-instant\", messages: [{ role: \"user\", content: \"You are a POD market analyst for r0merch. For the \\\"\" + $json.category + \"\\\" niche, identify the SINGLE best print-on-demand t-shirt keyword right now. Criteria: high search demand, low competition, emotionally resonant, 1-3 words max, visually printable, trending on Etsy/Amazon.\\n\\nExamples: fitness=GRIND MODE, nurse=SAVING LIVES, cat-lovers=CAT MOM\\n\\nReturn ONLY the keyword, nothing else. No quotes, no explanation.\" }], max_tokens: 20, temperature: 0.5 }) }}"
+        },
+        "id": "groq-keywords",
+        "name": "Groq Keyword Generator",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          440,
+          300
+        ],
+        "onError": "continueErrorOutput"
+      },
+      {
+        "parameters": {
+          "jsCode": "const category = $('Unpack Input').first().json.category || '';\nconst niche = $('Execute Workflow Trigger').first().json.niche || category;\nconst raw = $input.first().json?.choices?.[0]?.message?.content || '';\nconst keyword = raw.trim().replace(/[\"']/g, '').toUpperCase();\nreturn [{ json: { niche, category, keyword, keywords: [keyword] } }];"
+        },
+        "id": "parse-keywords",
+        "name": "Parse Keywords",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          660,
+          300
+        ]
+      }
+    ],
+    "connections": {
+      "Execute Workflow Trigger": {
+        "main": [
+          [
+            {
+              "node": "Unpack Input",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Unpack Input": {
+        "main": [
+          [
+            {
+              "node": "Groq Keyword Generator",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Groq Keyword Generator": {
+        "main": [
+          [
+            {
+              "node": "Parse Keywords",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Parse Keywords",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Groq Keyword Generator error": {
+        "main": [
+          [
+            {
+              "node": "Parse Keywords",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "import",
+    "name": null,
+    "description": null,
+    "autosaved": false,
+    "workflowPublishHistory": []
+  }
+}

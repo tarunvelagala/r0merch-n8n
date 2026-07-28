@@ -1,0 +1,244 @@
+{
+  "updatedAt": "2026-07-28T12:40:24.916Z",
+  "createdAt": "2026-07-28T12:21:33.701Z",
+  "id": "RD9bQuDJZFq2Vkqn",
+  "name": "POD Artwork Generator Agent",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "  const niche = $('Execute Workflow Trigger').first().json.niche;\n  const raw = $('Artwork Search').first()?.json || {};\n  const results = raw?.organic || raw?.organic_results || [];\n\n  const docs = results.map(r =>\n    ((r.title || '') + ' ' + (r.snippet || '')).toLowerCase()\n    .split(/[\\s\\-\\/,.|&()+]+/)\n    .filter(w => w.length > 3 && /^[a-z]+$/.test(w))\n  );\n\n  const tf = {}, df = {};\n  docs.forEach(words => {\n    const seen = new Set();\n    words.forEach(w => {\n      tf[w] = (tf[w] || 0) + 1;\n      if (!seen.has(w)) { df[w] = (df[w] || 0) + 1; seen.add(w); }\n    });\n  });\n\n  const n = docs.length || 1;\n  const topWords = Object.entries(tf)\n    .filter(([w]) => df[w] >= 2 && df[w] / n < 0.8)\n    .map(([w, count]) => ({ w, score: count * Math.log(n / df[w]) }))\n    .sort((a, b) => b.score - a.score)\n    .slice(0, 30)\n    .map(e => e.w);\n\n  const inspirationSeeds = results\n    .map(r => r.title || '')\n    .filter(Boolean)\n    .map(t => t.replace(/\\|.*$/, '').trim())\n    .filter(t => t.length > 3 && t.length < 60)\n    .slice(0, 12);\n\n  return [{ json: { niche, data: { topArtworkTerms: topWords, inspirationSeeds, totalResults: results.length } } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        48,
+        -16
+      ],
+      "id": "f33a5704-c905-4231-8cd7-8a65d12e1caf",
+      "name": "Parse Artwork Signals"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Error Occurred - POD Stickers Generator"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        496,
+        160
+      ],
+      "id": "54ebff76-fe07-4688-9c2c-21f9be42a686",
+      "name": "Stop and Error"
+    },
+    {
+      "parameters": {
+        "jsCode": "  const raw = $input.first().json?.choices?.[0]?.message?.content || '{}';\nconst niche = $('Execute Workflow Trigger').first().json.niche;\n  const clean = raw.replace(/```json|```/g, '').trim();\n  let artwork = {};\n  try { artwork = JSON.parse(clean); } catch(_) {}\n  \n  return [{ json: {\n    niche,\n    artwork: {\n      illustrationStyle: artwork.illustrationStyle || '',\n      colorMood:         artwork.colorMood         || '',\n      composition:       artwork.composition        || '',\n      iconThemes:        artwork.iconThemes         || [],\n      artworkNotes:      artwork.artworkNotes       || '',\n      topTerms:          $('Parse Artwork Signals').first().json.data?.topArtworkTerms || [],\n      totalResults:      $('Parse Artwork Signals').first().json.data?.totalResults    || 0,\n    }\n  } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        496,
+        -64
+      ],
+      "id": "0fb8c807-999b-4fc2-a292-a1eaeb429381",
+      "name": "Merge Artwork Output"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "niche"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -400,
+        64
+      ],
+      "id": "c19bd5f0-1168-40b7-b89b-b9daf1d93e0e",
+      "name": "Execute Workflow Trigger"
+    },
+    {
+      "parameters": {
+        "url": "https://google.serper.dev/search",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "engine",
+              "value": "google"
+            },
+            {
+              "name": "q",
+              "value": "=={{ $json.niche + ' graphic tee illustration art print bestseller etsy redbubble stickermule 2026' }}"
+            },
+            {
+              "name": "gl",
+              "value": "us"
+            },
+            {
+              "name": "hl",
+              "value": "en"
+            },
+            {
+              "name": "num",
+              "value": "20"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": "={{ $env.SERPER_API_KEY }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 25000
+        }
+      },
+      "id": "a13257cf-360e-48f1-b3ee-6102611b6723",
+      "name": "Artwork Search",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -176,
+        64
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.groq.com/openai/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + $env.GROQ_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ \nJSON.stringify({ \nmodel: 'llama-3.1-8b-instant', \nmessages: [{ role: 'system', content: 'You are a POD illustration strategist. Return ONLY valid JSON, no markdown, no code fences.' \n},\n{ role: 'user', content: 'Niche: \"' + $('Execute Workflow Trigger').item.json.niche + '\"\\n\\nTop recurring  terms from bestselling graphic tee listings:\\n' + ($('Parse Artwork Signals').first().json.data?.topArtworkTerms || []).join(', ') + '\\n\\nSample listing titles:\\n' + ($('Parse Artwork Signals').first().json.data?.inspirationSeeds || []).slice(0, 6).map(p => '- ' + p).join('\\n') + '\\n\\nClassify the artwork patterns.\\n\\nReturn ONLY this JSON:\\n{\"illustrationStyle\":\"e.g. bold vector illustration\",\"colorMood\":\"e.g. vibrant high contrast\",\"composition\":\"e.g. centered graphic with minimal text\",\"iconThemes\":[\"theme1\",\"theme2\",\"theme3\"],\"artworkNotes\":\"one sentence on what makes this niche artwork distinctive\"}' \n}],\nmax_tokens: 400, temperature: 0.5 \n}) \n}}",
+        "options": {}
+      },
+      "id": "f30d8442-e276-4477-b0c2-2a29581ab9c8",
+      "name": "Groq Artwork Analyst",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        272,
+        -16
+      ],
+      "onError": "continueErrorOutput"
+    }
+  ],
+  "connections": {
+    "Parse Artwork Signals": {
+      "main": [
+        [
+          {
+            "node": "Groq Artwork Analyst",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Artwork Search",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Artwork Search": {
+      "main": [
+        [
+          {
+            "node": "Parse Artwork Signals",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Artwork Analyst": {
+      "main": [
+        [
+          {
+            "node": "Merge Artwork Output",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "c4acdf30-a89d-45e4-ab9d-ed44add8f4e5",
+  "activeVersionId": null,
+  "versionCounter": 65,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-07-28T12:21:33.705Z",
+      "createdAt": "2026-07-28T12:21:33.705Z",
+      "role": "workflow:owner",
+      "workflowId": "RD9bQuDJZFq2Vkqn",
+      "projectId": "A5qWeG5doYXJG0tr",
+      "project": {
+        "updatedAt": "2026-03-29T08:57:26.442Z",
+        "createdAt": "2026-03-29T08:55:38.920Z",
+        "id": "A5qWeG5doYXJG0tr",
+        "name": "Tarun Velagala <tarunvelagala80@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "7a3b5da8-30cb-4aea-98f3-9838086695e3"
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": null
+}
