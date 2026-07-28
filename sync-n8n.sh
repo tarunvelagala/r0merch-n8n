@@ -6,6 +6,8 @@ DIR="/Users/C5404787/workplace/personal/r0merch-n8n/workflows"
 
 mkdir -p "$DIR"
 
+ROOT="/Users/C5404787/workplace/personal/r0merch-n8n"
+
 sync_workflow() {
   local ID="$1"
   local NAME="$2"
@@ -14,12 +16,16 @@ sync_workflow() {
 
   response=$(curl -s "$BASE/workflows/$ID" -H "X-N8N-API-KEY: $API_KEY")
   if echo "$response" | python3 -m json.tool > "$TMP" 2>/dev/null; then
-    # Only write if file changed and is not empty/error
     size=$(wc -c < "$TMP")
     if [ "$size" -gt 100 ]; then
       if ! diff -q "$TMP" "$TARGET" > /dev/null 2>&1; then
         cp "$TMP" "$TARGET"
         echo "[$(date '+%H:%M:%S')] Updated: ${NAME}.json"
+      fi
+      if [ "$NAME" = "pod-design-orchestrator" ]; then
+        if ! diff -q "$TMP" "$ROOT/workflow.json" > /dev/null 2>&1; then
+          cp "$TMP" "$ROOT/workflow.json"
+        fi
       fi
     fi
   fi
