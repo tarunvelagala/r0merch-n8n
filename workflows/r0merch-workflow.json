@@ -1,0 +1,45 @@
+{
+  "updatedAt": "2026-07-29T10:52:52.104Z",
+  "createdAt": "2026-07-29T10:52:51.981Z",
+  "id": "s2NGsr76SZ0LliIR",
+  "name": "R0Merch Workflow",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        208,
+        -48
+      ],
+      "id": "91f9b69f-01cd-48bd-90b4-c610d8582911",
+      "name": "When clicking ‘Execute workflow’"
+    }
+  ],
+  "connections": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "d4a04436-5b3f-472e-8589-a29de1832d87",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-07-29T10:52:51.982Z",
+      "createdAt": "2026-07-29T10:52:51.982Z",
+      "role": "workflow:owner",
+      "workflowId": "s2NGsr76SZ0LliIR",
+      "projectId": "grwT3rRsXgicvbte"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
