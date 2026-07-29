@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-07-29T11:02:54.829Z",
+  "updatedAt": "2026-07-29T11:07:26.513Z",
   "createdAt": "2026-07-29T09:30:27.215Z",
   "id": "x5HP2n7jeIEBlR0l",
   "name": "Bidirectional GitHub workflow sync & version control for n8n workflows",
@@ -235,8 +235,7 @@
         },
         "filePath": "={{ $('Set GitHub Details').item.json.repo_workflows_path }}/{{ $node['Edit for Update'].json.fileName }}",
         "fileContent": "={{ $('To base').item.json.data }}",
-        "commitMessage": "=n8n_backup_sync-{{ $('Edit for Update').item.json.commitDate }}",
-        "sha": "={{ $('Code - InputB').item.json.dataset.sha }}"
+        "commitMessage": "=n8n_backup_sync-{{ $('Edit for Update').item.json.commitDate }}"
       },
       "id": "138bd609-541a-46d6-aa1e-792e85a58c05",
       "name": "Update file",
@@ -500,7 +499,7 @@
     {
       "parameters": {
         "mode": "raw",
-        "jsonOutput": "={{ { ...$json.content.base64Decode() | fromJson, sha: $json.sha } }}",
+        "jsonOutput": "={{ $json.content.base64Decode() }}",
         "options": {}
       },
       "id": "fd1022a0-4f67-4603-bf94-68415776c587",
@@ -829,8 +828,8 @@
   },
   "nodeGroups": [],
   "pinData": {},
-  "versionId": "197226b6-a05e-4daa-872b-2d8bb49302b5",
-  "activeVersionId": "197226b6-a05e-4daa-872b-2d8bb49302b5",
+  "versionId": "b1258505-bf46-4680-ae35-1e20205edaac",
+  "activeVersionId": "b1258505-bf46-4680-ae35-1e20205edaac",
   "triggerCount": 1,
   "shared": [
     {
@@ -842,9 +841,9 @@
     }
   ],
   "activeVersion": {
-    "updatedAt": "2026-07-29T11:02:54.830Z",
-    "createdAt": "2026-07-29T11:02:54.830Z",
-    "versionId": "197226b6-a05e-4daa-872b-2d8bb49302b5",
+    "updatedAt": "2026-07-29T11:07:26.514Z",
+    "createdAt": "2026-07-29T11:07:26.514Z",
+    "versionId": "b1258505-bf46-4680-ae35-1e20205edaac",
     "workflowId": "x5HP2n7jeIEBlR0l",
     "nodes": [
       {
@@ -1076,8 +1075,7 @@
           },
           "filePath": "={{ $('Set GitHub Details').item.json.repo_workflows_path }}/{{ $node['Edit for Update'].json.fileName }}",
           "fileContent": "={{ $('To base').item.json.data }}",
-          "commitMessage": "=n8n_backup_sync-{{ $('Edit for Update').item.json.commitDate }}",
-          "sha": "={{ $('Code - InputB').item.json.dataset.sha }}"
+          "commitMessage": "=n8n_backup_sync-{{ $('Edit for Update').item.json.commitDate }}"
         },
         "id": "138bd609-541a-46d6-aa1e-792e85a58c05",
         "name": "Update file",
@@ -1341,7 +1339,7 @@
       {
         "parameters": {
           "mode": "raw",
-          "jsonOutput": "={{ { ...$json.content.base64Decode() | fromJson, sha: $json.sha } }}",
+          "jsonOutput": "={{ $json.content.base64Decode() }}",
           "options": {}
         },
         "id": "fd1022a0-4f67-4603-bf94-68415776c587",
