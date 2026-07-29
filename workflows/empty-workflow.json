@@ -1,0 +1,29 @@
+{
+  "updatedAt": "2026-07-29T09:55:46.610Z",
+  "createdAt": "2026-07-29T09:55:46.610Z",
+  "id": "rRTk8VL5r7CRDfwL",
+  "name": "Empty Workflow",
+  "active": false,
+  "isArchived": false,
+  "nodes": [],
+  "connections": {},
+  "settings": {},
+  "staticData": null,
+  "meta": null,
+  "nodeGroups": [],
+  "pinData": null,
+  "versionId": "ac81f934-a67f-4959-a802-79bc86c008c8",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-07-29T09:55:46.613Z",
+      "createdAt": "2026-07-29T09:55:46.613Z",
+      "role": "workflow:owner",
+      "workflowId": "rRTk8VL5r7CRDfwL",
+      "projectId": "grwT3rRsXgicvbte"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
