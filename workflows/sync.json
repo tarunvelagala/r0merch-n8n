@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-07-29T11:18:09.154Z",
+  "updatedAt": "2026-07-30T09:14:20.182Z",
   "createdAt": "2026-07-29T09:30:27.215Z",
   "id": "x5HP2n7jeIEBlR0l",
   "name": "Sync",
@@ -152,7 +152,7 @@
         "commitMessage": "=n8n_backup_sync-{{ $node['Edit for Upload'].json.commitDate }}",
         "additionalParameters": {
           "branch": {
-            "branch": "main"
+            "branch": "r0merch-dev"
           }
         }
       },
@@ -333,7 +333,6 @@
     },
     {
       "parameters": {
-        "language": "javaScript",
         "jsCode": "const workflowId = $('If n8n before GitHub').first().json.same.id; const matched = $('Decode to json').all().filter(item => item.json.id === workflowId); if (matched.length) return [{ json: { dataset: matched[0].json } }]; return [];"
       },
       "id": "09d43ee5-7a21-47cd-8bec-45ae16e8422f",
@@ -347,7 +346,6 @@
     },
     {
       "parameters": {
-        "language": "javaScript",
         "jsCode": "const workflowId = $('If n8n before GitHub').first().json.same.id; const matched = $('n8n').all().filter(item => item.json.id === workflowId); if (matched.length) return [{ json: { dataset: matched[0].json } }]; return [];"
       },
       "id": "d3be821f-a331-4dc7-993d-6af348fb1fb2",
@@ -828,7 +826,7 @@
   },
   "nodeGroups": [],
   "pinData": {},
-  "versionId": "a6487f10-d22c-49d5-9ce2-da856ff26889",
+  "versionId": "858f718e-8f20-4041-9dd3-b47117d4645d",
   "activeVersionId": "a6487f10-d22c-49d5-9ce2-da856ff26889",
   "triggerCount": 1,
   "shared": [
