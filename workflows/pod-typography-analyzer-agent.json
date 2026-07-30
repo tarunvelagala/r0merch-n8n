@@ -1,0 +1,380 @@
+{
+  "updatedAt": "2026-07-30T09:30:05.909Z",
+  "createdAt": "2026-07-30T09:30:05.909Z",
+  "id": "GmKU10UKJy0RbUpp",
+  "name": "POD Typography Analyzer Agent",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": " const niche = $('Execute Workflow Trigger').first().json.niche || '';\n  const raw = $('SerperAPI Google Search - Typography').first()?.json || {};\n  const results = raw?.organic || raw?.organic_results || [];\n\n  // Build per-doc word sets for IDF\n  const docs = results.map(r =>\n    ((r.title || '') + ' ' + (r.snippet || '')).toLowerCase()\n    .split(/[\\s\\-\\/,.|&()+]+/)\n    .filter(w => w.length > 3 && /^[a-z]+$/.test(w))\n  );\n\n  // Word frequency across all docs (TF) and doc frequency (IDF)\n  const tf = {}, df = {};\n  docs.forEach(words => {\n    const seen = new Set();\n    words.forEach(w => {\n      tf[w] = (tf[w] || 0) + 1;\n      if (!seen.has(w)) { df[w] = (df[w] || 0) + 1; seen.add(w); }\n    });\n  });\n\n  const n = docs.length || 1;\n  // Words appearing in >80% of docs are stop words, <2 docs are noise\n  const topWords = Object.entries(tf)\n    .filter(([w]) => df[w] >= 2 && df[w] / n < 0.8)\n    .map(([w, count]) => ({ w, score: count * Math.log(n / df[w]) }))\n    .sort((a, b) => b.score - a.score)\n    .slice(0, 30)\n    .map(e => e.w);\n\n  const phrases = results\n    .map(r => r.title || '')\n    .filter(Boolean)\n    .map(title => title.replace(/\\|.*$/, '').trim())\n    .filter(t => t.length > 3 && t.length < 60)\n    .slice(0, 12);\n\n  return [{ json: {\n    source: 'typography',\n    niche,\n    data: {\n      topTypographyTerms: topWords,\n      phrases,\n      totalResults: results.length,\n    }\n  } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        -336
+      ],
+      "id": "864362d3-ed35-4d65-8358-3547f27869a0",
+      "name": "Parse Typography Signals"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "niche"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -208,
+        -272
+      ],
+      "id": "9ce46159-53b7-4b67-9f15-41471ee5a8cb",
+      "name": "Execute Workflow Trigger"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + $env.GROQ_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  model: \"llama-3.1-8b-instant\",\n  messages: [\n    {\n      role: \"system\",\n      content: \"You are a POD slogan writer. Each slogan will be printed on a t-shirt alongside a matching illustration. Return ONLY a valid JSON array. No markdown. No code fences. No explanations.\"\n    },\n    {\n      role: \"user\",\n      content: `Niche: \"$('Execute Workflow Trigger').item.json.niche\"\nTypography signals: \n- Font style: \"${$json.dominantFontStyle}\"\n- Mood: ${$json.letteringMood}\n- Layout: ${$json.textLayout}\n- Market phrases: ${($json.suggestedPhrases || []).join(\", \")}\nGenerate exactly 5 original slogans.\n\nRequirements:\n- 1-5 words each\n- Suitable for printing on a t-shirt\n- Completely original.\n- Do NOT copy the market phrases.\n- Each slogan should naturally fit the niche.\n- Include a matching illustration concept.\n- Include a placement recommendation.\n- Include an overall mood.\n- Return ONLY valid JSON.\n- The output must parse successfully with JSON.parse().\n- No markdown.\n- No code fences.\n- No explanations.\n\nReturn exactly this JSON array:\n\n[\n  {\n    \"slogan\": \"text on shirt\",\n    \"illustrationConcept\": \"artwork description\",\n    \"placement\": \"e.g. centered chest\",\n    \"mood\": \"e.g. bold and rebellious\"\n  }\n]\n`\n}],\n  max_tokens: 600,\n  temperature: 0.85\n}) }}",
+        "options": {}
+      },
+      "id": "8211bb6c-2c01-4678-9abf-9bed06cbde65",
+      "name": "Groq Slogan Generator",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        912,
+        -336
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://google.serper.dev/search",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": "={{ $env.SERPER_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n    q: $json.niche + ' t-shirt typography lettering bestseller etsy redbubble amazon 2026',\n    num: 20,\n    gl: 'us',\n    hl: 'en'\n  }) }}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "0cb9fb66-50a0-4051-b9e4-4f08c6317c9f",
+      "name": "SerperAPI Google Search - Typography",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        16,
+        -272
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1f62049c-e03c-40fc-8d19-c8741154186f",
+              "leftValue": "={{ $json.niche }}",
+              "rightValue": "={{ null }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -208,
+        64
+      ],
+      "id": "84a888b9-9e97-492a-994e-cb92625e5d0c",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "55dfa30d-b649-40f0-928f-a7a7e0be529d",
+              "name": "niche",
+              "value": "gen-z",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        16,
+        64
+      ],
+      "id": "e2915f43-de06-4997-875c-5547ae598d6e",
+      "name": "Set Niche Value"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.groq.com/openai/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + $env.GROQ_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  model: \"llama-3.1-8b-instant\",\n  messages: [\n    {\n      role: \"system\",\n      content: \"You are a POD typography strategist. Return ONLY valid JSON, no markdown, no code fences, no explanations.\"\n    },\n    {\n      role: \"user\",\n      content: `Niche: \"$('Execute Workflow Trigger').item.json.niche\"\n\nTop recurring terms from bestselling listings:\n${($('Parse Typography Signals').first().json.data?.topTypographyTerms || []).join(\", \")}\n\nSample listing titles:\n${($('Parse Typography Signals').first().json.data?.phrases || [])\n  .slice(0, 6)\n  .map(p => `- ${p}`)\n  .join(\"\\n\")}\n\nClassify the typography patterns and generate original phrase ideas.\n\nReturn ONLY this JSON object:\n\n{\n  \"dominantFontStyle\": \"e.g. bold sans-serif\",\n  \"letteringMood\": \"e.g. energetic and irreverent\",\n  \"textLayout\": \"e.g. stacked two-line centered\",\n  \"suggestedPhrases\": [\n    \"phrase 1\",\n    \"phrase 2\",\n    \"phrase 3\"\n  ],\n  \"typographyNotes\": \"one sentence on what makes this niche typography distinctive\"\n}`\n    }\n  ],\n  max_tokens: 400,\n  temperature: 0.5\n}) }}",
+        "options": {}
+      },
+      "id": "1638f0e5-c428-4ac4-9c0e-5e5fabd8a16c",
+      "name": "Groq Typography Analyst",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        464,
+        -336
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "  const content = $input.first().json.choices[0].message.content;\n  const clean = content.replace(/```json|```/g, '').trim();\n  const data = JSON.parse(clean);\n\n  // Handle both array and object responses\n  const items = Array.isArray(data) ? data : [data];\n  return items.map(item => ({ json: item }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        688,
+        -336
+      ],
+      "id": "f7ebf306-9b20-4bb1-bf07-ee14d8562626",
+      "name": "Jsonify Typography Output"
+    },
+    {
+      "parameters": {
+        "jsCode": "const content = $input.first().json.choices[0].message.content;\nconst data = JSON.parse(content);\nreturn data.map(item => ({\n  json: item\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1136,
+        -384
+      ],
+      "id": "cf98057c-e22b-4d75-aa2a-330c708bf056",
+      "name": "Jsonify Slogan Generator Output"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Error Occurred - POD Typography Analyzer Agent"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1136,
+        -176
+      ],
+      "id": "520dec46-daa9-415d-9f66-762d88244fdb",
+      "name": "Stop and Error"
+    },
+    {
+      "parameters": {
+        "jsCode": "  const niche = $('Execute Workflow Trigger').first().json.niche || '';\n  const typo = $('Jsonify Typography Output').first().json?.typography || $('Jsonify Typography Output').first().json || {};\n\n  const raw = $('Jsonify Slogan Generator Output').first().json;\n  const slogans = Array.isArray(raw) ? raw : (raw?.slogans || [raw].filter(Boolean));\n\n  return [{ json: {\n    source: 'typography',\n    niche,\n    typography: typo,\n    slogans,\n  } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1360,
+        -384
+      ],
+      "id": "ba935d0c-b52d-4394-b41c-1d75b190bf3f",
+      "name": "Merge Typography + Slogans"
+    }
+  ],
+  "connections": {
+    "Parse Typography Signals": {
+      "main": [
+        [
+          {
+            "node": "Groq Typography Analyst",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Slogan Generator": {
+      "main": [
+        [
+          {
+            "node": "Jsonify Slogan Generator Output",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SerperAPI Google Search - Typography": {
+      "main": [
+        [
+          {
+            "node": "Parse Typography Signals",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "SerperAPI Google Search - Typography",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Set Niche Value",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Set Niche Value": {
+      "main": [
+        []
+      ]
+    },
+    "Groq Typography Analyst": {
+      "main": [
+        [
+          {
+            "node": "Jsonify Typography Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Jsonify Typography Output": {
+      "main": [
+        [
+          {
+            "node": "Groq Slogan Generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Jsonify Slogan Generator Output": {
+      "main": [
+        [
+          {
+            "node": "Merge Typography + Slogans",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "nodeGroups": [],
+  "pinData": null,
+  "versionId": "09c640a2-3104-4f60-99dd-c5f1c1c7bda9",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-07-30T09:30:05.910Z",
+      "createdAt": "2026-07-30T09:30:05.910Z",
+      "role": "workflow:owner",
+      "workflowId": "GmKU10UKJy0RbUpp",
+      "projectId": "grwT3rRsXgicvbte"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
