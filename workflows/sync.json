@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-07-30T09:16:19.685Z",
+  "updatedAt": "2026-07-29T11:15:32.271Z",
   "createdAt": "2026-07-29T09:30:27.215Z",
   "id": "x5HP2n7jeIEBlR0l",
   "name": "Sync",
@@ -32,8 +32,8 @@
         "rule": {
           "interval": [
             {
-              "field": "minutes",
-              "minutesInterval": 15
+              "field": "seconds",
+              "secondsInterval": 10
             }
           ]
         }
@@ -61,12 +61,7 @@
           "mode": "name",
           "value": "={{ $json.github_repo_name }}"
         },
-        "filePath": "={{ $json.repo_workflows_path }}",
-        "additionalParameters": {
-          "branch": {
-            "branch": "={{ $('Set GitHub Details').item.json.branch }}"
-          }
-        }
+        "filePath": "={{ $json.repo_workflows_path }}"
       },
       "id": "174b78dc-e584-4fc1-82a2-0e58b4a98b36",
       "name": "List files from repo",
@@ -157,7 +152,7 @@
         "commitMessage": "=n8n_backup_sync-{{ $node['Edit for Upload'].json.commitDate }}",
         "additionalParameters": {
           "branch": {
-            "branch": "={{ $('Set GitHub Details').item.json.branch }}"
+            "branch": "r0merch-dev"
           }
         }
       },
@@ -240,12 +235,7 @@
         },
         "filePath": "={{ $('Set GitHub Details').item.json.repo_workflows_path }}/{{ $node['Edit for Update'].json.fileName }}",
         "fileContent": "={{ $('To base').item.json.data }}",
-        "commitMessage": "=n8n_backup_sync-{{ $('Edit for Update').item.json.commitDate }}",
-        "additionalParameters": {
-          "branch": {
-            "branch": "={{ $('Set GitHub Details').item.json.branch }}"
-          }
-        }
+        "commitMessage": "=n8n_backup_sync-{{ $('Edit for Update').item.json.commitDate }}"
       },
       "id": "138bd609-541a-46d6-aa1e-792e85a58c05",
       "name": "Update file",
@@ -343,6 +333,7 @@
     },
     {
       "parameters": {
+        "language": "javaScript",
         "jsCode": "const workflowId = $('If n8n before GitHub').first().json.same.id; const matched = $('Decode to json').all().filter(item => item.json.id === workflowId); if (matched.length) return [{ json: { dataset: matched[0].json } }]; return [];"
       },
       "id": "09d43ee5-7a21-47cd-8bec-45ae16e8422f",
@@ -356,6 +347,7 @@
     },
     {
       "parameters": {
+        "language": "javaScript",
         "jsCode": "const workflowId = $('If n8n before GitHub').first().json.same.id; const matched = $('n8n').all().filter(item => item.json.id === workflowId); if (matched.length) return [{ json: { dataset: matched[0].json } }]; return [];"
       },
       "id": "d3be821f-a331-4dc7-993d-6af348fb1fb2",
@@ -573,12 +565,6 @@
               "name": "repo_workflows_path",
               "type": "string",
               "value": "workflows"
-            },
-            {
-              "id": "branch-field",
-              "name": "branch",
-              "type": "string",
-              "value": "r0merch-dev"
             }
           ]
         },
@@ -842,8 +828,8 @@
   },
   "nodeGroups": [],
   "pinData": {},
-  "versionId": "871bdf50-4f8c-427a-849f-fcb95670e28b",
-  "activeVersionId": "871bdf50-4f8c-427a-849f-fcb95670e28b",
+  "versionId": "b1258505-bf46-4680-ae35-1e20205edaac",
+  "activeVersionId": "b1258505-bf46-4680-ae35-1e20205edaac",
   "triggerCount": 1,
   "shared": [
     {
@@ -855,9 +841,9 @@
     }
   ],
   "activeVersion": {
-    "updatedAt": "2026-07-30T09:16:19.686Z",
-    "createdAt": "2026-07-30T09:16:19.686Z",
-    "versionId": "871bdf50-4f8c-427a-849f-fcb95670e28b",
+    "updatedAt": "2026-07-29T11:07:26.514Z",
+    "createdAt": "2026-07-29T11:07:26.514Z",
+    "versionId": "b1258505-bf46-4680-ae35-1e20205edaac",
     "workflowId": "x5HP2n7jeIEBlR0l",
     "nodes": [
       {
@@ -886,8 +872,8 @@
           "rule": {
             "interval": [
               {
-                "field": "minutes",
-                "minutesInterval": 15
+                "field": "seconds",
+                "secondsInterval": 10
               }
             ]
           }
@@ -915,12 +901,7 @@
             "mode": "name",
             "value": "={{ $json.github_repo_name }}"
           },
-          "filePath": "={{ $json.repo_workflows_path }}",
-          "additionalParameters": {
-            "branch": {
-              "branch": "={{ $('Set GitHub Details').item.json.branch }}"
-            }
-          }
+          "filePath": "={{ $json.repo_workflows_path }}"
         },
         "id": "174b78dc-e584-4fc1-82a2-0e58b4a98b36",
         "name": "List files from repo",
@@ -1011,7 +992,7 @@
           "commitMessage": "=n8n_backup_sync-{{ $node['Edit for Upload'].json.commitDate }}",
           "additionalParameters": {
             "branch": {
-              "branch": "={{ $('Set GitHub Details').item.json.branch }}"
+              "branch": "main"
             }
           }
         },
@@ -1094,12 +1075,7 @@
           },
           "filePath": "={{ $('Set GitHub Details').item.json.repo_workflows_path }}/{{ $node['Edit for Update'].json.fileName }}",
           "fileContent": "={{ $('To base').item.json.data }}",
-          "commitMessage": "=n8n_backup_sync-{{ $('Edit for Update').item.json.commitDate }}",
-          "additionalParameters": {
-            "branch": {
-              "branch": "={{ $('Set GitHub Details').item.json.branch }}"
-            }
-          }
+          "commitMessage": "=n8n_backup_sync-{{ $('Edit for Update').item.json.commitDate }}"
         },
         "id": "138bd609-541a-46d6-aa1e-792e85a58c05",
         "name": "Update file",
@@ -1197,6 +1173,7 @@
       },
       {
         "parameters": {
+          "language": "javaScript",
           "jsCode": "const workflowId = $('If n8n before GitHub').first().json.same.id; const matched = $('Decode to json').all().filter(item => item.json.id === workflowId); if (matched.length) return [{ json: { dataset: matched[0].json } }]; return [];"
         },
         "id": "09d43ee5-7a21-47cd-8bec-45ae16e8422f",
@@ -1210,6 +1187,7 @@
       },
       {
         "parameters": {
+          "language": "javaScript",
           "jsCode": "const workflowId = $('If n8n before GitHub').first().json.same.id; const matched = $('n8n').all().filter(item => item.json.id === workflowId); if (matched.length) return [{ json: { dataset: matched[0].json } }]; return [];"
         },
         "id": "d3be821f-a331-4dc7-993d-6af348fb1fb2",
@@ -1427,12 +1405,6 @@
                 "name": "repo_workflows_path",
                 "type": "string",
                 "value": "workflows"
-              },
-              {
-                "id": "branch-field",
-                "name": "branch",
-                "type": "string",
-                "value": "r0merch-dev"
               }
             ]
           },
